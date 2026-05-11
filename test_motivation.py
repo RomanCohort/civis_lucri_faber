@@ -35,7 +35,7 @@ def test_intrinsic_motivation():
     needs_after = im.evaluate_needs()
     print(f"  After decay: {needs_after}")
 
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_survival_pressure():
@@ -53,7 +53,7 @@ def test_survival_pressure():
         print(f"  Step {i}: pressure={pressure:.2f}, critical={sp.is_critical()}")
         sp.consume(0.2)
 
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_stockholm():
@@ -79,7 +79,7 @@ def test_stockholm():
     criticality = defense.get_criticality()
     print(f"  Criticality: {criticality:.2f}")
 
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_integrated():
@@ -118,7 +118,7 @@ def test_integrated():
     print(f"    - Autonomous actions: {summary['autonomous_actions']}")
     print(f"    - Stockholfs triggered: {summary['stockholm']['defense_triggered']}")
 
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 if __name__ == "__main__":

@@ -11,8 +11,8 @@ sys.path.insert(0, parent)
 import torch
 import torch.nn as nn
 
-# 直接读取模块源码，动态定义
-exec(open(os.path.join(parent, 'civis_lucri_faber', 'core', 'metabolic_budget.py')).read())
+# 直接读取模块源码，动态定义 (使用UTF-8编码)
+exec(open(os.path.join(parent, 'civis_lucri_faber', 'core', 'metabolic_budget.py'), encoding='utf-8').read())
 
 
 # 测试用简单模型
@@ -42,7 +42,7 @@ def test_metabolic_cost():
     print(f"  - Activation Rate: {detail['activation_rate']:.2%}")
     print(f"  - Budget: {detail['budget']:.2%}")
     print(f"  - Sparse Penalty: {detail['sparse_penalty']:.4f}")
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_starvation():
@@ -85,7 +85,7 @@ def test_starvation():
 
     stats = starvation.get_starvation_stats()
     print(f"  - Global Step: {stats['global_step']}")
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_full_budget():
@@ -131,7 +131,7 @@ def test_full_budget():
     print(f"    - Active Ratio: {summary['active_ratio']:.2%}")
     print(f"    - Budget: {summary['budget']:.2%}")
     print(f"    - Avg Metabolic Cost: {summary['met_cost']:.4f}")
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_ablation():
@@ -179,7 +179,7 @@ def test_ablation():
 
     improvement = (activation_without - activation_with) / activation_without
     print(f"  Activation Reduction: {improvement:.1%}")
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 if __name__ == "__main__":

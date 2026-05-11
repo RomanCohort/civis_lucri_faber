@@ -35,7 +35,7 @@ def test_tripartite():
     output3 = engine.forward(ctx3)
     print(f"  Emotional input: {output3}")
 
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_identity_core():
@@ -62,7 +62,7 @@ def test_identity_core():
     print(f"  Growth rate: {summary['growth_rate']:.2f}")
     print(f"  Reflections: {summary['reflection_count']}")
 
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_relational_embedding():
@@ -91,7 +91,7 @@ def test_relational_embedding():
     summary = embed.get_summary()
     print(f"  Total users: {summary['total_users']}")
 
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_attention_gating():
@@ -115,7 +115,7 @@ def test_attention_gating():
 
     print(f"  Set style: reward_seeking={style.reward_seeking}, risk_avoidance={style.risk_avoidance}")
 
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 def test_integration():
@@ -168,7 +168,7 @@ def test_integration():
     print(f"  Relation users: {rel_summary['total_users']}")
     print(f"  Gating style: reward={gate_summary['reward_seeking']:.2f}, risk={gate_summary['risk_avoidance']:.2f}")
 
-    print("  ✓ PASSED")
+    print("  [*] PASSED")
 
 
 if __name__ == "__main__":
