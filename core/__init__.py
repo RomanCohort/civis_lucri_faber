@@ -24,6 +24,50 @@ from civis_lucri_faber.core.metabolic_budget import (
     MetabolicState,
     create_metabolic_budget,
 )
+from civis_lucri_faber.core.sleep import (
+    SleepSystem,
+    SleepController,
+    SleepStage,
+    MemoryReplayer,
+    create_sleep_system,
+)
+from civis_lucri_faber.core.neuromodulation_integration import (
+    NeuromodulationIntegration,
+    RewardModulation,
+    TemporalDiscount,
+    AttentionModulator,
+    create_neuromodulation_integration,
+)
+from civis_lucri_faber.core.cerebello_spinal import (
+    CerebelloSpinalCoordination,
+    SpinalCord,
+    CentralPatternGenerator,
+    ReflexPathway,
+    Cerebellum,
+    create_cerebello_spinal,
+)
+from civis_lucri_faber.core.basal_ganglia import (
+    BasalGangliaSystem,
+    BasalGanglia,
+    create_basal_ganglia,
+)
+from civis_lucri_faber.core.hippocampus import (
+    Hippocampus,
+    create_hippocampus,
+)
+from civis_lucri_faber.core.limbic import (
+    LimbicSystem,
+    Amygdala,
+    Thalamus,
+    create_limbic_system,
+)
+from civis_lucri_faber.core.neurotransmitter import (
+    NeurotransmitterSystem,
+    DopamineSystem,
+    SerotoninSystem,
+    AcetylcholineSystem,
+    create_neurotransmitter_system,
+)
 
 __all__ = [
     "CivisLucriFaber",
@@ -38,4 +82,41 @@ __all__ = [
     "PeriodicStarvation",
     "MetabolicState",
     "create_metabolic_budget",
+    # 睡眠系统
+    "SleepSystem",
+    "SleepController",
+    "SleepStage",
+    "MemoryReplayer",
+    "create_sleep_system",
+    # 神经调制集成
+    "NeuromodulationIntegration",
+    "RewardModulation",
+    "TemporalDiscount",
+    "AttentionModulator",
+    "create_neuromodulation_integration",
+    # 小脑-脊髓
+    "CerebelloSpinalCoordination",
+    "SpinalCord",
+    "CentralPatternGenerator",
+    "ReflexPathway",
+    "Cerebellum",
+    "create_cerebello_spinal",
+    # 基底神经节
+    "BasalGangliaSystem",
+    "BasalGanglia",
+    "create_basal_ganglia",
+    # 海马体
+    "Hippocampus",
+    "create_hippocampus",
+    # 边缘系统
+    "LimbicSystem",
+    "Amygdala",
+    "Thalamus",
+    "create_limbic_system",
+    # 神经递质
+    "NeurotransmitterSystem",
+    "DopamineSystem",
+    "SerotoninSystem",
+    "AcetylcholineSystem",
+    "create_neurotransmitter_system",
 ]

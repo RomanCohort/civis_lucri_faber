@@ -1,0 +1,432 @@
+"""
+视觉皮层系统 - 参考Censor项目
+
+基于Vision Transformer (ViT)的视觉处理：
+- 图像分块 + 线性嵌入
+- Transformer编码器
+- 分类头/特征输出
+
+参考：D:\censor\data\iMER\backbone\vision_transformer_dual_prompt.py
+"""
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
+from typing import Dict, Tuple, List
+
+
+class ImagePatchEmbedding(nn.Module):
+    """图像分块嵌入"""
+    def __init__(
+        self,
+        img_size: int = 224,
+        patch_size: int = 16,
+        in_chans: int = 3,
+        embed_dim: int = 768,
+    ):
+        super().__init__()
+        self.img_size = img_size
+        self.patch_size = patch_size
+        self.n_patches = (img_size // patch_size) ** 2
+
+        # 线性嵌入层 (类似ResNet的卷积)
+        self.proj = nn.Conv2d(
+            in_chans, embed_dim,
+            kernel_size=patch_size,
+            stride=patch_size,
+        )
+
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, int]:
+        B, C, H, W = x.shape
+        # 展平空间维度
+        x = self.proj(x)  # B, embed_dim, H//patch, W//patch
+        x = x.flatten(2).transpose(1, 2)  # B, n_patches, embed_dim
+        return x, self.n_patches
+
+
+class ViTAttention(nn.Module):
+    """
+    ViT自注意力 - 参考censor项目
+    简化版
+    """
+    def __init__(
+        self,
+        dim: int = 768,
+        num_heads: int = 8,
+        qkv_bias: bool = True,
+        attn_drop: float = 0.0,
+        proj_drop: float = 0.0,
+    ):
+        super().__init__()
+        self.num_heads = num_heads
+        self.head_dim = dim // num_heads
+        self.scale = self.head_dim ** -0.5
+
+        # QKV投影
+        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+
+        # Dropout
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj = nn.Linear(dim, dim)
+        self.proj_drop = nn.Dropout(proj_drop)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        B, N, C = x.shape
+
+        # QKV
+        qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, self.head_dim)
+        qkv = qkv.permute(2, 0, 3, 1, 4)
+        q, k, v = qkv.unbind(0)
+
+        # Self-attention
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+        attn = self.attn_drop(attn)
+
+        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x = self.proj(x)
+        x = self.proj_drop(x)
+
+        return x
+
+
+class MLP(nn.Module):
+    """MLP块"""
+    def __init__(
+        self,
+        in_features: int,
+        hidden_features: int = None,
+        out_features: int = None,
+        act_layer: nn.Module = nn.GELU,
+        drop: float = 0.0,
+    ):
+        super().__init__()
+        out_features = out_features or in_features
+        hidden_features = hidden_features or in_features
+
+        self.fc1 = nn.Linear(in_features, hidden_features)
+        self.act = act_layer()
+        self.fc2 = nn.Linear(hidden_features, out_features)
+        self.drop = nn.Dropout(drop)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.act(x)
+        x = self.drop(x)
+        x = self.fc2(x)
+        x = self.drop(x)
+        return x
+
+
+class TransformerBlock(nn.Module):
+    """Transformer编码器块"""
+    def __init__(
+        self,
+        dim: int = 768,
+        num_heads: int = 8,
+        mlp_ratio: float = 4.0,
+        qkv_bias: bool = True,
+        drop: float = 0.0,
+        attn_drop: float = 0.0,
+    ):
+        super().__init__()
+
+        # LayerNorm
+        self.norm1 = nn.LayerNorm(dim)
+
+        # Attention
+        self.attn = ViTAttention(
+            dim, num_heads=num_heads,
+            qkv_bias=qkv_bias,
+            attn_drop=attn_drop,
+            proj_drop=drop,
+        )
+
+        # LayerNorm
+        self.norm2 = nn.LayerNorm(dim)
+
+        # MLP
+        mlp_hidden = int(dim * mlp_ratio)
+        self.mlp = MLP(dim, hidden_features=mlp_hidden, drop=drop)
+
+    def forward(self, x):
+        x = x + self.attn(self.norm1(x))
+        x = x + self.mlp(self.norm2(x))
+        return x
+
+
+class VisionTransformer(nn.Module):
+    """
+    Vision Transformer 视觉皮层
+
+    完整的ViT架构
+    """
+    def __init__(
+        self,
+        img_size: int = 224,
+        patch_size: int = 16,
+        in_chans: int = 3,
+        num_classes: int = 1000,
+        embed_dim: int = 768,
+        depth: int = 12,
+        num_heads: int = 8,
+        mlp_ratio: float = 4.0,
+        qkv_bias: bool = True,
+        drop_rate: float = 0.0,
+        attn_drop_rate: float = 0.0,
+    ):
+        super().__init__()
+
+        self.num_classes = num_classes
+        self.embed_dim = embed_dim
+
+        # 图像嵌入
+        self.patch_embed = ImagePatchEmbedding(
+            img_size, patch_size, in_chans, embed_dim
+        )
+        n_patches = self.patch_embed.n_patches
+
+        # Class token + 位置嵌入
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
+        self.pos_embed = nn.Parameter(
+            torch.zeros(1, n_patches + 1, embed_dim)
+        )
+        self.pos_drop = nn.Dropout(p=drop_rate)
+
+        # Transformer块
+        self.blocks = nn.ModuleList([
+            TransformerBlock(
+                dim=embed_dim,
+                num_heads=num_heads,
+                mlp_ratio=mlp_ratio,
+                qkv_bias=qkv_bias,
+                drop=drop_rate,
+                attn_drop=attn_drop_rate,
+            )
+            for _ in range(depth)
+        ])
+
+        self.norm = nn.LayerNorm(embed_dim)
+
+        # 分类头
+        self.head = nn.Linear(embed_dim, num_classes)
+
+        # 初始化
+        nn.init.trunc_normal_(self.pos_embed, std=0.02)
+        nn.init.trunc_normal_(self.cls_token, std=0.02)
+        self.apply(self._init_weights)
+
+    def _init_weights(self, m):
+        if isinstance(m, nn.Linear):
+            nn.init.trunc_normal_(m.weight, std=0.02)
+            if m.bias is not None:
+                nn.init.zeros_(m.bias)
+        elif isinstance(m, nn.LayerNorm):
+            nn.init.ones_(m.weight)
+            nn.init.zeros_(m.bias)
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        return_features: bool = False,
+    ) -> torch.Tensor:
+        """前向传播"""
+        # 嵌入
+        x, n_patches = self.patch_embed(x)
+
+        # Class token
+        cls_tokens = self.cls_token.expand(x.shape[0], -1, -1)
+        x = torch.cat([cls_tokens, x], dim=1)
+
+        # 位置编码
+        x = x + self.pos_embed
+        x = self.pos_drop(x)
+
+        # Transformer块
+        for blk in self.blocks:
+            x = blk(x)
+
+        x = self.norm(x)
+
+        # 特征或分类
+        if return_features:
+            return x  # 返回所有token的特征
+
+        # 只取cls token
+        x = x[:, 0]
+
+        return self.head(x)
+
+
+class ResNetBackbone(nn.Module):
+    """
+    ResNet骨干 - 参考censor项目
+
+    替代ViT的卷积 backbone
+    """
+    def __init__(
+        self,
+        in_channels: int = 3,
+        base_dim: int = 64,
+    ):
+        super().__init__()
+
+        # 基础卷积
+        self.conv1 = nn.Conv2d(in_channels, base_dim, 7, stride=2, padding=3)
+        self.bn1 = nn.BatchNorm2d(base_dim)
+        self.relu = nn.ReLU(inplace=True)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+
+        # 残差块
+        self.layer1 = self._make_layer(base_dim, base_dim, 2)
+        self.layer2 = self._make_layer(base_dim, base_dim * 2, 2, stride=2)
+        self.layer3 = self._make_layer(base_dim * 2, base_dim * 4, 2, stride=2)
+
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+
+    def _make_layer(
+        self,
+        in_channels: int,
+        out_channels: int,
+        blocks: int,
+        stride: int = 1,
+    ):
+        layers = []
+        layers.append(
+            nn.Conv2d(in_channels, out_channels, 3, stride=stride, padding=1)
+        )
+        layers.append(nn.BatchNorm2d(out_channels))
+        layers.append(nn.ReLU(inplace=True))
+
+        for _ in range(1, blocks):
+            layers.append(
+                nn.Conv2d(out_channels, out_channels, 3, padding=1)
+            )
+            layers.append(nn.BatchNorm2d(out_channels))
+            layers.append(nn.ReLU(inplace=True))
+
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        return x
+
+
+class VisualCortex(nn.Module):
+    """
+    完整视觉皮层
+
+    整合ViT + ResNet
+    """
+
+    def __init__(
+        self,
+        input_channels: int = 3,
+        embed_dim: int = 768,
+        use_vit: bool = True,
+    ):
+        super().__init__()
+
+        self.use_vit = use_vit
+        self.embed_dim = embed_dim
+
+        if use_vit:
+            self.encoder = VisionTransformer(
+                img_size=224,
+                patch_size=16,
+                in_chans=input_channels,
+                num_classes=1000,
+                embed_dim=embed_dim,
+                depth=12,
+                num_heads=8,
+            )
+        else:
+            self.encoder = ResNetBackbone(
+                in_channels=input_channels,
+                base_dim=embed_dim // 4,
+            )
+
+        # 特征投影
+        self.feature_proj = nn.Linear(embed_dim, 64)
+
+    def forward(
+        self,
+        visual_input: torch.Tensor,
+        return_features: bool = False,
+    ) -> Dict:
+        """
+        处理视觉输入
+
+        Args:
+            visual_input: [B, C, H, W] 或 [B, C]
+        """
+        # 调整维度
+        if visual_input.dim() == 2:
+            # 1D特征，视为已经处理过
+            return {
+                'features': visual_input,
+                'salience': 0.5,
+            }
+
+        if visual_input.dim() == 3 and visual_input.shape[1] < 50:
+            # 已经分块的序列
+            features = visual_input
+        else:
+            # 2D/3D图像
+            if self.use_vit:
+                # 确保图像尺寸
+                if visual_input.shape[-1] != 224:
+                    visual_input = F.interpolate(
+                        visual_input,
+                        size=224,
+                        mode='bilinear',
+                        align_corners=False,
+                    )
+                features = self.encoder(
+                    visual_input,
+                    return_features=True,
+                )
+            else:
+                # ResNet
+                features = self.encoder(visual_input)
+                features = features.unsqueeze(1)  # [B, 1, dim]
+
+        # 特征投影
+        features_64 = self.feature_proj(features[:, -1, :] if features.dim() == 3 else features)
+
+        # 计算显著度
+        salience = torch.sigmoid(features_64.mean())
+
+        return {
+            'features': features,
+            'embedding': features_64,
+            'salience': salience.item(),
+        }
+
+
+# ============ 便捷函数 ============
+
+def create_visual_cortex(
+    input_channels: int = 3,
+    embed_dim: int = 768,
+    use_vit: bool = False,  # ResNet更快
+) -> VisualCortex:
+    return VisualCortex(input_channels, embed_dim, use_vit)
+
+
+__all__ = [
+    'VisionTransformer',
+    'ResNetBackbone',
+    'VisualCortex',
+    'create_visual_cortex',
+]
