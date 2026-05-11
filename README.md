@@ -72,5 +72,3 @@ python main.py
 - Meta Learning: [MAML](https://arxiv.org/abs/1805.11000)
 
 ---
-
-**MIT License** | Created by Claude Opus 4.6
