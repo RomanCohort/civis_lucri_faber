@@ -312,6 +312,99 @@ class SpinalCord(nn.Module):
 
 # ============ 小脑系统 (Cerebellum) ============
 
+@dataclass
+class ProceduralSkill:
+    """程序性技能 (小脑的肌肉记忆)"""
+    context_hash: int           # 上下文哈希
+    action: int                 # 关联动作
+    motor_pattern: np.ndarray   # 运动模式
+    skill_level: float          # 熟练度 0-1
+    auto_execution_count: int = 0  # 自动执行次数
+
+
+class ProceduralMemory:
+    """
+    程序性记忆系统 (小脑肌肉记忆)
+
+    对应"熟能生巧"的后半段：
+    BG将重复达标的技能转移到这里，小脑接管自动执行。
+
+    生物对应：
+    - 骑自行车学会后不需要思考平衡 → 小脑自动控制
+    - 打字熟练后不需要看键盘 → 小脑接管手指运动
+    - 释放前额叶/BG的意识资源给新任务
+    """
+
+    def __init__(self, max_skills: int = 50):
+        self.skills: List[ProceduralSkill] = []
+        self.max_skills = max_skills
+
+    def store(
+        self,
+        context: np.ndarray,
+        action: int,
+        motor_pattern: np.ndarray,
+        skill_level: float,
+    ) -> ProceduralSkill:
+        """存储从BG转移来的技能"""
+        context_hash = self._hash_context(context)
+
+        # 检查是否已存在，存在则更新
+        for existing in self.skills:
+            if existing.context_hash == context_hash and existing.action == action:
+                existing.motor_pattern = motor_pattern.copy()
+                existing.skill_level = max(existing.skill_level, skill_level)
+                return existing
+
+        skill = ProceduralSkill(
+            context_hash=context_hash,
+            action=action,
+            motor_pattern=motor_pattern.copy(),
+            skill_level=skill_level,
+        )
+        self.skills.append(skill)
+
+        if len(self.skills) > self.max_skills:
+            self.skills.pop(0)
+
+        return skill
+
+    def lookup(self, context: np.ndarray) -> Optional[ProceduralSkill]:
+        """查找匹配的技能"""
+        context_hash = self._hash_context(context)
+        best = None
+        for skill in self.skills:
+            if skill.context_hash == context_hash:
+                if best is None or skill.skill_level > best.skill_level:
+                    best = skill
+        return best
+
+    def execute_auto(self, context: np.ndarray) -> Optional[Tuple[int, np.ndarray]]:
+        """自动执行已存档技能
+
+        Returns:
+            (action, motor_output) 或 None (无匹配技能)
+        """
+        skill = self.lookup(context)
+        if skill is None:
+            return None
+
+        skill.auto_execution_count += 1
+        return (skill.action, skill.motor_pattern)
+
+    def get_summary(self) -> Dict:
+        return {
+            'total_skills': len(self.skills),
+            'total_auto_executions': sum(s.auto_execution_count for s in self.skills),
+            'avg_skill_level': np.mean([s.skill_level for s in self.skills]) if self.skills else 0.0,
+        }
+
+    @staticmethod
+    def _hash_context(context: np.ndarray) -> int:
+        discretized = np.sign(context + 0.3) + np.sign(context - 0.3)
+        return hash(tuple(discretized.astype(int).tolist()))
+
+
 class CerebellarPatch(nn.Module):
     """
     小脑模块
@@ -469,6 +562,9 @@ class Cerebellum(nn.Module):
         self.sensory_dim = sensory_dim
         self.n_joints = n_motor_joints
 
+        # 程序性记忆 (肌肉记忆存储)
+        self.procedural_memory = ProceduralMemory()
+
         # 多个小脑patch (不同功能区)
         self.motor_patch = CerebellarPatch(
             input_dim=sensory_dim,
@@ -565,6 +661,47 @@ class Cerebellum(nn.Module):
         return {
             'loss': loss,
             'avg_error': self.total_error / self.learning_steps,
+        }
+
+    def receive_archived_skill(
+        self,
+        context: np.ndarray,
+        action: int,
+        motor_pattern: np.ndarray,
+        skill_level: float,
+    ) -> None:
+        """接收BG存档的技能 (写入程序性记忆)
+
+        对应"熟能生巧"的技能转移：
+        BG判断某个动作已足够熟练 → 转移到小脑自动执行
+        """
+        self.procedural_memory.store(
+            context=context,
+            action=action,
+            motor_pattern=motor_pattern,
+            skill_level=skill_level,
+        )
+        print(f"[CEREBELLUM] Skill received from BG: action={action}, "
+              f"level={skill_level:.2f}, total_procedural={len(self.procedural_memory.skills)}")
+
+    def execute_procedural(
+        self,
+        context: np.ndarray,
+    ) -> Optional[Dict]:
+        """执行程序性记忆 (自动执行已存档技能)
+
+        Returns:
+            None if no matching skill, else {action, motor_output, is_automatic}
+        """
+        result = self.procedural_memory.execute_auto(context)
+        if result is None:
+            return None
+
+        action, motor_pattern = result
+        return {
+            'action': action,
+            'motor_output': motor_pattern,
+            'is_automatic': True,  # 标记为自动执行 (无需意识参与)
         }
 
     def get_statistics(self) -> Dict:
@@ -775,6 +912,8 @@ __all__ = [
     'CentralPatternGenerator',
     'ReflexPathway',
     'SpinalCord',
+    'ProceduralSkill',
+    'ProceduralMemory',
     'CerebellarPatch',
     'Cerebellum',
     'CerebelloSpinalCoordination',

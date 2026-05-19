@@ -21,6 +21,12 @@ from typing import Dict, Tuple, Optional, List
 from dataclasses import dataclass, field
 from collections import deque
 
+# 延迟导入，避免循环引用
+try:
+    from civis_lucri_faber.core.interference_forgetting import InterferenceEngine
+except ImportError:
+    from interference_forgetting import InterferenceEngine
+
 
 # ============ 海马体核心 ============
 
@@ -91,6 +97,147 @@ class DentateGyrus(nn.Module):
         return encoding
 
 
+class NeurogenicDG(DentateGyrus):
+    """
+    具有神经发生能力的齿状回
+
+    对应生物学：成人海马神经发生（Adult Hippocampal Neurogenesis）
+    - DG是大脑中少数持续产生新神经元的区域之一
+    - 每天约产生700个新神经元（人类）
+    - 新神经元具有高可塑性（宽学习窗口）
+    - 通过竞争存活：找到功能角色的存活，否则死亡
+    - 新神经元增强模式分离能力
+
+    参数：
+        neurogenesis_rate: 每步产生新神经元的概率
+        max_encoding_dim: 最大编码维度上限
+        survival_window: 新神经元竞争存活的窗口步数
+    """
+
+    def __init__(
+        self,
+        input_dim: int = 64,
+        encoding_dim: int = 128,
+        neurogenesis_rate: float = 0.01,
+        max_encoding_dim: int = 200,
+        survival_window: int = 100,
+    ):
+        super().__init__(input_dim, encoding_dim)
+        self.neurogenesis_rate = neurogenesis_rate
+        self.max_encoding_dim = max_encoding_dim
+        self.survival_window = survival_window
+        self.current_encoding_dim = encoding_dim
+        self.step_count = 0
+
+        # 新神经元追踪
+        self._neuron_birth_dates: Dict[int, int] = {}  # dim_index -> step_born
+        self._neuron_survival_scores: Dict[int, float] = {}  # dim_index -> score
+        self._neurogenesis_accumulator: float = 0.0  # 确定性神经发生累积器
+
+    def _birth_new_neurons(self, n: int = 1):
+        """
+        诞生新神经元
+
+        通过扩展输出维度实现：
+        1. 在separator网络的最后一层添加新输出神经元
+        2. 新神经元初始连接随机（高可塑性）
+        3. 记录出生日期用于存活竞争
+        """
+        if self.current_encoding_dim >= self.max_encoding_dim:
+            return
+
+        for _ in range(n):
+            new_dim = self.current_encoding_dim + 1
+            # 扩展最后一层Linear
+            last_layer = self.separator[-2]  # Tanh之前的Linear
+            if isinstance(last_layer, nn.Linear):
+                old_weight = last_layer.weight.data
+                old_bias = last_layer.bias.data
+                # 新神经元：随机初始连接
+                new_weight_row = torch.randn(1, old_weight.shape[1]) * 0.1
+                new_bias_val = torch.tensor([0.0])
+                last_layer.weight = nn.Parameter(torch.cat([old_weight, new_weight_row], dim=0))
+                last_layer.bias = nn.Parameter(torch.cat([old_bias, new_bias_val], dim=0))
+
+            self.current_encoding_dim = new_dim
+            neuron_idx = new_dim - 1
+            self._neuron_birth_dates[neuron_idx] = self.step_count
+            self._neuron_survival_scores[neuron_idx] = 1.0  # 高初始可塑性
+
+    def _update_survival_scores(self, encoding: torch.Tensor):
+        """根据激活更新新神经元的存活分数"""
+        if encoding.dim() == 2:
+            flat = encoding[0]
+        else:
+            flat = encoding
+
+        for idx in list(self._neuron_survival_scores.keys()):
+            if idx < flat.shape[0]:
+                activation = abs(flat[idx].item())
+                if activation > 0.1:
+                    # 被激活 → 增强存活概率
+                    self._neuron_survival_scores[idx] = min(
+                        1.0, self._neuron_survival_scores[idx] + 0.05
+                    )
+                else:
+                    # 未激活 → 存活分数衰减
+                    self._neuron_survival_scores[idx] *= 0.98
+
+    def _apply_survival_competition(self):
+        """存活竞争：超过窗口期且得分低的新神经元死亡"""
+        dead_neurons = []
+        for idx, birth_step in list(self._neuron_birth_dates.items()):
+            age = self.step_count - birth_step
+            if age > self.survival_window:
+                score = self._neuron_survival_scores.get(idx, 0.0)
+                if score < 0.1:
+                    dead_neurons.append(idx)
+
+        # 清理死亡神经元记录（实际维度不缩减以保持张量一致性）
+        for idx in dead_neurons:
+            del self._neuron_birth_dates[idx]
+            del self._neuron_survival_scores[idx]
+
+    def forward(self, memory: torch.Tensor) -> torch.Tensor:
+        """带神经发生的模式分离"""
+        encoding = super().forward(memory)
+
+        self.step_count += 1
+
+        # 神经发生: 确定性累积替代随机门控
+        # neurogenesis_rate 累积到 1.0 时诞生新神经元
+        self._neurogenesis_accumulator += self.neurogenesis_rate
+        if self._neurogenesis_accumulator >= 1.0:
+            self._birth_new_neurons()
+            self._neurogenesis_accumulator -= 1.0
+
+        # 更新存活分数
+        self._update_survival_scores(encoding)
+
+        # 定期存活竞争（每100步）
+        if self.step_count % 100 == 0:
+            self._apply_survival_competition()
+
+        return encoding
+
+    def get_neurogenesis_summary(self) -> Dict:
+        """获取神经发生统计"""
+        young_neurons = sum(
+            1 for step in self._neuron_birth_dates.values()
+            if self.step_count - step < self.survival_window
+        )
+        return {
+            'current_encoding_dim': self.current_encoding_dim,
+            'young_neurons': young_neurons,
+            'total_new_neurons': len(self._neuron_birth_dates),
+            'step_count': self.step_count,
+            'avg_survival_score': (
+                sum(self._neuron_survival_scores.values()) / len(self._neuron_survival_scores)
+                if self._neuron_survival_scores else 0.0
+            ),
+        }
+
+
 class CA3Region(nn.Module):
     """
     CA3区域
@@ -129,7 +276,7 @@ class CA3Region(nn.Module):
         retrieve_hint: torch.Tensor = None,
     ) -> torch.Tensor:
         """
-        模式完成
+        模式完成 + 循环处理
         """
         if retrieve_hint is not None:
             # 部分线索 → 完整回忆
@@ -138,6 +285,20 @@ class CA3Region(nn.Module):
         else:
             # 完整编码
             output = self.associative_net(encoding)
+
+        # GRU循环处理（残差连接）
+        if output.dim() == 2:
+            gru_input = output.unsqueeze(1)  # [B, 1, dim]
+        else:
+            gru_input = output
+        gru_out, _ = self.recurrent(gru_input)
+        gru_out = gru_out.squeeze(1)  # [B, hidden_dim]
+
+        # 将GRU输出投影回encoding_dim并与关联输出残差连接
+        if not hasattr(self, '_gru_proj'):
+            self._gru_proj = nn.Linear(gru_out.shape[-1], encoding.shape[-1]).to(encoding.device)
+        projected = self._gru_proj(gru_out)
+        output = output + projected * 0.3  # 残差：30%来自GRU循环
 
         return output
 
@@ -333,6 +494,7 @@ class Hippocampus(nn.Module):
         self,
         input_dim: int = 64,
         encoding_dim: int = 128,
+        event_bus=None,
     ):
         super().__init__()
 
@@ -349,8 +511,64 @@ class Hippocampus(nn.Module):
         self.episodic_memory: List[EpisodeMemory] = []
         self.memory_traces = deque(maxlen=1000)
 
+        # 干扰性遗忘引擎（替代FIFO淘汰）
+        self.interference_engine = InterferenceEngine(
+            decay_rate=0.01,
+            proactive_strength=0.3,
+            retroactive_strength=0.01,
+            min_importance=0.05,
+        )
+        self.use_interference_forgetting = True
+
         # 状态
         self.state = HippocampusState()
+
+        # Event-driven registration
+        if event_bus is not None:
+            event_bus.subscribe(
+                "memory_encode",
+                self._handle_memory_encode,
+                priority=0,
+                name="hippocampus",
+            )
+
+    def _handle_memory_encode(self, event) -> Dict:
+        """Event-driven handler for memory_encode events."""
+        import numpy as _np
+        state = event.data.get("internal_state", {})
+
+        state_np = event.data.get("state_np")
+        if state_np is None:
+            state_np = _np.random.randn(self.input_dim).astype(_np.float32)
+
+        action_str = event.data.get("action_str", "default")
+        reward_val = event.data.get("reward_val", 0.0)
+
+        encoding = self.encode_memory(
+            state=state_np,
+            action=action_str,
+            reward=reward_val,
+        )
+
+        state["hc_memory_count"] = self.state.memory_count
+        state["hc_last_encoding_norm"] = float(_np.linalg.norm(encoding))
+
+        # Retrieve if enough memories
+        retrieved_avg_reward = 0.0
+        if self.state.memory_count > 5:
+            retrieved = self.retrieve(state_np, top_k=5)
+            if retrieved:
+                retrieved_avg_reward = float(_np.mean([m.reward for m in retrieved]))
+        state["hc_retrieved_avg_reward"] = retrieved_avg_reward
+
+        # Defensive mode: high negative reward triggers defensive behavior
+        state["defensive_mode"] = reward_val < -0.5
+
+        return {
+            "encoding_norm": state["hc_last_encoding_norm"],
+            "memory_count": self.state.memory_count,
+            "retrieved_avg_reward": retrieved_avg_reward,
+        }
 
     def encode_memory(
         self,
@@ -388,9 +606,22 @@ class Hippocampus(nn.Module):
         self.memory_traces.append(encoding_np)
         self.state.memory_count += 1
 
-        # 限制
-        if len(self.episodic_memory) > 1000:
-            self.episodic_memory.pop(0)
+        # 遗忘机制
+        if self.use_interference_forgetting:
+            # 前摄干扰：旧记忆降低新记忆的重要性
+            proactive = self.interference_engine.compute_proactive_interference(
+                self.episodic_memory[:-1], encoding_np
+            )
+            memory.importance *= (1.0 - proactive * 0.3)
+
+            # 倒摄干扰 + 淘汰低于阈值的记忆
+            self.episodic_memory = self.interference_engine.apply_forgetting(
+                self.episodic_memory, encoding_np
+            )
+        else:
+            # 原始FIFO后备
+            if len(self.episodic_memory) > 1000:
+                self.episodic_memory.pop(0)
 
         return encoding_np
 
@@ -493,24 +724,31 @@ class Hippocampus(nn.Module):
     ) -> List[torch.Tensor]:
         """
         情景回溯 (推理过去)
+
+        复用已有CA1的temporal_net进行反向预测，
+        通过反转预测方向实现时间回溯。
         """
-        # 反向序列学习
-        reversed_ca1 = nn.LSTM(
-            input_size=self.encoding_dim,
-            hidden_size=64,
-            num_layers=1,
-            batch_first=True,
-        )
+        # 确保维度正确
+        if current_state.dim() == 1:
+            current_state = current_state.unsqueeze(0)
 
         sequence = [current_state]
         for _ in range(n_steps):
-            # 简化的反向预测
             last = sequence[-1]
-            noise = torch.randn_like(last) * 0.1
-            prev = last + noise
+            # 使用CA1预测，但反转方向
+            try:
+                result = self.ca1.encode_sequence([last.squeeze(0)])
+                if result['prediction'] is not None:
+                    # 反向：prev ≈ current - (predicted_next - current)
+                    delta = result['prediction'] - last
+                    prev = last - delta * 0.5  # 半步回溯
+                else:
+                    prev = last
+            except Exception:
+                prev = last
             sequence.append(prev)
 
-        return reversed(sequence[:-1])
+        return list(reversed(sequence[:-1]))
 
     def link_episodes(
         self,
@@ -574,6 +812,7 @@ __all__ = [
     'EpisodeMemory',
     'PlaceCell',
     'DentateGyrus',
+    'NeurogenicDG',
     'CA3Region',
     'CA1Region',
     'EntorhinalCortex',

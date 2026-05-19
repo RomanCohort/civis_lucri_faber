@@ -10,12 +10,18 @@
 1. 注意力资源动态分配
 2. 认知风格标定
 3. 可调的气质参数
+
+事件驱动:
+    - 订阅 PERSONALITY_UPDATE: 收到人格更新事件时执行门控
 """
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
-from typing import Dict, Tuple, Optional
+from typing import Any, Dict, Tuple, Optional
 from dataclasses import dataclass
+
+from civis_lucri_faber.core.events import PERSONALITY_UPDATE
 
 
 @dataclass
@@ -115,6 +121,7 @@ class AttentionGating(nn.Module):
         dim: int = 128,
         reward_seeking: float = 0.5,
         risk_avoidance: float = 0.5,
+        event_bus=None,
     ):
         super().__init__()
         self.dim = dim
@@ -133,6 +140,11 @@ class AttentionGating(nn.Module):
 
         # 历史
         self.attention_history = []
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(PERSONALITY_UPDATE, self.on_personality_update, priority=3, name="attention")
 
     def gate(
         self,
@@ -223,6 +235,13 @@ class AttentionGating(nn.Module):
             'history_size': len(self.attention_history),
         }
 
+    def on_personality_update(self, event) -> Dict[str, Any]:
+        """事件驱动: 响应 PERSONALITY_UPDATE"""
+        task_type = event.data.get("task_type", "exploration")
+        user_emotion = event.data.get("user_emotion", 0.0)
+        result = self.gate(task_type=task_type, user_emotion=user_emotion)
+        return {"attention_weights": result}
+
 
 # ============ 便捷函数 ============
 
@@ -250,4 +269,80 @@ __all__ = [
     "AttentionRouter",
     "AttentionGating",
     "create_attention_gating",
+    "PersonalizedAdaptation",  # 新增
 ]
+
+
+# ============ PersonalizedAdaptation - 个性化适配 ============
+# 对应Censor的PersonalizedRadarEnhanced
+
+
+class PersonalizedAdaptation(nn.Module):
+    """
+    个性化适配模块
+
+    对应Censor的PersonalizedRadarEnhanced:
+    1. Test-time adaptation (无需再训练)
+    2. Warmup LR schedule
+    3. 少量样本即可适应
+    """
+
+    def __init__(
+        self,
+        input_dim: int = 128,
+        adapt_steps: int = 5,
+        base_lr: float = 1e-3,
+    ):
+        super().__init__()
+        self.input_dim = input_dim
+        self.adapt_steps = adapt_steps
+        self.base_lr = base_lr
+
+        # 残差适配器
+        self.adapter = nn.Linear(input_dim, input_dim, bias=False)
+        nn.init.eye_(self.adapter.weight)
+
+    def _get_lr(self, step: int) -> float:
+        """Warmup + cos decay LR"""
+        warmup_steps = 2
+        if step < warmup_steps:
+            return 1e-5 + (self.base_lr - 1e-5) * step / warmup_steps
+        progress = (step - warmup_steps) / (self.adapt_steps - warmup_steps)
+        return self.base_lr * 0.5 * (1 + np.cos(np.pi * progress))
+
+    def adapt(
+        self,
+        support_feat: torch.Tensor,
+        support_labels: torch.Tensor = None,
+    ):
+        """Few-shot adaptation"""
+        import numpy as np
+
+        for step in range(self.adapt_steps):
+            lr = self._get_lr(step)
+            optimizer = torch.optim.SGD(self.adapter.parameters(), lr=lr)
+
+            adapted = self.adapter(support_feat)
+            loss = F.mse_loss(adapted, support_feat)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+    def forward(
+        self,
+        query_feat: torch.Tensor,
+        support_feat: torch.Tensor = None,
+    ) -> torch.Tensor:
+        """
+        Args:
+            query_feat: [B, D]
+            support_feat: 可选的support set
+        Returns:
+            adapted: [B, D]
+        """
+        if support_feat is not None:
+            self.adapt(support_feat)
+
+        adapted = self.adapter(query_feat)
+        return adapted + query_feat  # 残差连接

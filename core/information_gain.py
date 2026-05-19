@@ -12,14 +12,22 @@
     使用变分推断近似:
     - q(s|s') = N(μ(s'), σ(s')) (变分近似 posterior)
     - H(s) ≈ -log P(s | θ) + KL(q || p)
+
+事件驱动:
+    - 订阅 EXPLORATION_START: 执行探索并计算信息增益
+    - 发布 EXPLORATION_DONE: 探索完成后通知下游
+    - 发布 INFO_GAIN_COMPUTED: 信息增益结果
 """
 import numpy as np
 from typing import List, Tuple, Optional, Dict, Any
 from dataclasses import dataclass
+from collections import deque
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Categorical, Normal, Distribution
+
+from civis_lucri_faber.core.events import EXPLORATION_START, EXPLORATION_DONE, INFO_GAIN_COMPUTED
 
 
 @dataclass
@@ -322,7 +330,8 @@ class TrueInformationGainCalculator:
         lr: float = 0.001,
         intrinsic_lambda: float = 0.5,
         use_true_ig: bool = True,
-        device: str = "cpu"
+        device: str = "cpu",
+        event_bus=None,
     ):
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -330,6 +339,11 @@ class TrueInformationGainCalculator:
         self.intrinsic_lambda = intrinsic_lambda
         self.use_true_ig = use_true_ig
         self.device = device
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(EXPLORATION_START, self.on_exploration_start, priority=0, name="info_gain")
 
         # 世界模型和熵计算器 - 注意: action_dim 应该是 n_actions
         self.world_model = VariationalWorldModel(
@@ -344,6 +358,11 @@ class TrueInformationGainCalculator:
         self.buffer: List[Tuple[np.ndarray, np.ndarray, float, np.ndarray]] = []
         self.buffer_size = 10000
         self.batch_size = 32
+
+        # Learning Progress 跟踪 (Phase 3)
+        self._prediction_error_history: deque = deque(maxlen=100)
+        self._lp_window = 10  # 计算LP的窗口大小
+        self._lp_beta = 0.3   # LP在内在奖励中的权重
 
     def set_env_dims(self, state_dim: int, n_actions: int):
         """设置环境维度"""
@@ -483,6 +502,106 @@ class TrueInformationGainCalculator:
 
         return pred_error
 
+    def compute_learning_progress(self) -> float:
+        """计算学习进步感知 (Phase 3)
+
+        LearningProgress = max(0, past_avg_error - current_error)
+        高LP = "我正在学到东西"
+        低LP = 学习停滞或已饱和
+        """
+        if len(self._prediction_error_history) < self._lp_window + 1:
+            return 0.0
+
+        errors = list(self._prediction_error_history)
+        current = errors[-1]
+        past_avg = np.mean(errors[-(self._lp_window + 1):-1])
+
+        lp = max(0.0, past_avg - current)
+        return lp
+
+    def get_world_model(self):
+        """获取世界模型引用 (供好奇心引擎使用)"""
+        return self.world_model
+
+    def on_exploration_start(self, event) -> Dict[str, Any]:
+        """事件驱动: 响应 EXPLORATION_START，执行探索并计算信息增益
+
+        接受 agent 传入的真实状态向量，不再使用随机噪声。
+        """
+        goal = event.data.get("goal")
+        if goal is None:
+            return {"info_gain": 0.0}
+
+        # 使用真实状态 (Phase 2)
+        state = event.data.get("state")
+        next_state = event.data.get("next_state")
+
+        if state is None:
+            state = np.zeros(self.state_dim, dtype=np.float32)
+        if next_state is None:
+            next_state = state.copy()  # fallback: 状态不变
+
+        action = event.data.get("action")
+        if action is None:
+            action = np.zeros(self.action_dim, dtype=np.float32)
+
+        reward = 0.0
+
+        # 计算信息增益奖励
+        reward_obj = self.compute_reward(
+            state, action, reward, next_state,
+            use_intrinsic=True
+        )
+
+        # 追踪预测误差用于 Learning Progress
+        try:
+            state_t = torch.FloatTensor(state).to(self.device).unsqueeze(0)
+            action_t = torch.FloatTensor(action).to(self.device).unsqueeze(0)
+            with torch.no_grad():
+                pred_mu, _, _, _ = self.world_model(state_t, action_t)
+                next_t = torch.FloatTensor(next_state).to(self.device).unsqueeze(0)
+                pred_error = F.mse_loss(pred_mu, next_t).item()
+            self._prediction_error_history.append(pred_error)
+        except Exception:
+            pass
+
+        # 计算学习进步
+        learning_progress = self.compute_learning_progress()
+
+        # 训练世界模型
+        self.train_step()
+
+        # 发布事件
+        if self._bus is not None:
+            self._bus.publish(
+                EXPLORATION_DONE,
+                {
+                    "info_gain": reward_obj.intrinsic,
+                    "total_reward": reward_obj.total,
+                    "learning_progress": learning_progress,
+                    "state": state,
+                    "action": action,
+                    "reward": reward,
+                    "next_state": next_state,
+                },
+                source="info_gain",
+            )
+            self._bus.publish(
+                INFO_GAIN_COMPUTED,
+                {"intrinsic": reward_obj.intrinsic, "total": reward_obj.total,
+                 "learning_progress": learning_progress},
+                source="info_gain",
+            )
+
+        return {
+            "info_gain": reward_obj.intrinsic,
+            "total_reward": reward_obj.total,
+            "learning_progress": learning_progress,
+            "reward_obj": reward_obj,
+            "state": state,
+            "next_state": next_state,
+        }
+
     def get_statistics(self) -> Dict[str, Any]:
         """获取统计"""
         if len(self.buffer) < self.batch_size:
@@ -523,3 +642,27 @@ class TrueInformationGainCalculator:
 
 # 保持向后兼容的别名
 InformationGainCalculator = TrueInformationGainCalculator
+
+
+class WorldModelWrapper(nn.Module):
+    """将 VariationalWorldModel(state, action) 包装为单参数 nn.Module
+
+    用于 UncertaintyAwareActiveLearner 的 ensemble 推理。
+    接受拼接输入 x = [state | zero_action]，输出 predicted next state mean。
+    """
+
+    def __init__(self, world_model: VariationalWorldModel):
+        super().__init__()
+        self.wm = world_model
+        self.state_dim = world_model.state_dim
+        self.n_actions = world_model.n_actions
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """单参数前向: x=[state|action] → predicted next_state_mean"""
+        state = x[:, :self.state_dim]
+        action = x[:, self.state_dim:self.state_dim + self.n_actions]
+
+        with torch.no_grad():
+            mu, std, kl, dist = self.wm(state, action)
+
+        return mu  # [batch, state_dim]

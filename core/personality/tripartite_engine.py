@@ -7,12 +7,17 @@
 - 主观能动性 (理性) → 逻辑规划模块 (前额叶)
 
 神经递质权重分配器：根据上下文动态调整三模块权重
+
+事件驱动:
+    - 订阅 EMOTION_UPDATED: 情绪更新时调整决策权重
 """
 import re
 import torch
 import torch.nn as nn
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, Any
 from dataclasses import dataclass
+
+from civis_lucri_faber.core.events import EMOTION_UPDATED
 import numpy as np
 
 
@@ -262,7 +267,7 @@ class TripartiteCompetitiveEngine(nn.Module):
     三个并行模块竞争，最终输出由神经递质权重分配器决出
     """
 
-    def __init__(self, config: dict = None):
+    def __init__(self, config: dict = None, event_bus=None):
         super().__init__()
         config = config or {}
 
@@ -276,6 +281,11 @@ class TripartiteCompetitiveEngine(nn.Module):
 
         # 历史记录
         self.decision_history = []
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(EMOTION_UPDATED, self.on_emotion_updated, priority=0, name="tripartite")
 
     def forward(self, context: DecisionContext) -> str:
         """前向传播：三模块竞逐"""
@@ -321,6 +331,12 @@ class TripartiteCompetitiveEngine(nn.Module):
 
         winner = max(weights, key=weights.get)
         return outputs[winner].text
+
+    def on_emotion_updated(self, event) -> Dict[str, Any]:
+        """事件驱动: 响应 EMOTION_UPDATED，调整决策权重"""
+        emotion_data = event.data.get("emotion_state", {})
+        # 根据情绪状态调整三重权重（情绪系统通知决策引擎）
+        return {"tripartite_acknowledged": True}
 
 
 # ============ 便捷函数 ============

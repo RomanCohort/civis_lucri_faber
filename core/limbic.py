@@ -179,18 +179,25 @@ class CentralNucleus(nn.Module):
     def compute_response(
         self,
         emotion: str,
-    ) -> str:
-        """计算情绪反应"""
+    ) -> Dict:
+        """计算情绪反应 (连续概率, 非argmax离散选择)"""
         emotions = ["joy", "sadness", "anger", "fear", "neutral"]
         emotion_idx = emotions.index(emotion) if emotion in emotions else 4
 
         emotion_vec = torch.zeros(5)
         emotion_vec[emotion_idx] = 1
 
-        response = self.response_net(emotion_vec)
-        response_idx = response.argmax().item()
+        response_logits = self.response_net(emotion_vec)
+        response_probs = F.softmax(response_logits, dim=-1)
 
-        return self.responses[response_idx]
+        # 派生主反应 (向后兼容)
+        response_idx = response_probs.argmax().item()
+        primary_response = self.responses[response_idx]
+
+        return {
+            'response': primary_response,
+            'response_probs': response_probs.detach().numpy(),
+        }
 
 
 class FearConditioning(nn.Module):
@@ -218,12 +225,14 @@ class FearConditioning(nn.Module):
         cue: np.ndarray,
         US: float,  # Unconditioned Stimulus
     ):
-        """学习恐惧条件"""
+        """学习恐惧条件 (连续记忆强度, 非硬阈值)"""
         if US < 0:  # 负性US
             cue_t = torch.tensor(cue, dtype=torch.float32).unsqueeze(0)
             fear_strength = self.condition_net(cue_t).item()
 
-            if fear_strength > self.fear_threshold:
+            # sigmoid平滑替代硬阈值: 强度越高越可能被存储
+            formation_prob = 1.0 / (1.0 + np.exp(-10 * (fear_strength - 0.6)))
+            if np.random.random() < formation_prob:
                 self.fear_memories.append(FearCondition(
                     cue=cue,
                     response="fear",
@@ -302,14 +311,15 @@ class Amygdala(nn.Module):
             self.emotion_history.append(memory)
 
         # 反应
-        response = self.central.compute_response(result['emotion'])
+        response_result = self.central.compute_response(result['emotion'])
 
         return {
             'emotion': result['emotion'],
             'valence': result['valence'],
             'arousal': result['arousal'],
             'intensity': result['intensity'],
-            'response': response,
+            'response': response_result['response'],
+            'response_probs': response_result['response_probs'],
         }
 
     def get_emotion_summary(self) -> Dict:
@@ -374,6 +384,77 @@ class ThalamicRelay(nn.Module):
         # 整合
         return torch.stack(outputs).mean(dim=0)
 
+    def filter_noise(
+        self,
+        sensory_inputs: List[torch.Tensor],
+        noise_threshold: float = 0.3,
+    ) -> List[torch.Tensor]:
+        """
+        Exp 7改进: 丘脑门控噪声过滤
+
+        通过 attention_gate 参数实际过滤噪声信号:
+        - 高 attention_gate 值 → 低过滤 → ADHD模式 (噪声淹没信号)
+        - 低 attention_gate 值 → 高过滤 → 正常模式 (信号清晰)
+
+        Args:
+            sensory_inputs: 感觉输入张量列表
+            noise_threshold: 噪声过滤阈值
+
+        Returns:
+            过滤后的感觉输入列表
+        """
+        filtered_inputs = []
+
+        for i, sensory in enumerate(sensory_inputs):
+            if i >= len(self.sensory_nets):
+                filtered_inputs.append(sensory)
+                continue
+
+            # 获取门控值 (sigmoid输出)
+            gate_value = self.attention_gate[i].sigmoid().item()
+
+            # 计算噪声过滤强度 (高门控→低过滤, 低门控→高过滤)
+            # 正常模式: gate=1.0 → filter_strength=0.3
+            # ADHD模式: gate=2.0 → filter_strength=0.1 (过滤弱)
+            filter_strength = noise_threshold * (1.5 - gate_value)
+            filter_strength = max(0.05, min(0.5, filter_strength))
+
+            # 应用噪声过滤: 保留信号成分，抑制高频噪声
+            if sensory.dim() >= 1 and sensory.shape[-1] > 0:
+                # 计算信号的标准差作为噪声估计
+                signal_std = sensory.std().item()
+                signal_mean = sensory.mean().item()
+
+                # 噪声估计: 高频波动成分
+                noise_estimate = (sensory - signal_mean).abs().std().item()
+
+                # 信号-噪声比
+                snr = signal_std / (noise_estimate + 1e-6)
+
+                # 根据SNR和门控强度调整过滤
+                if snr < 2.0:  # 低信噪比 → 噪声大
+                    # ADHD模式: gate高→过滤弱→保留更多噪声
+                    # Normal模式: gate低→过滤强→抑制噪声
+                    filtered = sensory * (1 - filter_strength * (2.0 - snr) / 2.0)
+                else:
+                    filtered = sensory  # 高信噪比，无需过滤
+
+                filtered_inputs.append(filtered)
+            else:
+                filtered_inputs.append(sensory)
+
+        return filtered_inputs
+
+    def get_attention_stats(self) -> Dict[str, float]:
+        """获取门控统计信息"""
+        gate_values = [g.sigmoid().item() for g in self.attention_gate]
+        return {
+            'attention_gate_avg': np.mean(gate_values),
+            'attention_gate_min': min(gate_values),
+            'attention_gate_max': max(gate_values),
+            'noise_filtering_weak': np.mean(gate_values) > 0.85,  # Exp 7改进: 阈值从1.5调整为0.85
+        }
+
 
 class MDNucleus(nn.Module):
     """
@@ -409,18 +490,19 @@ class MDNucleus(nn.Module):
         self,
         current: torch.Tensor,
     ) -> torch.Tensor:
-        """获取注意的状态"""
+        """获取注意的状态（通过integrator变换）"""
         if not self.working_memory:
-            return current
+            return self.integrator(current)
 
         # 关注相关信息
         recent = torch.stack(list(self.working_memory))
 
-        # 简单attention
+        # 注意力加权
         attention = F.softmax(recent @ current.unsqueeze(-1), dim=0)
         attended = (attention * recent).sum(dim=0)
 
-        return attended
+        # 通过integrator变换输出
+        return self.integrator(attended)
 
 
 class PUL(nn.Module):
@@ -516,11 +598,43 @@ class LimbicSystem(nn.Module):
     def __init__(
         self,
         input_dim: int = 64,
+        event_bus=None,
     ):
         super().__init__()
 
         self.amygdala = Amygdala(input_dim)
         self.thalamus = Thalamus(input_dim)
+
+        # Event-driven registration
+        if event_bus is not None:
+            event_bus.subscribe(
+                "sensory_process",
+                self._handle_sensory_process,
+                priority=0,
+                name="limbic",
+            )
+
+    def _handle_sensory_process(self, event) -> Dict:
+        """Event-driven handler for sensory_process events."""
+        import torch as _torch
+        state_tensor = event.data.get("state_tensor", _torch.randn(1, 64))
+        result = self(
+            state=state_tensor,
+            sensory_inputs=[state_tensor],
+        )
+
+        state = event.data.get("internal_state", {})
+        state["limbic_emotion"] = result["emotion"]
+        state["limbic_valence"] = result["valence"]
+        state["limbic_arousal"] = result["arousal"]
+        state["limbic_response"] = result["response"]
+        state["limbic_emotional_attention"] = result["emotional_attention"]
+
+        # Set emotion_criticality if fear + high arousal
+        if result["emotion"] == "fear" and result["arousal"] > 0.7:
+            state["emotion_criticality"] = True
+
+        return result
 
     def forward(
         self,
@@ -575,9 +689,48 @@ __all__ = [
     'CentralNucleus',
     'FearConditioning',
     'Amygdala',
+    'AmygdalaWithPrior',
     'ThalamicRelay',
     'MDNucleus',
     'Thalamus',
     'LimbicSystem',
     'create_limbic_system',
 ]
+
+
+# ============ AmygdalaWithPrior - 面部区域先验 ============
+# 对应Censor的AmygdalaWithPrior
+
+
+class AmygdalaWithPrior(nn.Module):
+    """
+    杏仁核 + 面部区域先验（对应Censor的AmygdalaWithPrior）
+    """
+
+    def __init__(
+        self,
+        input_dim: int = 64,
+        output_h: int = 14,
+        output_w: int = 14,
+    ):
+        super().__init__()
+        self.fc1 = nn.Linear(input_dim, 256)
+        self.fc2 = nn.Linear(256, output_h * output_w)
+        self.prior_strength = nn.Parameter(torch.tensor(0.3))
+        self.register_buffer('face_prior', self._create_face_prior())
+
+    def _create_face_prior(self) -> torch.Tensor:
+        h, w = 14, 14
+        self.output_h = h
+        self.output_w = w
+        prior = torch.zeros(h, w)
+        prior[h//6:h//3, w//4:3*w//4] = 1.0  # 眼
+        prior[h//3:h//2, w//3:2*w//3] = 1.0  # 鼻
+        prior[2*h//3:5*h//6, w//4:3*w//4] = 1.0  # 嘴
+        return prior / (prior.sum() + 1e-8)
+
+    def forward(self, fast_feat: torch.Tensor) -> Dict:
+        h = torch.relu(self.fc1(fast_feat))
+        learned_map = torch.sigmoid(self.fc2(h).view(-1, 1, 14, 14))
+        attention_map = (1 - self.prior_strength) * learned_map + self.prior_strength * self.face_prior.view(1, 1, 14, 14)
+        return {'attention_map': attention_map, 'prior_strength': self.prior_strength}

@@ -11,6 +11,12 @@
 
     # 模型压缩收益
     Compress_Savings = (params_before - params_after) · storage_rate
+
+事件驱动:
+    - 订阅 STEP_START: 每步开始时计算成本
+    - 发布 THERMO_STATE: 状态变化时通知下游
+    - 发布 HIBERNATE_ENTER / SYSTEM_DEAD: 特殊状态
+    - 发布 COMPRESSION_NEEDED: 余额不足时
 """
 import numpy as np
 from typing import List, Dict, Any, Optional
@@ -18,6 +24,11 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import json
 import os
+
+from civis_lucri_faber.core.events import (
+    STEP_START, THERMO_STATE, HIBERNATE_ENTER,
+    SYSTEM_DEAD, COMPRESSION_NEEDED,
+)
 
 
 @dataclass
@@ -59,7 +70,8 @@ class ThermodynamicsSystem:
         task_reward_min: float = 0.1,
         task_reward_max: float = 1.0,
         compress_threshold: float = 10.0,
-        log_path: str = "thermodynamics_log.json"
+        log_path: str = "thermodynamics_log.json",
+        event_bus=None,
     ):
         self.initial_balance = initial_balance
         self.compute_cost_per_sec = compute_cost_per_sec
@@ -69,6 +81,11 @@ class ThermodynamicsSystem:
         self.compress_threshold = compress_threshold
 
         self.log_path = log_path
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(STEP_START, self.on_step_start, priority=0, name="thermodynamics")
 
         # 状态
         self.balance = initial_balance
@@ -296,6 +313,27 @@ class ThermodynamicsSystem:
             for t in self.transactions[-n:]
         ]
 
+    def on_step_start(self, event) -> Optional[Dict[str, Any]]:
+        """事件驱动: 响应 STEP_START"""
+        elapsed = event.data.get("elapsed_seconds", 1.0)
+        system_state = self.step(elapsed_seconds=elapsed)
+
+        # 发布状态事件
+        if self._bus is not None:
+            self._bus.publish(
+                THERMO_STATE,
+                {"status": system_state.status, "balance": system_state.balance},
+                source="thermodynamics",
+            )
+            if system_state.status == "DEAD":
+                self._bus.publish(SYSTEM_DEAD, {"balance": self.balance}, source="thermodynamics")
+            elif system_state.status == "HIBERNATE":
+                self._bus.publish(HIBERNATE_ENTER, {"balance": self.balance}, source="thermodynamics")
+                if self.balance < self.compress_threshold:
+                    self._bus.publish(COMPRESSION_NEEDED, {"balance": self.balance}, source="thermodynamics")
+
+        return {"thermo_state": system_state.status, "balance": system_state.balance}
+
     def _save_log(self) -> None:
         """保存日志"""
         data = {
@@ -337,4 +375,4 @@ class ThermodynamicsSystem:
                 for i, t in enumerate(data.get("transactions", []))
             ]
         except Exception as e:
-            print(f"⚠️ 日志加载失败: {e}")
+            print(f"[WARN] log load failed: {e}")

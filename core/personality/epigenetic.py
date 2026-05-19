@@ -10,14 +10,19 @@ AI映射：
 - 重大事件触发权重固化
 - LoRA快速权重
 - 带时间戳的长期记忆
+
+事件驱动:
+    - 订阅 PERSONALITY_UPDATE: 收到人格更新事件时处理表观遗传学习
 """
 import torch
 import torch.nn as nn
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from dataclasses import dataclass
 import time
 import json
+
+from civis_lucri_faber.core.events import PERSONALITY_UPDATE
 
 
 @dataclass
@@ -284,6 +289,7 @@ class EpigeneticLearner(nn.Module):
     def __init__(
         self,
         rank: int = 8,
+        event_bus=None,
     ):
         super().__init__()
 
@@ -291,6 +297,11 @@ class EpigeneticLearner(nn.Module):
 
         # LoRA配置
         self.lora_rank = rank
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(PERSONALITY_UPDATE, self.on_personality_update, priority=6, name="epigenetic")
 
     def learn(
         self,
@@ -330,6 +341,15 @@ class EpigeneticLearner(nn.Module):
     def get_summary(self) -> Dict:
         """获取摘要"""
         return self.memory.get_summary()
+
+    def on_personality_update(self, event) -> Dict[str, Any]:
+        """事件驱动: 响应 PERSONALITY_UPDATE"""
+        user_input = event.data.get("user_input", "")
+        assistant_output = event.data.get("user_input", "")  # fallback
+        sentiment = event.data.get("sentiment", 0.1)
+        feedback = event.data.get("feedback", 0.3)
+        result = self.learn(user_input, assistant_output, sentiment, feedback)
+        return {"epigenetic_result": result}
 
 
 # ============ 便捷函数 ============

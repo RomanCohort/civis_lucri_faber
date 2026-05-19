@@ -429,4 +429,239 @@ __all__ = [
     'ResNetBackbone',
     'VisualCortex',
     'create_visual_cortex',
+    # 新增模块
+    'AdaptiveVisualAttention',
+    'SaliencyDetectorE2E',
+    'StandardMoE',
 ]
+
+
+# ============ AdaptiveVisualAttention - 两阶段视觉注意力 ============
+# 对应Censor的AdaptiveOpticalFlow，但用于视觉注意力
+
+
+class AdaptiveVisualAttention(nn.Module):
+    """
+    两阶段视觉注意力：
+    - Stage 1: 快速粗筛选 (saliency screening)
+    - Stage 2: 精细注意力 (fine attention) 仅当motion detected
+
+    对应Censor的AdaptiveOpticalFlow思想
+    """
+
+    def __init__(
+        self,
+        embed_dim: int = 768,
+        num_heads: int = 8,
+        threshold: float = 0.1,
+    ):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.threshold = threshold
+
+        # Saliency检测器
+        self.saliency_scorer = nn.Sequential(
+            nn.Linear(embed_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, 1),
+            nn.Sigmoid()
+        )
+
+        # 精细注意力
+        self.fine_attn = nn.MultiheadAttention(
+            embed_dim=embed_dim,
+            num_heads=num_heads,
+            batch_first=True,
+            dropout=0.1
+        )
+
+        # 输出投影
+        self.output_proj = nn.Linear(embed_dim, embed_dim)
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        return_stage: bool = False,
+    ) -> Dict:
+        """
+        Args:
+            x: [B, T, D] 时序特征
+        Returns:
+            output: [B, T, D] 注意力后的特征
+            stage: 'fast' or 'fine'
+        """
+        B, T, D = x.shape
+
+        # Stage 1: 快速筛选
+        saliency_scores = self.saliency_scorer(x).squeeze(-1)  # [B, T]
+        motion_magnitude = saliency_scores.mean()
+
+        if motion_magnitude > self.threshold:
+            # Stage 2: 精细注意力
+            attn_out, _ = self.fine_attn(x, x, x)
+            stage = 'fine'
+        else:
+            # 快速路径：直接使用原始特征
+            attn_out = x
+            stage = 'fast'
+
+        output = self.output_proj(attn_out)
+
+        if return_stage:
+            return {'output': output, 'stage': stage, 'saliency': saliency_scores}
+        return {'output': output, 'stage': stage}
+
+
+# ============ SaliencyDetectorE2E - 全端到端显著性检测 ============
+# 对应Censor的SaliencyDetectorE2E
+
+
+class SaliencyDetectorE2E(nn.Module):
+    """
+    全端到端显著性检测器
+
+    对应Censor的SaliencyDetectorE2E：
+    1. 所有参数可学习
+    2. 分辨率自适应sigma
+    """
+
+    def __init__(
+        self,
+        embed_dim: int = 768,
+        pyramid_levels: int = 4,
+        sigma_ratio: float = 0.15,
+    ):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.pyramid_levels = pyramid_levels
+
+        # 可学习参数
+        self.sigma_ratio = nn.Parameter(torch.tensor(sigma_ratio))
+        self.center_bias = nn.Parameter(torch.tensor(0.5))
+        self.fusion_weights = nn.Parameter(torch.ones(pyramid_levels) / pyramid_levels)
+
+        # 多层特征提取
+        self.pyramid_convs = nn.ModuleList([
+            nn.Linear(embed_dim, embed_dim) for _ in range(pyramid_levels)
+        ])
+
+    def forward(
+        self,
+        x: torch.Tensor,
+    ) -> Dict:
+        """
+        Args:
+            x: [B, T, D] 特征序列
+        Returns:
+            saliency: [B, T] 显著性分数
+        """
+        B, T, D = x.shape
+
+        # 多层融合
+        weights = F.softmax(self.fusion_weights, dim=0)
+
+        pyramid_feats = []
+        for i, conv in enumerate(self.pyramid_convs):
+            if i == 0:
+                pyramid_feats.append(x)
+            else:
+                # 下采样
+                pyramid_feats.append(F.avg_pool1d(pyramid_feats[-1].transpose(1, 2), 2).transpose(1, 2))
+
+        # 加权融合
+        fused = sum(w * feat for w, feat in zip(weights, pyramid_feats))
+
+        # 显著性评分
+        scores = torch.sum(fused * x, dim=-1)  # [B, T]
+        scores = scores * self.center_bias
+
+        return {
+            'saliency': scores,
+            'fused_features': fused,
+        }
+
+
+# ============ StandardMoE - 标准MoE对比 ============
+# 对应Censor的StandardMoE（更客观的替代方案）
+
+
+class StandardMoE(nn.Module):
+    """
+    标准MoE - 对比Censor的BioMoE
+
+    对比BioMoE：
+    - 简单的gating（无生物学先验）
+    - 无membrane potential
+    - 无emotional state
+    """
+
+    def __init__(
+        self,
+        input_dim: int = 768,
+        output_dim: int = 7,
+        num_experts: int = 3,
+        expert_hidden: int = 2048,
+        k: int = 2,
+    ):
+        super().__init__()
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.num_experts = num_experts
+        self.k = k
+
+        # 专家
+        self.experts = nn.ModuleList([
+            nn.Sequential(
+                nn.Linear(input_dim, expert_hidden),
+                nn.GELU(),
+                nn.Dropout(0.1),
+                nn.Linear(expert_hidden, output_dim),
+            )
+            for _ in range(num_experts)
+        ])
+
+        # 简单门控
+        self.gate = nn.Sequential(
+            nn.Linear(input_dim, num_experts),
+        )
+
+        # Load balancing
+        self.register_buffer('expert_usage', torch.zeros(num_experts))
+
+    def forward(
+        self,
+        x: torch.Tensor,
+    ) -> Dict:
+        """
+        Args:
+            x: [B, D]
+        Returns:
+            output: [B, output_dim]
+            gate_weights: [B, k]
+        """
+        B = x.shape[0]
+
+        # 门控
+        gate_logits = self.gate(x)  # [B, num_experts]
+        gate_weights = F.softmax(gate_logits, dim=-1)
+
+        # Top-k
+        top_k_weights, top_k_idx = torch.topk(gate_weights, self.k, dim=-1)
+        top_k_weights = top_k_weights / (top_k_weights.sum(dim=-1, keepdim=True) + 1e-8)
+
+        # 专家输出
+        outputs = torch.stack([expert(x) for expert in self.experts], dim=1)  # [B, num_experts, output_dim]
+
+        # 加权
+        output = sum(w * o for w, o in zip(gate_weights.unbind(), outputs.unbind()))
+        output = output.squeeze(1)
+
+        # 更新使用统计
+        self.expert_usage += (gate_weights > 0.5).float().sum(dim=0)
+
+        return {
+            'output': output,
+            'gate_weights': gate_weights,
+            'expert_usage': self.expert_usage,
+        }

@@ -9,6 +9,10 @@
     Novelty(g) = -log P(g | History)  # 真正的信息论 novelty
     Complexity(g) = 目标分解子问题熵
     Utility(g) = 对知识库的预期信息贡献
+
+事件驱动:
+    - 订阅 GOAL_NEEDED: 收到请求时生成并选择目标
+    - 发布 GOAL_SELECTED: 目标选定后通知下游
 """
 import numpy as np
 from typing import List, Dict, Any, Optional, Callable
@@ -18,6 +22,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Categorical, Normal
+
+from civis_lucri_faber.core.events import GOAL_NEEDED, GOAL_SELECTED
 
 
 @dataclass
@@ -283,7 +289,9 @@ class CuriosityEngine:
         gamma: float = 0.3,
         exploration_rate: float = 0.1,
         use_learned_novelty: bool = True,
-        history_size: int = 50
+        history_size: int = 50,
+        event_bus=None,
+        world_model=None,
     ):
         self.alpha = alpha
         self.beta = beta
@@ -291,6 +299,14 @@ class CuriosityEngine:
         self.exploration_rate = exploration_rate
         self.use_learned_novelty = use_learned_novelty
         self.history_size = history_size
+
+        # 世界模型引用 (用于不确定性驱动目标生成)
+        self._world_model = world_model
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(GOAL_NEEDED, self.on_goal_needed, priority=0, name="curiosity")
 
         # 学习的新颖度引擎
         self.novelty_engine = LearnedNoveltyEngine(
@@ -305,6 +321,9 @@ class CuriosityEngine:
         self.selected_count: Dict[str, int] = {}
         self.reward_history: List[float] = []
 
+        # 探索反馈记录 (Phase 5 闭环)
+        self._ig_feedback: Dict[str, Dict[str, float]] = {}  # goal_id -> {ig, lp}
+
         # 预定义目标模板
         self.goal_templates = [
             "探索新的状态空间区域",
@@ -317,29 +336,172 @@ class CuriosityEngine:
             "探索不确定性最高的方向"
         ]
 
-    def generate_candidate_goals(self, n: int = 5) -> List[ExplorationGoal]:
-        """生成候选探索目标"""
+    def _description_to_tokens(self, description: str) -> Optional[torch.Tensor]:
+        """将目标描述转换为 token tensor
+
+        使用字符级 hash tokenizer:
+        - 每个字符 → hash(char) % vocab_size → token ID
+        - 截断/填充到固定长度
+        """
+        if not description:
+            return None
+
+        vocab_size = self.novelty_engine.goal_encoder.vocab_size
+        max_len = 32  # 最大序列长度
+
+        # 字符级 hash tokenize
+        token_ids = []
+        for ch in description[:max_len]:
+            token_id = hash(ch) % vocab_size
+            token_ids.append(token_id)
+
+        # 填充到固定长度
+        while len(token_ids) < max_len:
+            token_ids.append(0)  # padding token
+
+        return torch.LongTensor(token_ids)
+
+    def _encode_goal(self, goal: ExplorationGoal) -> Optional[np.ndarray]:
+        """将目标编码为向量嵌入"""
+        tokens = self._description_to_tokens(goal.description)
+        if tokens is None:
+            return None
+        with torch.no_grad():
+            embedding = self.novelty_engine.goal_encoder.encode(tokens.unsqueeze(0))
+            return embedding.squeeze(0).cpu().numpy()
+
+    def generate_candidate_goals(self, n: int = 5, state_vector: np.ndarray = None) -> List[ExplorationGoal]:
+        """生成候选探索目标 (不确定性驱动 + 模板后备)
+
+        Phase 4: 当世界模型可用且有真实状态向量时，
+        在潜在空间中采样多个方向，选不确定性最高的方向作为目标。
+        否则回退到模板生成。
+        """
         candidates = []
 
-        for i in range(n):
+        # ---- 不确定性驱动生成 ----
+        if (self._world_model is not None
+                and state_vector is not None
+                and len(self.goal_history) >= 3):
+            try:
+                uncertainty_goals = self._generate_uncertainty_goals(state_vector, n)
+                if uncertainty_goals:
+                    candidates.extend(uncertainty_goals)
+            except Exception:
+                pass
+
+        # ---- 模板后备 (填充不足的部分) ----
+        remaining = n - len(candidates)
+        for i in range(remaining):
             template = random.choice(self.goal_templates)
+            # 利用IG反馈调整模板权重
+            direction = random.choice(["正向", "逆向", "边界", "极值", "对比", "迁移"])
+            description = f"{template} [{direction}路径 v{i+1}]"
+
+            # 从历史反馈推断 complexity/utility
+            if self._ig_feedback:
+                avg_ig = np.mean([f["ig"] for f in self._ig_feedback.values()])
+                avg_lp = np.mean([f.get("lp", 0) for f in self._ig_feedback.values()])
+                complexity = 0.3 + 0.4 * min(1.0, avg_ig + avg_lp)
+                utility = 0.3 + 0.4 * min(1.0, avg_lp)
+            else:
+                complexity = random.uniform(0.3, 0.9)
+                utility = random.uniform(0.3, 0.9)
+
             goal = ExplorationGoal(
-                id=f"goal_{len(self.goal_history)}_{i}",
-                description=f"{template} (变体 {i+1})",
-                complexity=random.uniform(0.3, 0.9),
-                utility=random.uniform(0.3, 0.9)
+                id=f"goal_{len(self.goal_history)}_{len(candidates)}",
+                description=description,
+                complexity=complexity,
+                utility=utility,
             )
+
+            # 编码目标为embedding
+            embedding = self._encode_goal(goal)
+            if embedding is not None:
+                goal.embedding = embedding
+                self.novelty_engine.add_history(embedding)
+
             candidates.append(goal)
 
         return candidates
+
+    def _generate_uncertainty_goals(
+        self, state_vector: np.ndarray, n: int
+    ) -> List[ExplorationGoal]:
+        """从世界模型预测不确定性中生成目标 (Phase 4)
+
+        在潜在空间中采样多个方向，计算每个方向的世界模型预测方差，
+        选不确定性最高的方向。
+        """
+        import torch
+        goals = []
+        wm = self._world_model
+        device = next(wm.parameters()).device
+
+        state_t = torch.FloatTensor(state_vector).unsqueeze(0).to(device)
+
+        # 采样多个action方向
+        n_samples = min(n * 3, 30)
+        uncertainties = []
+
+        for _ in range(n_samples):
+            # 随机action (one-hot)
+            action_idx = random.randint(0, wm.n_actions - 1)
+            action_t = torch.zeros(1, wm.n_actions, device=device)
+            action_t[0, action_idx] = 1.0
+
+            with torch.no_grad():
+                pred_mu, pred_std, kl, _ = wm(state_t, action_t)
+                # 不确定性 = 预测标准差的均值
+                uncertainty = pred_std.mean().item()
+
+            uncertainties.append((action_idx, uncertainty, pred_std))
+
+        # 按不确定性降序排序
+        uncertainties.sort(key=lambda x: x[1], reverse=True)
+
+        # 取前n个最不确定的方向
+        for rank, (action_idx, uncertainty, pred_std) in enumerate(uncertainties[:n]):
+            # 找到最不确定的维度
+            top_dim = pred_std.argmax().item()
+            direction_desc = f"维度{top_dim}(σ={uncertainty:.3f})"
+
+            description = (
+                f"探索不确定性热点: {direction_desc} "
+                f"[action={action_idx}, rank={rank+1}]"
+            )
+
+            goal = ExplorationGoal(
+                id=f"goal_{len(self.goal_history)}_u{rank}",
+                description=description,
+                complexity=min(0.95, 0.4 + uncertainty * 2.0),
+                utility=min(0.95, 0.3 + uncertainty * 1.5),
+                metadata={"uncertainty": uncertainty, "action": action_idx},
+            )
+
+            embedding = self._encode_goal(goal)
+            if embedding is not None:
+                goal.embedding = embedding
+                self.novelty_engine.add_history(embedding)
+
+            goals.append(goal)
+
+        return goals
 
     def compute_novelty(self, goal: ExplorationGoal) -> float:
         """计算目标的新颖度
 
         True Novelty = -log P(goal | History)
         """
-        if self.use_learned_novelty and len(self.goal_history) > 0:
-            # 使用简化的嵌入相似度
+        if self.use_learned_novelty and len(self.goal_history) >= 2:
+            try:
+                # 使用学习的novelty引擎（BiLSTM + Transformer）
+                goal_tokens = self._description_to_tokens(goal.description)
+                if goal_tokens is not None:
+                    return self.novelty_engine.compute_novelty(goal_tokens)
+            except Exception:
+                pass
+            # fallback to simple novelty
             return self._simple_novelty.compute(goal, self.goal_history)
         else:
             # 回退到简单方法
@@ -396,6 +558,12 @@ class CuriosityEngine:
         self.selected_count[selected.id] = self.selected_count.get(selected.id, 0) + 1
         self.goal_history.append(selected)
 
+        # 训练novelty引擎：如果前一个目标存在，用(前一个, 当前)对训练
+        if selected.embedding is not None and len(self.goal_history) >= 2:
+            prev = self.goal_history[-2]
+            if prev.embedding is not None:
+                self.novelty_engine.train_step([(prev.embedding, selected.embedding)])
+
         return selected
 
     def update_reward(self, goal_id: str, reward: float) -> None:
@@ -407,9 +575,41 @@ class CuriosityEngine:
                 goal.completed = True
                 break
 
+    def update_exploration_result(
+        self, goal_id: str, ig_reward: float, learning_progress: float = 0.0
+    ) -> None:
+        """探索结果反馈闭环 (Phase 5)
+
+        高IG + 高LP → 方向值得深入
+        高IG + 低LP → 方向已学过，换方向
+        低IG → 方向无趣
+        """
+        self._ig_feedback[goal_id] = {
+            "ig": ig_reward,
+            "lp": learning_progress,
+        }
+
+        # 保留最近50条反馈
+        if len(self._ig_feedback) > 50:
+            oldest = list(self._ig_feedback.keys())[0]
+            del self._ig_feedback[oldest]
+
+        # 调整探索策略
+        if ig_reward > 0.5 and learning_progress > 0.1:
+            # 高进步 → 可略微降低该方向的探索率（已找到有价值的方向）
+            self.exploration_rate = max(0.05, self.exploration_rate * 0.95)
+        elif ig_reward > 0.5 and learning_progress < 0.05:
+            # 高IG但没进步 → 可能是噪声，增加探索多样性
+            self.exploration_rate = min(0.4, self.exploration_rate * 1.1)
+        elif ig_reward < 0.1:
+            # 无趣方向 → 维持当前探索率
+            pass
+
     def get_statistics(self) -> Dict[str, Any]:
         """获取统计"""
         completed = sum(1 for g in self.goal_history if g.completed)
+        ig_values = [f["ig"] for f in self._ig_feedback.values()] if self._ig_feedback else []
+        lp_values = [f.get("lp", 0) for f in self._ig_feedback.values()] if self._ig_feedback else []
         return {
             "total_goals": len(self.goal_history),
             "completed": completed,
@@ -417,7 +617,11 @@ class CuriosityEngine:
             "complexity_avg": np.mean([g.complexity for g in self.goal_history]) if self.goal_history else 0,
             "value_avg": np.mean([g.value for g in self.goal_history]) if self.goal_history else 0,
             "exploration_rate": self.exploration_rate,
-            "use_learned_novelty": self.use_learned_novelty
+            "use_learned_novelty": self.use_learned_novelty,
+            "ig_feedback_count": len(self._ig_feedback),
+            "avg_ig": np.mean(ig_values) if ig_values else 0,
+            "avg_lp": np.mean(lp_values) if lp_values else 0,
+            "uncertainty_driven": self._world_model is not None,
         }
 
     def reset(self) -> None:
@@ -425,6 +629,39 @@ class CuriosityEngine:
         self.goal_history.clear()
         self.selected_count.clear()
         self.reward_history.clear()
+
+    def on_goal_needed(self, event) -> Dict[str, Any]:
+        """事件驱动: 响应 GOAL_NEEDED，生成并选择目标"""
+        emotion_state = event.data.get("emotion_state", {})
+        state_vector = event.data.get("state_vector")
+        emotion_bonus = 0.0
+
+        # 情绪影响因子
+        if emotion_state:
+            mood_valence = emotion_state.get('mood_valence', 0.0)
+            mood_arousal = emotion_state.get('mood_arousal', 0.5)
+            if mood_valence < -0.3:
+                emotion_bonus = -0.2
+            if mood_arousal > 0.7:
+                emotion_bonus = 0.15
+
+        candidates = self.generate_candidate_goals(n=5, state_vector=state_vector)
+
+        if emotion_bonus != 0.0:
+            for goal in candidates:
+                goal.value = goal.value * (1.0 + emotion_bonus)
+
+        selected = self.select_goal(candidates)
+
+        # 发布目标选定事件
+        if self._bus is not None:
+            self._bus.publish(
+                GOAL_SELECTED,
+                {"goal": selected, "emotion_bonus": emotion_bonus},
+                source="curiosity",
+            )
+
+        return {"goal": selected, "emotion_bonus": emotion_bonus}
 
 
 class SimpleNoveltyCalculator:

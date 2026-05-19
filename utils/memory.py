@@ -152,7 +152,7 @@ class KnowledgeMemory:
             with open(self.memory_path, 'w', encoding='utf-8') as f:
                 json.dump(self.state_dict(), f, ensure_ascii=False, indent=2)
         except Exception as e:
-            print(f"⚠️ 记忆保存失败: {e}")
+            print(f"[WARN] memory save failed: {e}")
 
     def _load(self) -> None:
         """从文件加载"""
@@ -179,7 +179,7 @@ class KnowledgeMemory:
                 self.stats["unique_tags"] = set(data["stats"]["unique_tags"])
 
         except Exception as e:
-            print(f"⚠️ 记忆加载失败: {e}")
+            print(f"[WARN] memory load failed: {e}")
 
     def clear(self) -> None:
         """清空记忆"""

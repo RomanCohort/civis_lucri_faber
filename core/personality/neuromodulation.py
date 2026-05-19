@@ -9,13 +9,18 @@
 1. 全局信心门控 (Global Confidence Gating)
 2. 价值方差预测
 3. 不确定性检测 → 温度调整
+
+事件驱动:
+    - 订阅 PERSONALITY_UPDATE: 收到人格更新事件时处理神经调质
 """
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from typing import Dict, Tuple, Optional
+from typing import Any, Dict, Tuple, Optional
 from dataclasses import dataclass
+
+from civis_lucri_faber.core.events import PERSONALITY_UPDATE
 
 
 @dataclass
@@ -266,6 +271,7 @@ class NeuromodulationSystem(nn.Module):
         self,
         hidden_dim: int = 768,
         vocab_size: int = 32000,
+        event_bus=None,
     ):
         super().__init__()
 
@@ -280,6 +286,11 @@ class NeuromodulationSystem(nn.Module):
 
         # 调质信号历史
         self.signal_history = []
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(PERSONALITY_UPDATE, self.on_personality_update, priority=5, name="neuromodulation")
 
     def forward(
         self,
@@ -351,6 +362,15 @@ class NeuromodulationSystem(nn.Module):
             'acetylcholine': np.mean([s.acetylcholine for s in recent]),
             'temperature': self.temperature.current_temp,
         }
+
+    def on_personality_update(self, event) -> Dict[str, Any]:
+        """事件驱动: 响应 PERSONALITY_UPDATE"""
+        hidden = event.data.get("hidden_states")
+        task_type = event.data.get("task_type", "exploration")
+        if hidden is None:
+            hidden = torch.randn(1, 10, 128)
+        result = self.forward(hidden, task_type=task_type)
+        return {"neuromodulation_result": result}
 
 
 # ============ 便捷函数 ============

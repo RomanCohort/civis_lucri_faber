@@ -229,15 +229,16 @@ class SerotoninSystem(nn.Module):
         self,
         temptation: float,
     ) -> float:
-        """计算冲动控制"""
-        # 血清素高 → 冲动控制好
-        impulse_control = self.current_level
+        """计算冲动控制 (连续调制)"""
+        # 血清素高 → 冲动控制好 (连续, 无硬阈值)
+        # impulse_control = serotonergic tone × continuous inhibition function
+        serotonergic_inhibition = self.current_level
 
-        # 高诱惑 → 需要更多血清素
-        if temptation > 0.7 and impulse_control < 0.5:
-            return 0.0  # 失控
-
-        return impulse_control
+        # 高诱惑 → 需要更多血清素才能控制
+        # 高诱惑 + 低血清素 → 冲动控制渐弱 (而非突然归零)
+        temptation_load = float(np.clip(temptation, 0.0, 1.0))
+        effective_control = serotonergic_inhibition * (1.0 - 0.5 * temptation_load)
+        return float(np.clip(effective_control, 0.0, 1.0))
 
     def decay(self):
         """自然衰减"""
@@ -349,14 +350,15 @@ class GlutamateGABASystem(nn.Module):
         self,
         threat_level: float = 0.0,
     ) -> float:
-        """计算抑制"""
+        """计算抑制 (连续调制, 无硬阈值)"""
         baseline = 0.5
-        # 威胁 → GABA增加 (镇静)
-        if threat_level > 0.5:
-            self.gaba = np.clip(self.gaba + threat_level * 0.2, 0, 1)
-        else:
-            self.gaba = baseline
-
+        # 威胁 → GABA增加 (镇静) — 连续响应
+        # 低威胁(<0.3): 轻微增加; 中威胁(0.3-0.7): 中等增加; 高威胁(>0.7): 强增加
+        gaba_drive = float(np.clip(threat_level, 0.0, 1.0))
+        self.gaba = float(np.clip(
+            baseline + gaba_drive * 0.3 * gaba_drive,  # quadratic for saturation at high threat
+            0.1, 1.0
+        ))
         return self.gaba
 
     def compute_balance(self) -> float:
@@ -387,37 +389,43 @@ class NorepinephrineSystem(nn.Module):
         self.level = 0.3      # 基线
         self.locus_coeruleus = 0.3
 
-        self.state = "calm"  # calm | alert | stress
-
     def compute_alertness(
         self,
         novelty: float,
         urgency: float,
     ) -> float:
-        """计算警觉"""
-        if novelty > 0.5 or urgency > 0.7:
-            self.state = "alert"
-            self.level = min(1.0, self.level + 0.2)
+        """计算警觉 (连续调制)"""
+        # 连续输入 → 连续响应 (无硬阈值)
+        alert_drive = 0.4 * novelty + 0.6 * urgency
+        # 快速上升，慢衰减 (不对称动力学)
+        if alert_drive > self.level:
+            self.level = float(np.clip(
+                self.level + 0.2 * (alert_drive - self.level),
+                0.05, 1.0
+            ))
         else:
-            self.level *= 0.95
+            self.level = float(np.clip(self.level * 0.95, 0.05, 1.0))
 
         self.locus_coeruleus = self.level
-
         return self.level
 
     def compute_stress(
         self,
         threat: float,
     ) -> float:
-        """计算应激"""
-        if threat > 0.7:
-            self.state = "stress"
-            # 急性应激
-            self.level = min(1.0, self.level + threat * 0.3)
-        elif threat > 0.3:
-            self.state = "alert"
+        """计算应激 (连续调制, 无硬阈值)"""
+        # 连续威胁 → 连续NE上升 (sigmoid-shaped)
+        # 低威胁(<0.3): 几乎无影响; 中威胁(0.3-0.7): 线性增长; 高威胁(>0.7): 饱和
+        stress_drive = float(np.clip(threat, 0.0, 1.0))
+        if stress_drive > self.level:
+            # 上升快 (SAM快速激活)
+            self.level = float(np.clip(
+                self.level + 0.15 * stress_drive,
+                0.05, 1.0
+            ))
         else:
-            self.state = "calm"
+            # 恢复慢 (NE清除)
+            self.level = float(np.clip(self.level * 0.93, 0.05, 1.0))
 
         return self.level
 
@@ -469,7 +477,7 @@ class NeurotransmitterSystem(nn.Module):
     完整神经递质系统
     """
 
-    def __init__(self):
+    def __init__(self, event_bus=None):
         super().__init__()
 
         # 主要递质
@@ -484,6 +492,41 @@ class NeurotransmitterSystem(nn.Module):
         self.overall_state = "neutral"
         self.motivation = 0.5
         self.arousal = 0.5
+
+        # Event-driven registration
+        if event_bus is not None:
+            event_bus.subscribe(
+                "brain_update",
+                self._handle_brain_update,
+                priority=1,
+                name="neurotransmitter",
+            )
+
+    def _handle_brain_update(self, event) -> Dict:
+        """Event-driven handler for brain_update events."""
+        state = event.data.get("internal_state", {})
+        info_gain = event.data.get("info_gain_reward", 0.0)
+
+        result = self.step(
+            reward=info_gain,
+            expectation=state.get("expectation", 0.0),
+            novelty=state.get("novelty", 0.0),
+            salience=state.get("salience", 0.0),
+            pain=0.0,
+            threat=state.get("threat", 0.0),
+            urgency=state.get("urgency", 0.0),
+        )
+
+        state["nt_dopamine"] = result["dopamine"]
+        state["nt_serotonin"] = result["serotonin"]
+        state["nt_acetylcholine"] = result["acetylcholine"]
+        state["nt_norepinephrine"] = result["norepinephrine"]
+        state["nt_motivation"] = result["motivation"]
+        state["nt_arousal"] = result["arousal"]
+        state["nt_state"] = result["state"]
+        state["dopamine"] = result["dopamine"]
+
+        return result
 
     def step(
         self,
@@ -534,15 +577,26 @@ class NeurotransmitterSystem(nn.Module):
         self.motivation = dop_level * 0.4 + ser_level * 0.3 + ach_level * 0.3
         self.arousal = ne_level * 0.5 + ach_level * 0.3 + end_level * 0.2
 
-        # 更新整体状态
-        if stress > 0.7:
-            self.overall_state = "stress"
-        elif ne_level > 0.7:
-            self.overall_state = "alert"
-        elif dop_level > 0.7:
-            self.overall_state = "motivated"
-        elif ser_level < 0.3:
-            self.overall_state = "sad"
+        # 更新整体状态 (连续混合, 无硬阈值if/elif)
+        # 使用加权融合: 每种状态的"激活度"基于对应递质水平
+        stress_activation = float(np.clip(stress * 1.5 - 0.2, 0.0, 1.0))    # 平滑过渡
+        alert_activation = float(np.clip(ne_level * 1.3 - 0.15, 0.0, 1.0))
+        motivation_activation = float(np.clip(dop_level * 1.3 - 0.15, 0.0, 1.0))
+        sadness_activation = float(np.clip((0.3 - ser_level) * 2, 0.0, 1.0))
+        neutral_activation = max(0.0, 1.0 - stress_activation - alert_activation
+                                 - motivation_activation - sadness_activation)
+
+        # 归一化激活权重
+        activations = {
+            "stress": stress_activation,
+            "alert": alert_activation,
+            "motivated": motivation_activation,
+            "sad": sadness_activation,
+            "neutral": neutral_activation,
+        }
+        total_act = sum(activations.values())
+        if total_act > 0:
+            self.overall_state = max(activations, key=activations.get)
         else:
             self.overall_state = "neutral"
 

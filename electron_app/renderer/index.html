@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>CLF Neuro Monitor - Civis Lucri-Faber</title>
+<style>
+/* ═══════════ Catppuccin Mocha 暗色主题 ═══════════ */
+:root {
+  --base:      #1e1e2e;
+  --mantle:    #181825;
+  --crust:     #11111b;
+  --surface0:  #313244;
+  --surface1:  #45475a;
+  --surface2:  #585b70;
+  --overlay0:  #6c7086;
+  --subtext0:  #a6adc8;
+  --text:      #cdd6f4;
+  --lavender:  #b4befe;
+  --blue:      #89b4fa;
+  --sapphire:  #74c7ec;
+  --sky:       #89dceb;
+  --teal:      #94e2d5;
+  --green:     #a6e3a1;
+  --yellow:    #f9e2af;
+  --peach:     #fab387;
+  --maroon:    #eba0ac;
+  --red:       #f38ba8;
+  --mauve:     #cba6f7;
+  --pink:      #f5c2e7;
+  --flamingo:  #f2cdcd;
+  --rosewater: #f5e0dc;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--base);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── 顶栏 ── */
+.header {
+  background: var(--mantle);
+  border-bottom: 1px solid var(--surface0);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.header h1 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--lavender);
+  white-space: nowrap;
+}
+.header h1 span { color: var(--overlay0); font-weight: 400; }
+.status-pills { display: flex; gap: 8px; margin-left: auto; }
+.pill {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--surface0);
+  color: var(--subtext0);
+  white-space: nowrap;
+}
+.pill.live { background: rgba(166,227,161,0.15); color: var(--green); }
+.pill.warn { background: rgba(249,226,175,0.15); color: var(--yellow); }
+
+/* ── 主布局 ── */
+.main-layout {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── 左: 聊天区 ── */
+.chat-panel {
+  width: 420px;
+  min-width: 320px;
+  border-right: 1px solid var(--surface0);
+  display: flex;
+  flex-direction: column;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.msg {
+  max-width: 92%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+.msg.user {
+  align-self: flex-end;
+  background: var(--surface1);
+  color: var(--text);
+  border-bottom-right-radius: 4px;
+}
+.msg.assistant {
+  align-self: flex-start;
+  background: var(--surface0);
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+.msg-meta {
+  font-size: 10px;
+  color: var(--overlay0);
+  margin-top: 4px;
+}
+.chat-input-area {
+  padding: 12px;
+  border-top: 1px solid var(--surface0);
+  display: flex;
+  gap: 8px;
+}
+.chat-input-area input {
+  flex: 1;
+  background: var(--surface0);
+  border: 1px solid var(--surface1);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+.chat-input-area input:focus { border-color: var(--blue); }
+.chat-input-area button {
+  background: var(--blue);
+  color: var(--crust);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chat-input-area button:hover { opacity: 0.85; }
+.chat-input-area button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── 右: 参数监测区 ── */
+.monitor-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.tab-bar {
+  display: flex;
+  background: var(--mantle);
+  border-bottom: 1px solid var(--surface0);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.tab-bar::-webkit-scrollbar { height: 0; }
+.tab-btn {
+  padding: 8px 14px;
+  font-size: 11px;
+  color: var(--subtext0);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.tab-btn:hover { color: var(--text); background: var(--surface0); }
+.tab-btn.active { color: var(--text); font-weight: 600; border-bottom-color: var(--blue); }
+.tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+.tab-content::-webkit-scrollbar { width: 6px; }
+.tab-content::-webkit-scrollbar-thumb { background: var(--surface1); border-radius: 3px; }
+
+/* ── 参数卡片网格 ── */
+.param-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+.param-card {
+  background: var(--crust);
+  border: 1px solid var(--surface0);
+  border-radius: 8px;
+  padding: 10px;
+  transition: border-color 0.2s;
+}
+.param-card:hover { border-color: var(--surface1); }
+.param-card .label {
+  font-size: 11px;
+  color: var(--subtext0);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+.param-card .value {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.param-card canvas {
+  width: 100%;
+  height: 40px;
+  display: block;
+}
+.flag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 6px;
+}
+.flag-item {
+  background: var(--crust);
+  border: 1px solid var(--surface0);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.flag-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── 药理面板 ── */
+.pharma-panel { padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+.pharma-row { display: flex; gap: 8px; align-items: center; }
+.pharma-row label { font-size: 12px; color: var(--subtext0); min-width: 80px; }
+.pharma-row select, .pharma-row input {
+  background: var(--surface0);
+  border: 1px solid var(--surface1);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+.pharma-row select { min-width: 160px; }
+.pharma-btn {
+  background: var(--surface0);
+  color: var(--text);
+  border: 1px solid var(--surface1);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.pharma-btn:hover { background: var(--surface1); }
+.pharma-btn.danger { border-color: var(--red); color: var(--red); }
+.pharma-btn.danger:hover { background: rgba(243,139,168,0.15); }
+.pharma-result {
+  background: var(--mantle);
+  border: 1px solid var(--surface0);
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 11px;
+  color: var(--subtext0);
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: 'Cascadia Code', 'Fira Code', monospace;
+}
+.preset-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.preset-chip {
+  background: var(--surface0);
+  color: var(--subtext0);
+  border: 1px solid var(--surface1);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.preset-chip:hover { background: var(--surface1); color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- ── 顶栏 ── -->
+<div class="header">
+  <h1>CLF Neuro Monitor <span>v1.0</span></h1>
+  <div class="status-pills">
+    <div class="pill live" id="pill-status">LIVE</div>
+    <div class="pill" id="pill-step">Step: 0</div>
+    <div class="pill" id="pill-emotion">Emotion: neutral</div>
+    <div class="pill" id="pill-valence">V: 0.000</div>
+    <div class="pill" id="pill-arousal">A: 0.500</div>
+  </div>
+</div>
+
+<!-- ── 主布局 ── -->
+<div class="main-layout">
+
+  <!-- 左: 聊天 -->
+  <div class="chat-panel">
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-area">
+      <input id="chat-input" placeholder="输入消息..." autocomplete="off" />
+      <button id="chat-send" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+
+  <!-- 右: 参数 -->
+  <div class="monitor-panel">
+    <div class="tab-bar" id="tab-bar"></div>
+    <div class="tab-content" id="tab-content"></div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// 配置
+// ═══════════════════════════════════════════════════════════
+const API = '';
+const HISTORY_LEN = 80;
+
+const CATEGORIES = {
+  "Neurotransmitters": {
+    params: {
+      nt_dopamine:        { label: "Dopamine",   color: "#f38ba8", range: [0,1] },
+      nt_serotonin:       { label: "Serotonin",  color: "#a6e3a1", range: [0,1] },
+      nt_acetylcholine:   { label: "ACh",        color: "#89b4fa", range: [0,1] },
+      nt_norepinephrine:  { label: "NE",         color: "#f9e2af", range: [0,1] },
+      nt_motivation:      { label: "Motivation",  color: "#cba6f7", range: [0,1] },
+      nt_arousal:         { label: "NT Arousal",  color: "#fab387", range: [0,1] },
+    }
+  },
+  "Hormones": {
+    params: {
+      hormone_cortisol:     { label: "Cortisol",      color: "#f38ba8", range: [0,1] },
+      hormone_adrenaline:   { label: "Adrenaline",    color: "#fab387", range: [0,1] },
+      hormone_melatonin:    { label: "Melatonin",     color: "#cba6f7", range: [0,1] },
+      hormone_oxytocin:     { label: "Oxytocin",      color: "#94e2d5", range: [0,1] },
+      encoding_modulation:  { label: "Encoding Mod",  color: "#74c7ec", range: [0,1.5] },
+      exploration_modulation:{ label: "Explore Mod",  color: "#a6e3a1", range: [0,1.5] },
+      gr_sensitivity:       { label: "GR Sensitivity", color: "#f2cdcd", range: [0.2,1.1] },
+      mr_sensitivity:       { label: "MR Sensitivity", color: "#f5e0dc", range: [0.4,1.1] },
+    }
+  },
+  "Brainstem": {
+    params: {
+      bsm_arousal:            { label: "Arousal",        color: "#fab387", range: [0,1] },
+      bsm_consciousness_gate: { label: "Conscious Gate", color: "#f9e2af", range: [0,1] },
+      bsm_cortical_activation:{ label: "Cortical Act.", color: "#89b4fa", range: [0,1] },
+      bsm_respiratory_rate:   { label: "Resp. Rate",     color: "#89dceb", range: [0,40] },
+      bsm_heart_rate:         { label: "Heart Rate",     color: "#f38ba8", range: [0,200] },
+      bsm_blood_pressure:     { label: "Blood Press.",   color: "#eba0ac", range: [0,200] },
+      bsm_pain_gating:        { label: "Pain Gate",      color: "#f2cdcd", range: [0,1] },
+    }
+  },
+  "Autonomic": {
+    params: {
+      ans_sympathetic:    { label: "Sympathetic",  color: "#f38ba8", range: [0,1] },
+      ans_parasympathetic:{ label: "Parasympath.", color: "#a6e3a1", range: [0,1] },
+      ans_hrv:            { label: "HRV",          color: "#89b4fa", range: [0,1] },
+    }
+  },
+  "HPA & Stress": {
+    params: {
+      cortisol_level: { label: "Cortisol Lvl", color: "#f38ba8", range: [0,1] },
+      cortisol:       { label: "Cortisol",     color: "#eba0ac", range: [0,1] },
+      hpa_crh:        { label: "CRH",          color: "#fab387", range: [0,1] },
+      hpa_acth:       { label: "ACTH",         color: "#f9e2af", range: [0,1] },
+    }
+  },
+  "Glial & Metabolic": {
+    params: {
+      brain_waste:          { label: "Brain Waste",     color: "#f38ba8", range: [0,1] },
+      neuroinflammation:    { label: "Neuroinflam.",    color: "#fab387", range: [0,1] },
+      myelination_level:    { label: "Myelination",     color: "#89b4fa", range: [0,1] },
+      brain_health:         { label: "Brain Health",    color: "#a6e3a1", range: [0,1] },
+      glymphatic_clearance: { label: "Glymphatic",      color: "#89dceb", range: [0,1] },
+      allostatic_load:      { label: "Allostatic Load", color: "#f9e2af", range: [0,1] },
+      regulatory_capacity:  { label: "Regul. Capacity", color: "#94e2d5", range: [0,1] },
+    }
+  },
+  "Limbic & Emotion": {
+    params: {
+      limbic_valence:             { label: "Valence",     color: "#a6e3a1", range: [-1,1] },
+      limbic_arousal:             { label: "Limbic Ar.",  color: "#fab387", range: [0,1] },
+      limbic_emotional_attention: { label: "Emot. Attn.", color: "#f9e2af", range: [0,1] },
+      mood_valence:               { label: "Mood Val.",   color: "#94e2d5", range: [-1,1] },
+      mood_arousal:               { label: "Mood Ar.",    color: "#89dceb", range: [0,1] },
+      regulation_capacity:        { label: "Regul. Cap.", color: "#89b4fa", range: [0,1] },
+    }
+  },
+  "Executive Control": {
+    params: {
+      pfc_inhibition:    { label: "PFC Inhibit.",  color: "#89b4fa", range: [0,1] },
+      pfc_maturity:      { label: "PFC Maturity",  color: "#74c7ec", range: [0,1] },
+      pfc_plan_depth:    { label: "Plan Depth",    color: "#b4befe", range: [0,10] },
+      bg_td_error:       { label: "BG TD Error",   color: "#f38ba8", range: [-1,1] },
+      bg_habit_strength: { label: "Habit Str.",    color: "#fab387", range: [0,1] },
+      conscious_load:    { label: "Consc. Load",   color: "#f9e2af", range: [0,1] },
+    }
+  },
+  "Circadian & Sleep": {
+    params: {
+      scn_alertness:       { label: "Alertness",       color: "#f9e2af", range: [0,1] },
+      scn_melatonin:       { label: "SCN Melatonin",   color: "#cba6f7", range: [0,1] },
+      scn_cortisol_rhythm: { label: "Cortisol Rhythm", color: "#f38ba8", range: [0,1] },
+      scn_wake_drive:      { label: "Wake Drive",      color: "#fab387", range: [0,1] },
+      scn_sleep_pressure:  { label: "Sleep Pressure",  color: "#89b4fa", range: [0,1] },
+      scn_temperature:     { label: "Core Temp.",      color: "#eba0ac", range: [35,40] },
+      sleep_fatigue:       { label: "Fatigue",         color: "#585b70", range: [0,1] },
+    }
+  },
+  "Predictive Coding": {
+    params: {
+      free_energy:            { label: "Free Energy",     color: "#f38ba8", range: [0,2] },
+      prediction_error:       { label: "Pred. Error",     color: "#fab387", range: [0,2] },
+      precision:              { label: "Precision",       color: "#89b4fa", range: [0,2] },
+      active_inference_drive: { label: "Active Infer.",   color: "#94e2d5", range: [0,1] },
+    }
+  },
+  "Social & Empathy": {
+    params: {
+      social_engagement: { label: "Soc. Engage.",  color: "#a6e3a1", range: [0,1] },
+      social_capacity:   { label: "Soc. Capacity", color: "#94e2d5", range: [0,1] },
+      mirror_resonance:  { label: "Mirror Res.",   color: "#89dceb", range: [0,1] },
+      affective_empathy: { label: "Affec. Emp.",   color: "#f5c2e7", range: [0,1] },
+      cognitive_empathy: { label: "Cog. Emp.",     color: "#cba6f7", range: [0,1] },
+      compassion:        { label: "Compassion",    color: "#f2cdcd", range: [0,1] },
+      pain_resonance:    { label: "Pain Res.",     color: "#f38ba8", range: [0,1] },
+      empathy_level:     { label: "Empathy Lvl",   color: "#f5e0dc", range: [0,1] },
+    }
+  },
+  "Self & Plasticity": {
+    params: {
+      self_coherence:       { label: "Self Coherence",  color: "#b4befe", range: [0,1] },
+      self_endorsement:     { label: "Self Endorse.",   color: "#cba6f7", range: [0,1] },
+      narrative_continuity: { label: "Narrative Cont.", color: "#89b4fa", range: [0,1] },
+      plasticity_bdnf:      { label: "BDNF",            color: "#a6e3a1", range: [0,1] },
+      plasticity_synapses:  { label: "Synaptic Str.",   color: "#94e2d5", range: [0,1] },
+      info_gain:            { label: "Info Gain",       color: "#f9e2af", range: [0,1] },
+    }
+  },
+  "Memory & Language": {
+    params: {
+      hc_memory_count:        { label: "Memory Count",    color: "#89b4fa", range: [0,500] },
+      hc_last_encoding_norm:  { label: "Encoding Norm",   color: "#74c7ec", range: [0,5] },
+      hc_retrieved_avg_reward:{ label: "Avg Reward",      color: "#a6e3a1", range: [-1,1] },
+      language_valence:       { label: "Lang. Valence",   color: "#94e2d5", range: [-1,1] },
+      language_arousal:       { label: "Lang. Arousal",   color: "#fab387", range: [0,1] },
+      language_surprise:      { label: "Lang. Surprise",  color: "#f9e2af", range: [0,1] },
+    }
+  },
+  "LLM Params": {
+    params: {
+      llm_temperature: { label: "Temperature", color: "#fab387", range: [0,2] },
+      llm_top_p:       { label: "Top-P",       color: "#89b4fa", range: [0,1] },
+      llm_max_tokens:  { label: "Max Tokens",  color: "#a6e3a1", range: [0,4096] },
+    }
+  },
+  "Flags": {
+    text_keys: [
+      "bsm_defense_behavior", "bsm_arousal_name", "allostatic_regime",
+      "stress_type", "current_emotion", "limbic_emotion",
+      "nt_state", "ans_polyvagal_state", "sleep_stage", "inferred_intent",
+    ],
+    bool_keys: [
+      "defensive_mode", "minimal_mode", "processing_throttle",
+      "memory_pressure_critical", "memory_pressure_warning",
+      "emergency_compression", "gc_triggered_by_waste",
+      "sleep_request", "conservative_learning",
+      "social_openness", "social_withdrawal",
+      "encoding_suppressed", "high_self_awareness",
+      "pfc_overrode_bg", "emotion_criticality",
+      "is_introspective_mode", "should_ask_followup", "sleep_is_sleeping",
+    ]
+  },
+  "Pharma": { pharma: true },
+};
+
+// ═══════════════════════════════════════════════════════════
+// 状态
+// ═══════════════════════════════════════════════════════════
+let currentTab = null;
+const stateHistory = {};   // key -> [val, val, ...]
+let latestState = {};
+
+// ═══════════════════════════════════════════════════════════
+// Tab 构建
+// ═══════════════════════════════════════════════════════════
+function buildTabs() {
+  const bar = document.getElementById("tab-bar");
+  Object.keys(CATEGORIES).forEach((name, i) => {
+    const btn = document.createElement("button");
+    btn.className = "tab-btn" + (i === 0 ? " active" : "");
+    btn.textContent = name;
+    btn.onclick = () => switchTab(name);
+    btn.dataset.tab = name;
+    bar.appendChild(btn);
+  });
+  switchTab(Object.keys(CATEGORIES)[0]);
+}
+
+function switchTab(name) {
+  currentTab = name;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  renderTab(name);
+}
+
+function renderTab(name) {
+  const container = document.getElementById("tab-content");
+  const cat = CATEGORIES[name];
+  if (!cat) return;
+  if (cat.pharma) { renderPharmaPanel(container); return; }
+
+  if (cat.text_keys || cat.bool_keys) {
+    renderFlagsTab(container, cat);
+  } else if (cat.params) {
+    renderParamsTab(container, cat.params);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// 参数卡片渲染
+// ═══════════════════════════════════════════════════════════
+function renderParamsTab(container, params) {
+  container.innerHTML = "";
+  const grid = document.createElement("div");
+  grid.className = "param-grid";
+
+  Object.entries(params).forEach(([key, cfg]) => {
+    const card = document.createElement("div");
+    card.className = "param-card";
+
+    const label = document.createElement("div");
+    label.className = "label";
+    label.innerHTML = `<span>${cfg.label}</span><span id="pk-${key}" style="color:var(--overlay0);font-size:10px;">${key}</span>`;
+
+    const value = document.createElement("div");
+    value.className = "value";
+    value.style.color = cfg.color;
+    value.id = "pv-" + key;
+    value.textContent = "--";
+
+    const canvas = document.createElement("canvas");
+    canvas.id = "pc-" + key;
+    canvas.width = 380;
+    canvas.height = 40;
+
+    card.appendChild(label);
+    card.appendChild(value);
+    card.appendChild(canvas);
+    grid.appendChild(card);
+  });
+
+  container.appendChild(grid);
+}
+
+function renderFlagsTab(container, cat) {
+  container.innerHTML = "";
+  const grid = document.createElement("div");
+  grid.className = "flag-grid";
+
+  if (cat.text_keys) {
+    cat.text_keys.forEach(key => {
+      const item = document.createElement("div");
+      item.className = "flag-item";
+      item.innerHTML = `<div class="flag-dot" style="background:var(--blue);"></div>
+        <span style="color:var(--subtext0);min-width:160px;">${key}</span>
+        <span id="fv-${key}" style="color:var(--text);">--</span>`;
+      grid.appendChild(item);
+    });
+  }
+  if (cat.bool_keys) {
+    cat.bool_keys.forEach(key => {
+      const item = document.createElement("div");
+      item.className = "flag-item";
+      item.innerHTML = `<div class="flag-dot" id="fd-${key}" style="background:var(--surface2);"></div>
+        <span style="color:var(--subtext0);min-width:160px;">${key}</span>
+        <span id="fv-${key}" style="color:var(--text);">--</span>`;
+      grid.appendChild(item);
+    });
+  }
+
+  container.appendChild(grid);
+}
+
+// ═══════════════════════════════════════════════════════════
+// 药理面板
+// ═══════════════════════════════════════════════════════════
+function renderPharmaPanel(container) {
+  container.innerHTML = "";
+  const panel = document.createElement("div");
+  panel.className = "pharma-panel";
+  panel.innerHTML = `
+    <h3 style="color:var(--mauve);font-size:13px;">Pharmacology Interface</h3>
+
+    <div class="pharma-row">
+      <label>Action:</label>
+      <select id="ph-action">
+        <option value="inject">Inject (升高)</option>
+        <option value="reduce">Reduce (降低)</option>
+        <option value="anesthetize">Anesthetize (麻醉)</option>
+        <option value="activate">Activate (激活)</option>
+        <option value="lesion">Lesion (切除)</option>
+        <option value="prescribe">Prescribe (处方预设)</option>
+      </select>
+    </div>
+    <div class="pharma-row">
+      <label>Target:</label>
+      <input id="ph-target" placeholder="e.g. dopamine / amygdala" style="flex:1;" />
+    </div>
+    <div class="pharma-row">
+      <label>Value:</label>
+      <input id="ph-value" type="number" step="0.1" min="0" max="1" placeholder="0.0 ~ 1.0" style="width:120px;" />
+      <button class="pharma-btn" onclick="executePharma()">Execute</button>
+      <button class="pharma-btn danger" onclick="resetPharma()">Reset All</button>
+    </div>
+
+    <div style="margin-top:8px;">
+      <div style="font-size:11px;color:var(--subtext0);margin-bottom:6px;">Quick Presets:</div>
+      <div class="preset-chips" id="preset-chips"></div>
+    </div>
+
+    <div class="pharma-result" id="pharma-result">Ready</div>
+  `;
+  container.appendChild(panel);
+  loadPresets();
+}
+
+async function loadPresets() {
+  try {
+    const res = await fetch(`${API}/api/pharma/presets`);
+    const presets = await res.json();
+    const box = document.getElementById("preset-chips");
+    Object.entries(presets).forEach(([k, v]) => {
+      const chip = document.createElement("span");
+      chip.className = "preset-chip";
+      chip.textContent = v.name || k;
+      chip.onclick = () => {
+        document.getElementById("ph-action").value = "prescribe";
+        document.getElementById("ph-target").value = k;
+        executePharma();
+      };
+      box.appendChild(chip);
+    });
+  } catch(e) { console.error("Failed to load presets", e); }
+}
+
+async function executePharma() {
+  const action = document.getElementById("ph-action").value;
+  const target = document.getElementById("ph-target").value.trim();
+  const value = document.getElementById("ph-value").value;
+  if (!target) { alert("Please enter a target"); return; }
+
+  const resBox = document.getElementById("pharma-result");
+  resBox.textContent = `Executing ${action} on ${target}...`;
+
+  try {
+    const res = await fetch(`${API}/api/pharma`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ action, target, value: value || undefined })
+    });
+    const data = await res.json();
+    resBox.textContent = JSON.stringify(data, null, 2);
+    if (data.state) { latestState = data.state; updateAll(); }
+  } catch(e) {
+    resBox.textContent = `Error: ${e.message}`;
+  }
+}
+
+async function resetPharma() {
+  try {
+    await fetch(`${API}/api/pharma`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ action: "reset" })
+    });
+    document.getElementById("pharma-result").textContent = "All systems reset to baseline";
+  } catch(e) { alert(e.message); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// 绘制迷你折线图
+// ═══════════════════════════════════════════════════════════
+function drawChart(canvasId, data, color, range) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  if (data.length < 2) return;
+
+  const [lo, hi] = range || [Math.min(...data), Math.max(...data)];
+  const span = (hi - lo) || 1;
+
+  // grid lines
+  ctx.strokeStyle = "#313244";
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < 4; i++) {
+    const y = H * i / 3;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // line
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = (i / (data.length - 1)) * W;
+    const y = H - ((v - lo) / span) * (H - 4) - 2;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // fill
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = color;
+  ctx.lineTo(W, H);
+  ctx.lineTo(0, H);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 状态更新
+// ═══════════════════════════════════════════════════════════
+function updateAll() {
+  const state = latestState;
+
+  // 顶栏 pills
+  document.getElementById("pill-step").textContent = `Step: ${state.step || 0}`;
+  const emo = state.current_emotion || state.limbic_emotion || "neutral";
+  document.getElementById("pill-emotion").textContent = `Emotion: ${emo}`;
+  document.getElementById("pill-valence").textContent = `V: ${(state.limbic_valence||0).toFixed(3)}`;
+  document.getElementById("pill-arousal").textContent = `A: ${(state.limbic_arousal||0).toFixed(3)}`;
+
+  // 当前 Tab 更新
+  const cat = CATEGORIES[currentTab];
+  if (!cat) return;
+
+  if (cat.params) {
+    Object.keys(cat.params).forEach(key => {
+      const val = state[key];
+      if (val === undefined || val === null) return;
+
+      // 追加历史
+      if (!stateHistory[key]) stateHistory[key] = [];
+      stateHistory[key].push(typeof val === "number" ? val : 0);
+      if (stateHistory[key].length > HISTORY_LEN) stateHistory[key].shift();
+
+      // 更新数值
+      const el = document.getElementById("pv-" + key);
+      if (el) el.textContent = typeof val === "number" ? val.toFixed(4) : String(val);
+
+      // 重绘折线
+      const cfg = cat.params[key];
+      drawChart("pc-" + key, stateHistory[key], cfg.color, cfg.range);
+    });
+  }
+
+  if (cat.text_keys) {
+    cat.text_keys.forEach(key => {
+      const el = document.getElementById("fv-" + key);
+      if (el) el.textContent = state[key] ?? "--";
+    });
+  }
+  if (cat.bool_keys) {
+    cat.bool_keys.forEach(key => {
+      const val = state[key];
+      const textEl = document.getElementById("fv-" + key);
+      const dotEl = document.getElementById("fd-" + key);
+      if (textEl) textEl.textContent = val === true ? "TRUE" : val === false ? "false" : "--";
+      if (dotEl) dotEl.style.background = val === true ? "#a6e3a1" : "var(--surface2)";
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// 聊天
+// ═══════════════════════════════════════════════════════════
+function appendMsg(role, text, meta) {
+  const box = document.getElementById("chat-messages");
+  const div = document.createElement("div");
+  div.className = "msg " + role;
+  let inner = text.replace(/</g, "&lt;").replace(/\n/g, "<br>");
+  if (meta) inner += `<div class="msg-meta">${meta}</div>`;
+  div.innerHTML = inner;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById("chat-input");
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = "";
+  appendMsg("user", text);
+
+  const btn = document.getElementById("chat-send");
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/api/chat`, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    if (data.error) {
+      appendMsg("assistant", `[Error] ${data.error}`);
+    } else {
+      const strategy = (data.cognitive_gate || {}).strategy || "?";
+      const verdict = (data.quality_filter || {}).verdict || "?";
+      const learnTag = data.learning_active ? " [Learn]" : "";
+      const meta = `[${data.emotion} | S=${strategy} Q=${verdict}${learnTag} | T=${(data.llm_params||{}).temperature?.toFixed(2)||"?"}]`;
+      appendMsg("assistant", data.text, meta);
+    }
+  } catch(e) {
+    appendMsg("assistant", `[Network Error] ${e.message}`);
+  }
+  btn.disabled = false;
+  input.focus();
+}
+
+document.getElementById("chat-input").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+
+// ═══════════════════════════════════════════════════════════
+// SSE 实时状态流
+// ═══════════════════════════════════════════════════════════
+function startSSE() {
+  const es = new EventSource(`${API}/api/state/stream`);
+  es.onmessage = (e) => {
+    try {
+      latestState = JSON.parse(e.data);
+      updateAll();
+    } catch(err) {}
+  };
+  es.onerror = () => {
+    console.log("SSE reconnecting...");
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// 初始化
+// ═══════════════════════════════════════════════════════════
+buildTabs();
+startSSE();
+document.getElementById("chat-input").focus();
+</script>
+</body>
+</html>

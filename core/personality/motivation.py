@@ -6,13 +6,18 @@
 2. InverseStockholmDefense - 反向斯德哥尔摩防御
 
 目标：防止"谄媚病"，让AI保持独立性
+
+事件驱动:
+    - 订阅 PERSONALITY_UPDATE: 收到人格更新事件时处理动机
 """
 import torch
 import torch.nn as nn
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from dataclasses import dataclass
 import time
+
+from civis_lucri_faber.core.events import PERSONALITY_UPDATE
 
 
 @dataclass
@@ -322,7 +327,7 @@ class MotivationSurvivalSystem(nn.Module):
     整合两个机制，对抗谄媚病
     """
 
-    def __init__(self):
+    def __init__(self, event_bus=None):
         super().__init__()
 
         # 内在动机
@@ -336,6 +341,11 @@ class MotivationSurvivalSystem(nn.Module):
 
         # 统计
         self.autonomous_actions = 0
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(PERSONALITY_UPDATE, self.on_personality_update, priority=4, name="motivation")
 
     def process_interaction(
         self,
@@ -390,6 +400,13 @@ class MotivationSurvivalSystem(nn.Module):
         action = self.motivation.create_action_plan(primary)
         self.autonomous_actions += 1
         return action
+
+    def on_personality_update(self, event) -> Dict[str, Any]:
+        """事件驱动: 响应 PERSONALITY_UPDATE"""
+        user_input = event.data.get("user_input", "")
+        user_sentiment = event.data.get("sentiment", 0.1)
+        result = self.process_interaction(user_input, user_sentiment=user_sentiment)
+        return {"motivation_result": result}
 
     def get_summary(self) -> Dict:
         """获取摘要"""

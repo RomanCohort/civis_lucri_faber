@@ -10,14 +10,19 @@
 1. 用户画像向量
 2. 动态关系更新
 3. 交互模式自动切换
+
+事件驱动:
+    - 订阅 PERSONALITY_UPDATE: 收到人格更新事件时更新关系
 """
 import torch
 import torch.nn as nn
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from dataclasses import dataclass
 import time
 from collections import deque
+
+from civis_lucri_faber.core.events import PERSONALITY_UPDATE
 
 
 @dataclass
@@ -151,7 +156,7 @@ class RelationalEmbedding(nn.Module):
     基于GNN的动态人际网络记忆
     """
 
-    def __init__(self, embedding_dim: int = 64):
+    def __init__(self, embedding_dim: int = 64, event_bus=None):
         super().__init__()
         self.dim = embedding_dim
 
@@ -164,6 +169,11 @@ class RelationalEmbedding(nn.Module):
             nn.ReLU(),
             nn.Linear(embedding_dim, embedding_dim),
         )
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(PERSONALITY_UPDATE, self.on_personality_update, priority=2, name="relation")
 
     def update(self, user_id: str, **kwargs):
         """更新用户"""
@@ -188,6 +198,13 @@ class RelationalEmbedding(nn.Module):
             'total_users': len(self.scm.users),
             'interaction_log_size': len(self.scm.interaction_log),
         }
+
+    def on_personality_update(self, event) -> Dict[str, Any]:
+        """事件驱动: 响应 PERSONALITY_UPDATE"""
+        user_id = event.data.get("user_id", "default")
+        sentiment = event.data.get("sentiment", 0.1)
+        self.update(user_id, sentiment=sentiment)
+        return {"relation_updated": True}
 
 
 # ============ 便捷函数 ============

@@ -615,51 +615,11 @@ class BioGate(nn.Module):
         # 心境状态 (中层)
         self.mood = MoodState()
 
-    def forward(self, input_emb: torch.Tensor, return_all: bool = False):
-        # 内容门控
-        content_logits = self.content_gate(input_emb)
-
-        # 膜电位
-        membrane_effect = self.membrane_potential.unsqueeze(0)
-
-        # 情绪影响
-        emotion_effect = torch.tanh(self.emotion_vector.sum()) * 0.2
-
-        # 心境影响 (中层)
-        mood_logits = mood_affect_decision(content_logits)
-        mood_effect = self.mood.mood_affect_decision(content_logits)
-
-        # 综合门控
-        gate_logits = content_logits + membrane_effect + emotion_effect + mood_effect
-        gate_weights = F.softmax(gate_logits, dim=-1)
-        expert_idx = gate_weights.argmax(dim=-1)
-
-        # 更新膜电位
-        with torch.no_grad():
-            updates = torch.zeros_like(self.membrane_potential)
-            updates[expert_idx] = 0.1
-            self.membrane_potential.data = self.membrane_potential.data * self.membrane_decay + updates
-
-        if return_all:
-            return expert_idx, gate_weights, self.emotion_state, self.mood.forward()
-
-        return expert_idx, gate_weights
-
-    def mood_affect_decision(self, base_logits):
-        return self.mood.mood_affect_decision(base_logits)
-
-    @property
-    def emotion_state(self):
-        return {
-            'valence': torch.tanh(self.emotion_vector[0]),
-            'arousal': torch.sigmoid(self.emotion_vector[1]),
-            'dominance': torch.sigmoid(self.emotion_vector[2]),
-        }
-
     def forward(self, input_emb: torch.Tensor, return_emotion: bool = False):
         """
         Args:
             input_emb: [B, dim]
+            return_emotion: 是否返回情绪状态
         Returns:
             expert_idx: 选择的专家ID
             gate_weights: 各专家权重
@@ -671,11 +631,14 @@ class BioGate(nn.Module):
         # === 步骤2: 膜电位影响 ===
         membrane_effect = self.membrane_potential.unsqueeze(0)
 
-        # === 步骤3: 情绪影响 (简化) ===
+        # === 步骤3: 情绪影响 ===
         emotion_effect = torch.tanh(self.emotion_vector.sum()) * 0.3
 
+        # === 步骤4: 心境影响 (中层调节) ===
+        mood_effect = self.mood.mood_affect_decision(content_logits)
+
         # === 综合门控 ===
-        gate_logits = content_logits + membrane_effect + emotion_effect
+        gate_logits = content_logits + membrane_effect + emotion_effect + mood_effect
         gate_weights = F.softmax(gate_logits, dim=-1)
 
         expert_idx = gate_weights.argmax(dim=-1)
@@ -794,7 +757,7 @@ class ParallelEncoder(nn.Module):
         super().__init__()
         hidden = dim * 2  # 增大隐藏层
         self.gru = nn.GRU(dim, hidden, batch_first=True, bidirectional=True, num_layers=2)
-        self.proj = nn.Linear(hidden * 2, dim)
+        self.proj = nn.Linear(hidden * 4, dim)
         self.layer_norm = nn.LayerNorm(dim)
 
     def forward(self, embeddings):
@@ -823,6 +786,7 @@ class LanguageCortex(nn.Module):
         self,
         vocab_size: int = 10000,
         use_parallel: bool = True,
+        event_bus=None,
     ):
         super().__init__()
         self.use_parallel = use_parallel
@@ -861,6 +825,52 @@ class LanguageCortex(nn.Module):
             nn.ReLU(),
             nn.Linear(64, 4),
         )
+
+        # Event-driven registration
+        if event_bus is not None:
+            event_bus.subscribe(
+                "sensory_process",
+                self._handle_sensory_process,
+                priority=1,
+                name="language_cortex",
+            )
+
+    @staticmethod
+    def _text_to_tokens(text: str):
+        """确定性文本到 token 编码（相同文本产生相同 token）"""
+        import torch as _torch
+        words = text.split()
+        if not words:
+            return _torch.tensor([[0]])
+        # 用字符 hash 映射到 vocab 空间，确定性且可复现
+        tokens = []
+        for word in words:
+            token_id = hash(word) % 10000
+            tokens.append(token_id)
+        return _torch.tensor([tokens])
+
+    def _handle_sensory_process(self, event) -> Dict:
+        """Event-driven handler for sensory_process events."""
+        import torch as _torch
+        user_input = event.data.get("user_input")
+        if user_input is None:
+            return {}
+
+        # Convert user_input to tokens tensor
+        # 使用确定性字符编码代替随机 token，相同文本产生相同结果
+        if isinstance(user_input, str):
+            tokens = self._text_to_tokens(user_input)
+        else:
+            tokens = user_input if isinstance(user_input, _torch.Tensor) else _torch.randint(0, 10000, (1, 10))
+
+        result = self(tokens)
+
+        state = event.data.get("internal_state", {})
+        state["language_valence"] = result["valence"].item() if hasattr(result["valence"], "item") else result["valence"]
+        state["language_arousal"] = result["arousal"].item() if hasattr(result["arousal"], "item") else result["arousal"]
+        state["language_surprise"] = result["surprise"] if isinstance(result["surprise"], float) else float(result["surprise"])
+
+        return result
 
     def forward(self, tokens: torch.Tensor, return_emotion: bool = False) -> Dict:
         """

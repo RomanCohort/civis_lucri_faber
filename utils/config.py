@@ -45,6 +45,45 @@ class Config:
     openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
     anthropic_api_key: str = field(default_factory=lambda: os.getenv("ANTHROPIC_API_KEY", ""))
     model_name: str = "gpt-4"
+    # LLM 多通道
+    deepseek_api_key: str = field(default_factory=lambda: os.getenv("DEEPSEEK_API_KEY", ""))
+    deepseek_model: str = "deepseek-chat"
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_model: str = "llama3"
+    llm_provider: str = "auto"  # "openai" / "anthropic" / "deepseek" / "ollama" / "auto"
+    # 对话参数
+    chat_temperature: float = 0.7
+    chat_max_tokens: int = 2048
+    tool_max_rounds: int = 5
+
+    # 维度8: 神经修剪参数
+    prune_threshold: float = 0.15       # 权重低于此值触发硬剪枝
+    prune_decay_rate: float = 0.002     # 基础权重衰减率
+    growth_factor_baseline: float = 0.5 # 生长因子基线浓度
+    neurogenesis_enabled: bool = True   # 是否启用神经发生
+
+    # 维度9: 神经自调节参数
+    # ANS (自主神经)
+    ans_sympathetic_reactivity: float = 1.0   # 交感神经反应性
+    ans_baseline_vagal_tone: float = 0.5      # 基础迷走神经张力
+    ans_baroreceptor_setpoint: float = 0.5     # 压力感受器设定点
+    # HPA轴
+    hpa_stress_reactivity: float = 1.0        # 应激反应性
+    hpa_cortisol_half_life_steps: int = 60     # 皮质醇半衰期 (步数)
+    hpa_feedback_strength: float = 0.6         # 负反馈强度
+    hpa_load_accumulation_rate: float = 0.002  # 稳态负荷累积率
+    # 胶质系统
+    glial_pruning_rate: float = 0.05           # 基础突触修剪率
+    # 稳态调节
+    allostatic_overload_threshold: float = 0.8  # 稳态超载阈值
+    allostatic_load_recovery_rate: float = 0.005  # 稳态恢复率
+    # 预测编码
+    predictive_coding_layers: int = 3           # 预测编码层级数
+    predictive_coding_lr: float = 0.01          # 生成模型学习率
+
+    # 事件驱动参数
+    event_log_enabled: bool = False   # 事件日志开关
+    event_bus_debug: bool = False     # 调试模式
 
     # 系统参数
     max_history_size: int = 1000

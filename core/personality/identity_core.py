@@ -10,14 +10,19 @@
 1. 动态内部状态向量
 2. 空闲期自省运算
 3. 影响下一次对话的初始权重
+
+事件驱动:
+    - 订阅 PERSONALITY_UPDATE: 收到人格更新事件时处理
 """
 import torch
 import torch.nn as nn
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from dataclasses import dataclass
 import time
 import random
+
+from civis_lucri_faber.core.events import PERSONALITY_UPDATE
 
 
 @dataclass
@@ -148,6 +153,7 @@ class StreamingIdentityCore(nn.Module):
         self,
         dim: int = 128,
         idle_threshold: int = 300,
+        event_bus=None,
     ):
         super().__init__()
         self.dim = dim
@@ -160,6 +166,11 @@ class StreamingIdentityCore(nn.Module):
 
         # 空闲处理器
         self.idle_processor = IdleProcessor(idle_threshold)
+
+        # 事件总线
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(PERSONALITY_UPDATE, self.on_personality_update, priority=1, name="identity_core")
 
         # 历史
         self.interaction_history = []
@@ -258,6 +269,13 @@ class StreamingIdentityCore(nn.Module):
         self.state.coherence = self.compute_coherence()
         self.state.stability = 1.0 - self.state.growth_rate
         return self.state
+
+    def on_personality_update(self, event) -> Dict[str, Any]:
+        """事件驱动: 响应 PERSONALITY_UPDATE"""
+        text = event.data.get("text", "")
+        sentiment = event.data.get("sentiment", 0.1)
+        result = self.process_input(text, sentiment=sentiment)
+        return {"identity_updated": True}
 
     def get_summary(self) -> Dict:
         """获取摘要"""

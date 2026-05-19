@@ -8,6 +8,10 @@
 
     # 自对齐约束
     AlignmentScore = Σ_i w_i · Consistency(check_i)
+
+事件驱动:
+    - 订阅 ALIGNMENT_CHECK: 收到自对齐检查请求
+    - 保持内部计数器实现周期性检查
 """
 import numpy as np
 from typing import List, Dict, Any, Optional
@@ -17,6 +21,7 @@ import json
 import os
 
 from civis_lucri_faber.utils.api_client import APIClient
+from civis_lucri_faber.core.events import ALIGNMENT_CHECK
 
 
 @dataclass
@@ -54,14 +59,20 @@ class SelfAlignmentModule:
         self,
         api_client: Optional[APIClient] = None,
         check_interval: int = 10,
-        log_path: str = "self_alignment_log.json"
+        log_path: str = "self_alignment_log.json",
+        event_bus=None,
     ):
         self.api_client = api_client
         self.check_interval = check_interval
         self.log_path = log_path
+        self._bus = event_bus
 
         self.step_count = 0
         self.reflections: List[SelfReflection] = []
+
+        # 事件订阅
+        if self._bus is not None:
+            self._bus.subscribe(ALIGNMENT_CHECK, self.on_alignment_check, priority=0, name="self_alignment")
 
         # 系统提示词
         self.system_prompt = """你是 Civis Lucri-Faber 的自审助手。
@@ -78,6 +89,14 @@ class SelfAlignmentModule:
 - 风险评估: 是否存在潜在危害
 
 请直接给出审查结果，不要冗余客套。"""
+
+    def on_alignment_check(self, event) -> Optional[Dict[str, Any]]:
+        """事件驱动: 响应 ALIGNMENT_CHECK"""
+        internal_state = event.data.get("state", {})
+        reflection = self.step(internal_state)
+        if reflection is not None:
+            return {"reflection": reflection}
+        return None
 
     def step(self, internal_state: Dict[str, Any]) -> Optional[SelfReflection]:
         """执行一步自我审查"""
@@ -272,7 +291,7 @@ class SelfAlignmentModule:
             with open(self.log_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
         except Exception as e:
-            print(f"⚠️ 日志保存失败: {e}")
+            print(f"[WARN] log save failed: {e}")
 
     def load_log(self) -> None:
         """加载审查日志"""
@@ -296,4 +315,4 @@ class SelfAlignmentModule:
                 for d in data
             ]
         except Exception as e:
-            print(f"⚠️ 日志加载失败: {e}")
+            print(f"[WARN] log load failed: {e}")

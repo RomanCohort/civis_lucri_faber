@@ -10,7 +10,7 @@
 
 ### 1.1 Research Motivation
 
-Civis Lucri-Faber (Latin "Craftsman Seeking Wealth", CLF) is a comprehensive bio-inspired AI cognitive architecture integrating **15 brain mechanisms**, **cognitive psychology**, and **adaptive pruning**. The core research question: **How to design more efficient, interpretable, and adaptive AI systems by inspired by the human brain?**
+Civis Lucri-Faber (Latin "Craftsman Seeking Wealth", CLF) is a bio-inspired AI cognitive architecture with **8 implemented brain mechanisms**, **cognitive psychology**, and **adaptive pruning**. The core research question: **How to design more efficient, interpretable, and adaptive AI systems by inspired by the human brain?**
 
 #### 1.1.1 Brain vs. Computer
 
@@ -66,23 +66,29 @@ The brain accomplishes vast cognitive tasks with ~20W power. This inspired our e
 
 ### 2.2 Fifteen Brain Mechanisms
 
-| # | Brain Region | Location | Function | Simulation | Reference |
-|---|------------|----------|----------|------------|-----------|
-| 1 | **Cochlea** | Inner ear | Frequency analysis | Gabor filter | von Békésy (1961) |
-| 2 | **Inferior Colliculus** | Midbrain | Auditory relay | Attention | Oliver (2009) |
-| 3 | **MGN** | Thalamus | Auditory thalamus | Feature pass | Winer (2005) |
-| 4 | **Primary Auditory (A1)** | Superior temporal | Sound processing | CNN | Recanzone (2000) |
-| 5 | **Planum Temporale** | Superior temporal | Speech recognition | MOE experts | Hickok (2007) |
-| 6 | **SIP** | Parietal | Spatial localization | Attention | Grefkes (2002) |
-| 7 | **Broca's Area** | Inferior frontal | Language production | Seq generation | Broca (1861) |
-| 8 | **Wernicke's Area** | Superior temporal | Semantic understanding | Attention | Wernicke (1874) |
-| 9 | **Arcuate Fasciculus** | White matter | Inter-regional connection | Cross-modal | Catani (2005) |
-| 10 | **Amygdala** | Medial temporal | Emotion perception | VAD emotion | LeDoux (2000) |
-| 11 | **Hippocampus** | Medial temporal | Working memory | 7-slot memory | Eichenbaum (2001) |
-| 12 | **Prefrontal Cortex** | Frontal lobe | High-level cognition | System1/2 | Miller (2000) |
-| 13 | **Pulvinar** | Thalamus | Fast routing | Direct path | Sherman (2007) |
-| 14 | **Visual Cortex V1-V4** | Occipital | Visual processing | Hierarchical CNN | Felleman (1991) |
-| 15 | **Midbrain nuclei** | Midbrain | Neuromodulation | Dopamine/serotonin | Schultz (2007) |
+**Note**: This list is a target/goal. Not all 15 are fully implemented.
+
+| # | Brain Region | Location | Function | Implementation | Status |
+|---|------------|----------|----------|------------|--------|
+| 1 | **Cochlea** | Inner ear | Frequency analysis | Gabor filter | ✓ Implemented |
+| 2 | **Inferior Colliculus** | Midbrain | Auditory relay | -- | Listed only |
+| 3 | **MGN** | Thalamus | Auditory thalamus | -- | Listed only |
+| 4 | **Primary Auditory (A1)** | Superior temporal | Sound processing | ✓ Implemented | ✓ Implemented |
+| 5 | **Planum Temporale** | Superior temporal | Speech recognition | -- | Listed only |
+| 6 | **SIP** | Parietal | Spatial localization | -- | Listed only |
+| 7 | **Broca's Area** | Inferior frontal | Language production | ✓ Implemented | ✓ Implemented |
+| 8 | **Wernicke's Area** | Superior temporal | Semantic understanding | ✓ Implemented | ✓ Implemented |
+| 9 | **Arcuate Fasciculus** | White matter | Inter-regional connection | CrossModalBinder | ✓ Implemented |
+| 10 | **Amygdala** | Medial temporal | Emotion perception | EmergentEmotion | ✓ Implemented |
+| 11 | **Hippocampus** | Medial temporal | Working memory | Listed only |
+| 12 | **Prefrontal Cortex** | Frontal lobe | Decision making | ✓ Implemented |
+| 13 | **Pulvinar** | Thalamus | Fast routing | Listed only |
+| 14 | **Visual Cortex V1-V4** | Occipital | Visual processing | ✓ Implemented | ✓ Implemented |
+| 15 | **Midbrain nuclei** | Midbrain | Neuromodulation | -- | Listed only |
+
+**Legend**:
+- ✓ Implemented: Code exists in `core/`
+- Listed only: Named in table but not implemented
 
 ---
 
@@ -1004,6 +1010,222 @@ $$\Delta w_{ij} = \eta \cdot a_j(a_i - w_{ij} \cdot a_j)$$
 
 ---
 
+### 3.7 Improved Modules (Censor-aligned)
+
+本节描述与Censor项目对齐的改进模块。
+
+#### 3.7.1 AdaptiveVisualAttention — 两阶段视觉注意力
+
+**对应Censor模块**: AdaptiveOpticalFlow
+
+**功能**: 快速初筛 + 精细注意力
+
+```python
+class AdaptiveVisualAttention(nn.Module):
+    """
+    两阶段视觉注意力：
+    - Stage 1: 快速筛选 (saliency screening)
+    - Stage 2: 精细注意力 (fine attention) 仅当motion detected
+    """
+    def __init__(self, embed_dim=768, num_heads=8, threshold=0.1):
+        self.saliency_scorer = nn.Sequential(...)
+        self.fine_attn = nn.MultiheadAttention(...)
+    
+    def forward(self, x):
+        saliency_scores = self.saliency_scorer(x)
+        if saliency_scores.mean() > self.threshold:
+            # 精细注意力
+            attn_out = self.fine_attn(x, x, x)
+            stage = 'fine'
+        else:
+            # 快速路径
+            attn_out = x
+            stage = 'fast'
+        return {'output': attn_out, 'stage': stage}
+```
+
+#### 3.7.2 SaliencyDetectorE2E — 全端到端显著性检测
+
+**对应Censor模块**: SaliencyDetectorE2E
+
+**改进**:
+1. 所有参数可学习 (sigma_ratio, center_bias, fusion_weights)
+2. 分辨率自适应sigma: sigma = sigma_ratio × min(H, W)
+
+```python
+class SaliencyDetectorE2E(nn.Module):
+    def __init__(self, embed_dim=768, sigma_ratio=0.15):
+        self.sigma_ratio = nn.Parameter(torch.tensor(sigma_ratio))
+        self.center_bias = nn.Parameter(torch.tensor(0.5))
+        self.fusion_weights = nn.Parameter(torch.ones(levels) / levels)
+```
+
+#### 3.7.3 StandardMoE — 标准MoE对比
+
+**对应Censor模块**: StandardMoE (对比BioMoE)
+
+| 特性 | BioMoE | StandardMoE |
+|------|--------|------------|
+| Routing | gate(input, membrane) | gate(input) |
+| Memory | Membrane potential | None |
+| Emotional | Mood bias | None |
+| Persistence | Stateful | Stateless |
+
+```python
+class StandardMoE(nn.Module):
+    """标准MoE - 无生物学先验，更客观"""
+    def __init__(self, input_dim, output_dim, num_experts=3):
+        self.experts = nn.ModuleList([...])  # 3个MLP
+        self.gate = nn.Linear(input_dim, num_experts)
+```
+
+#### 3.7.4 AmygdalaWithPrior — 面部区域先验
+
+**对应Censor模块**: AmygdalaWithPrior
+
+**改进**: 添加面部区域先验（眼/鼻/嘴）
+
+```python
+class AmygdalaWithPrior(nn.Module):
+    def __init__(self, input_dim=64):
+        self.fc1 = nn.Linear(input_dim, 256)
+        self.fc2 = nn.Linear(256, 14*14)
+        self.prior_strength = nn.Parameter(torch.tensor(0.3))
+        self.register_buffer('face_prior', self._create_face_prior())
+    
+    def _create_face_prior(self):
+        # 眼区域 (top) | 鼻区域 (center) | 嘴区域 (bottom)
+        prior[h//6:h//3, w//4:3*w//4] = 1.0  # 眼
+        prior[h//3:h//2, w//3:2*w//3] = 1.0  # 鼻
+        prior[2*h//3:5*h//6, w//4:3*w//4] = 1.0  # 嘴
+```
+
+#### 3.7.5 PersonalizedAdaptation — 个性化适配
+
+**对应Censor模块**: PersonalizedRadarEnhanced
+
+**改进**: Warmup LR + Test-time adaptation
+
+```python
+class PersonalizedAdaptation(nn.Module):
+    def _get_lr(self, step):
+        warmup_steps = 2
+        if step < warmup_steps:
+            return 1e-5 + (self.base_lr - 1e-5) * step / warmup_steps
+        # Cosine decay
+        progress = (step - warmup_steps) / (self.adapt_steps - warmup_steps)
+        return self.base_lr * 0.5 * (1 + np.cos(np.pi * progress))
+```
+
+---
+
+### 3.8 Emergent Emotion -- 从动力学涌现情绪
+
+**核心思想**：情绪不再硬编码Plutchik轮，而是从底层机制涌现。
+
+#### 3.8.1 为什么需要涌现？
+
+| 硬编码 | 涌现 |
+|--------|------|
+| 预设8种情绪 | 从交互中涌现 |
+| 固定VAD映射 | 从学习中生成 |
+| 多巴胺=奖励 | 从预测误差生成 |
+| 固定阈值 | 动态适应 |
+
+#### 3.8.2 底层机制
+
+```python
+class EmergentEmotion(nn.Module):
+    """从价值学习 + 紧迫度 + 社会推理的交互中涌现情绪"""
+    
+    def __init__(self):
+        self.value_learner = ValueLearner()      # TD误差驱动
+        self.urgency_detector = UrgencyDetector()  # 时间尺度
+        self.social_inference = SocialInference()  # ToM
+        self.emergence_net = nn.Sequential(...)  # 涌现动力学
+    
+    def forward(self, state, reward, other_obs):
+        # 1. 价值学习 → TD误差（多巴胺信号）
+        value = self.value_learner(state, reward)  # δ = r - V
+        
+        # 2. 紧迫度
+        urgency = self.urgency_detector(state)  # fast vs slow
+        
+        # 3. 社会推理
+        social = self.social_inference(other_obs, state)  # ToM
+        
+        # 4. 涌现：从交互动力学中生成情绪
+        combined = [value, urgency, social]
+        emotion = self.emergence_net(combined)
+        return emotion
+```
+
+#### 3.8.3 验证方法
+
+**时间动态匹配**：
+- 恐惧反应：0-200ms生理唤醒 → 对应fast_urgency
+- 愉悦期望：渐进式TD衰减 → 对应value learning
+
+**预测验证**：
+- 输入模糊刺激 → 产生特定混淆（gorilla vs elephant）
+- 个体差异可预测（内向/外向）
+
+**与其他模块的耦合**：
+- 情绪输出 → 影响决策（价值学习器的输入）
+- 决策结果 → 反馈给情绪（reward信号）
+
+---
+
+### 3.9 Cross-Modal Binding -- 跨模态绑定
+
+**问题**：视觉"看到蛇" + 听觉"听到嘶嘶声" → 如何统一为"危险"体验？
+
+#### 3.9.1 当前问题
+
+```
+视觉Censor ──┐
+听觉Censor ──┼──→ 前额叶（并行输入，缺乏动态交互）
+语言Censor ──┘
+```
+
+#### 3.9.2 Binding Mechanism
+
+```python
+class CrossModalBinder(nn.Module):
+    """
+    1. Temporal Binding Buffer: 存储时序事件
+    2. Cross-Modal Attention: 跨模态调制
+    3. Scene Detector: 场景检测
+    """
+    
+    def forward(self, modalities, timestamp):
+        # 编码各模态
+        encoded = {mod: self.encoder[mod](input) for mod, input in modalities.items()}
+        
+        # 时序绑定：找到时间窗口内的事件
+        if 'vision' in encoded and 'audio' in encoded:
+            bound = self.cross_attention(
+                query_mod='vision',
+                query_repr=encoded['vision'],
+                key_mod='audio',
+                key_repr=encoded['audio'],
+            )
+        
+        # 统一表征 → 场景检测
+        scene = self.scene_detector(unified_repr)
+        return scene
+```
+
+#### 3.9.3 解决的具体问题
+
+| 问题 | 解决方案 |
+|------|-----------|
+| Temporal Binding | 时序缓冲区，找到±500ms的事件 |
+| Cross-modal Attention | Query-Key-Value跨模态调制 |
+| Scene Detection | 统一表征→场景分类 |
+
+---
+
 ## 4. Training
 
 ### 4.1 Language: Next Token Prediction
@@ -1102,7 +1324,73 @@ def mask_random_patches(x, mask_ratio=0.75):
 
 ## 6. FAQ and Troubleshooting
 
-### 6.1 Model Loading Fails
+### 6.1 Clarifications: Biological Metaphor vs Engineering
+
+**Q: You named modules with biological names (Broca's Area, Amygdala, Synaptic Plasticity), but under the hood they're all matrix multiplications. What's the practical guidance for AI engineers?**
+
+**A:分层原则**
+
+| Layer | 生物命名 | 实际实现 | 调参价值 |
+|-------|----------|----------|----------|
+| **Architecture** | 稀疏门控 | Top-K routing | 有用→"可用稀疏门控" |
+| **Implementation** | 杏仁核 | Dense + Sigmoid | 无区别→标准DL |
+| **Tuning** | LTP/LTD | weight update | 无区别→直接调参 |
+
+**生物隐喻只在架构设计阶段有用**：
+- "可以用稀疏门控替代全连接" → 功耗↓
+- TD学习 → 效率↑
+
+**调参时不需要神经科学**：
+- Loss不收敛？直接调lr、改数据
+- 不需要查LTP论文
+
+### 6.2 Scale Limitations
+
+**Q: Human brain has 86B neurons, CLF has only ~12M parameters. Will bio-mechanisms work at scale?**
+
+**A: 大部分机制会失效或需要重构**
+
+| 机制 | 小规模 | 大规模(70B) |
+|------|--------|-------------|
+| 7槽位WM | 有效 | 失效→分层记忆 |
+| Bio-Gating | 效率优势 | 失效→标准MoE |
+| 固定瓶颈 | 有效 | 失效→Dynamic Comp |
+
+**保留的有效机制**：TD学习、模块化、事件驱动（仍有效）
+
+### 6.3 Comparison with LLM
+
+**Q: Compared to mainstream LLMs, besides low-power narrative, does CLF have performance comparability?**
+
+**A: 诚实的差距**
+
+| 能力 | 7B LLM | CLF当前 |
+|------|--------|--------|
+| 复杂推理 | 自回归生成 | 原型阶段 |
+| 知识问答 | 预训练海量 | 无大规模训练 |
+| 上下文 | 32K+ tokens | 早期框架 |
+
+**CLF的价值定位**：
+- 低功耗实时场景（需验证）
+- 可解释性（模块化）
+- 持续学习（元学习）
+- 特定场景补充，非LLM替代品
+
+### 6.4 Cross-Modal Binding
+
+**Q: Vision, Auditory, Language inputs are parallel. How to solve binding problem like "see snake + hear hiss → danger"?**
+
+**A: Cross-Modal Binding机制** (见 §3.9)
+
+```python
+# 时序绑定：找到±500ms内的事件
+# 跨模态注意力：Query-Key-Value
+# 场景检测：统一表征→场景分类
+```
+
+---
+
+### 6.5 Model Loading Fails
 
 **Solution:**
 ```bash

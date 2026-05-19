@@ -9,6 +9,10 @@
 
     # 认知失调检测
     Dissonance(θ) = KL(θ_prior || θ_posterior)
+
+事件驱动:
+    - CognitiveDissonanceDetector 订阅 MEMORY_ADDED: 新记忆时触发矛盾检测
+    - 发布 DISSONANCE_DETECTED: 检测到矛盾时通知
 """
 import numpy as np
 from typing import List, Tuple, Optional, Dict, Any, Callable
@@ -18,6 +22,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Categorical, Normal
 from torch.utils.data import DataLoader, TensorDataset
+
+from civis_lucri_faber.core.events import MEMORY_ADDED, DISSONANCE_DETECTED
 
 
 @dataclass
@@ -276,12 +282,11 @@ class UncertaintyAwareActiveLearner:
         self.num_ensemble = num_ensemble
         self.device = device
 
-        # 创建 ensemble
+        # 创建 ensemble (使用 deepcopy 避免构造器兼容性问题)
+        import copy
         self.ensemble: List[nn.Module] = []
         for i in range(num_ensemble):
-            # 克隆模型
-            clone = model.__class__(**model.__dict__)
-            clone.load_state_dict(model.state_dict())
+            clone = copy.deepcopy(model)
             clone.to(device)
             clone.train()  # 使用 dropout 近似
             self.ensemble.append(clone)
@@ -314,11 +319,14 @@ class UncertaintyAwareActiveLearner:
         # 方差 = 认知不确定性
         variance = predictions.var(dim=0).mean().item()
 
+        # mean_pred 可能是多维张量, 取标量均值
+        mean_val = mean_pred.mean().item()
+
         # 还有一种: 基于 dropout 的 MC Dropout
         # 方差随数据量减少 -> 不确定性高 (认知不确定性)
         # 方差随数据量增加 -> 不确定性低 (偶然不确定性)
 
-        return mean_pred.item(), variance
+        return mean_val, variance
 
     def estimate_aleatoric_uncertainty(
         self,
@@ -396,11 +404,18 @@ class CognitiveDissonanceDetector:
     """认知失调检测器
 
     检测知识库中的逻辑矛盾
+
+    事件驱动:
+        - 订阅 MEMORY_ADDED: 新记忆时触发矛盾检测
+        - 发布 DISSONANCE_DETECTED: 检测到矛盾时通知
     """
 
-    def __init__(self):
+    def __init__(self, event_bus=None):
         self.beliefs: List[Tuple[str, float]] = []
         self.contradictions: List[Tuple[str, str]] = []
+        self._bus = event_bus
+        if self._bus is not None:
+            self._bus.subscribe(MEMORY_ADDED, self.on_memory_added, priority=0, name="dissonance_detector")
 
     def add_belief(self, belief: str, confidence: float = 0.5) -> None:
         """添加信念"""
@@ -434,6 +449,23 @@ class CognitiveDissonanceDetector:
             if (neg in a and neg not in b) or (neg in b and neg not in a):
                 return np.random.random() < 0.3
         return False
+
+    def on_memory_added(self, event) -> Optional[Dict[str, Any]]:
+        """事件驱动: 响应 MEMORY_ADDED，检测认知失调"""
+        memories = event.data.get("memories", [])
+        results = []
+        for mem in memories:
+            content = mem if isinstance(mem, str) else getattr(mem, 'content', str(mem))
+            dissonance = self.detect_contradiction(content)
+            if dissonance:
+                results.append(dissonance)
+                if self._bus is not None:
+                    self._bus.publish(
+                        DISSONANCE_DETECTED,
+                        {"inconsistency_score": dissonance.inconsistency_score, "content": content},
+                        source="dissonance_detector",
+                    )
+        return {"dissonances": results} if results else None
 
 
 @dataclass

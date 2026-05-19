@@ -139,8 +139,10 @@ class SleepController(nn.Module):
         elif current == SleepStage.NREM1:
             return SleepStage.NREM2
         elif current == SleepStage.NREM2:
-            # 约80%概率进入深度睡眠
-            if random.random() < 0.8:
+            # 深度睡眠倾向随周期递减 (模拟生物: 后半夜深睡减少)
+            deep_tendency = max(0.3, 0.9 - 0.12 * self.total_cycles)
+            # 确定性选择: cycle_progress < deep_tendency → NREM3
+            if self.cycle_progress < deep_tendency:
                 return SleepStage.NREM3
             else:
                 return SleepStage.REM
@@ -220,26 +222,25 @@ class SleepController(nn.Module):
 
     def get_consolidation_bonus(self) -> float:
         """
-        获取记忆巩固增益
+        获取记忆巩固增益 (连续调制)
 
-        不同阶段有不同效果：
-        - REM: 情绪记忆巩固
-        - NREM2: 程序性记忆
-        - NREM3: 陈述性/情景记忆
+        不同阶段有不同效果，阶段内随进度连续变化
         """
         if not self.is_sleeping:
             return 0.0
 
         current = self.current_cycle.current_stage
+        # 阶段内连续调制: 中期增益最高 (正弦包络)
+        modulation = 0.1 * np.sin(np.pi * self.cycle_progress)
 
         if current == SleepStage.REM:
-            return 0.8  # 情绪/创造性
+            return 0.7 + 0.2 * modulation  # 情绪/创造性
         elif current == SleepStage.NREM2:
-            return 0.5  # 程序性技能
+            return 0.4 + 0.2 * modulation  # 程序性技能
         elif current == SleepStage.NREM3:
-            return 0.9  # 陈述性记忆最强
+            return 0.8 + 0.15 * modulation  # 陈述性记忆最强
         elif current == SleepStage.NREM1:
-            return 0.2
+            return 0.15 + 0.1 * modulation
 
         return 0.0
 
@@ -278,25 +279,24 @@ class SleepController(nn.Module):
 
     def get_synaptic_downscale_factor(self) -> float:
         """
-        获取突触缩减因子
+        获取突触缩减因子 (连续调制)
 
-        睡眠时进行突触缩减，模拟：
-        - 去除冗余连接
-        - 节省能量
-        - 为新学习腾出空间
+        深度睡眠时缩减最强，阶段内连续变化
         """
         if not self.is_sleeping:
             return 1.0
 
-        # 深度睡眠时缩减最强
-        if self.current_cycle.current_stage == SleepStage.NREM3:
-            return 0.9  # 强缩减
-        elif self.current_cycle.current_stage == SleepStage.NREM2:
-            return 0.95
-        elif self.current_cycle.current_stage == SleepStage.REM:
-            return 0.98  # REM期间保持
+        current = self.current_cycle.current_stage
+        progress_mod = 0.02 * np.sin(np.pi * self.cycle_progress)
+
+        if current == SleepStage.NREM3:
+            return 0.88 + progress_mod  # 强缩减
+        elif current == SleepStage.NREM2:
+            return 0.93 + progress_mod  # 中缩减
+        elif current == SleepStage.REM:
+            return 0.97 + progress_mod  # REM期间保持
         else:
-            return 1.0
+            return 0.99 + progress_mod
 
     def get_summary(self) -> Dict:
         """获取摘要"""
@@ -571,6 +571,82 @@ def create_sleep_system(
     )
 
 
+# ══════════════════════════════════════════════════════
+# 食欲素/下丘脑分泌素系统 (Orexin/Hypocretin)
+# ══════════════════════════════════════════════════════
+
+class OrexinSystem:
+    """食欲素系统 — 觉醒促进与失眠关键通路。
+
+    食欲素神经元 (下丘脑外侧) 投射到:
+    - 蓝斑 (LC) → NE释放 → 觉醒
+    - 中缝核 → 5-HT释放 → 觉醒
+    - 结节乳头核 → His释放 → 觉醒
+    - 腹侧被盖区 (VTA) → DA释放 → 动机
+
+    失眠机制: orexin过度激活 + GABA不足 → 无法从觉醒切换到睡眠
+    Suvorexant (DORA): 阻断orexin1/orexin2 → 降低觉醒驱动 → 入睡
+
+    参考:
+    - Sakurai (2007) Nat Rev Neurosci — orexin系统综述
+    - Scammell (2015) Neuron — 失眠的神经机制
+    """
+
+    def __init__(
+        self,
+        baseline_orexin: float = 0.5,
+        circadian_coupling: float = 0.3,
+        gaba_inhibition: float = 0.4,
+    ):
+        self.baseline = baseline_orexin
+        self.circadian_coupling = circadian_coupling
+        self.gaba_inhibition = gaba_inhibition
+        self.orexin_level = baseline_orexin
+
+    def step(
+        self,
+        gaba_level: float = 0.5,
+        scn_wake_drive: float = 0.5,
+        stress_level: float = 0.0,
+        receptor_block: float = 0.0,  # suvorexant occupancy (0-1)
+    ) -> Dict[str, float]:
+        """每步更新orexin水平。
+
+        Args:
+            gaba_level: GABA抑制强度 (高GABA→抑制orexin)
+            scn_wake_drive: SCN觉醒驱动 (白天高, 夜间低)
+            stress_level: 应激水平 (应激→激活orexin)
+            receptor_block: orexin受体阻断率 (suvorexant)
+
+        Returns:
+            orexin_level, effective_orexin (阻断后), arousal_contribution
+        """
+        # 基础orexin: 昼夜节律调制
+        circadian_drive = self.baseline * (0.5 + 0.5 * scn_wake_drive)
+
+        # GABA抑制orexin神经元
+        gaba_suppression = gaba_level * self.gaba_inhibition
+
+        # 应激激活orexin (CRH→orexin通路)
+        stress_activation = stress_level * 0.3
+
+        # 更新orexin水平
+        target = circadian_drive - gaba_suppression + stress_activation
+        self.orexin_level = 0.9 * self.orexin_level + 0.1 * max(0.0, min(1.0, target))
+
+        # 受体阻断后的有效orexin
+        effective = self.orexin_level * (1.0 - receptor_block)
+
+        # 对觉醒的贡献
+        arousal_contribution = effective * 0.3
+
+        return {
+            "orexin_level": self.orexin_level,
+            "effective_orexin": effective,
+            "arousal_contribution": arousal_contribution,
+        }
+
+
 __all__ = [
     'SleepStage',
     'SleepCycle',
@@ -579,4 +655,5 @@ __all__ = [
     'MemoryReplayer',
     'SleepSystem',
     'create_sleep_system',
+    'OrexinSystem',
 ]
