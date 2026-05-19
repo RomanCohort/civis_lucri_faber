@@ -12,8 +12,8 @@ import torch
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-from civis_lucri_faber.utils.config import load_config
-from civis_lucri_faber.core.agent import CivisLucriFaber
+from simulacrum.utils.config import load_config
+from simulacrum.core.agent import Simulacrum
 
 
 class TestAgentIntegration:
@@ -47,7 +47,7 @@ class TestAgentIntegration:
     @pytest.fixture
     def agent(self, config):
         """Create test agent"""
-        agent = CivisLucriFaber(
+        agent = Simulacrum(
             config=config,
             memory_path="test_memory.json",
             alignment_log_path="test_alignment.json",
@@ -141,7 +141,7 @@ class TestAgentIntegration:
         agent.save(str(save_path))
 
         # Load creates new agent
-        agent2 = CivisLucriFaber(
+        agent2 = Simulacrum(
             config=agent.config,
             state_dim=4,
             n_actions=4
@@ -157,13 +157,13 @@ class TestAllMechanismsPresent:
 
     def test_core_modules_importable(self):
         """Test all core modules can be imported"""
-        from civis_lucri_faber.core.curiosity import CuriosityEngine
-        from civis_lucri_faber.core.information_gain import TrueInformationGainCalculator
-        from civis_lucri_faber.core.meta_learning import FirstOrderMAML
-        from civis_lucri_faber.core.self_alignment import SelfAlignmentModule
-        from civis_lucri_faber.core.thermodynamics import ThermodynamicsSystem
-        from civis_lucri_faber.core.policy_learning import SimpleQLearning
-        from civis_lucri_faber.core.metabolic_budget import MetabolicBudget
+        from simulacrum.core.curiosity import CuriosityEngine
+        from simulacrum.core.information_gain import TrueInformationGainCalculator
+        from simulacrum.core.meta_learning import FirstOrderMAML
+        from simulacrum.core.self_alignment import SelfAlignmentModule
+        from simulacrum.core.thermodynamics import ThermodynamicsSystem
+        from simulacrum.core.policy_learning import SimpleQLearning
+        from simulacrum.core.metabolic_budget import MetabolicBudget
 
         # All should be importable without error
         assert CuriosityEngine is not None
@@ -176,7 +176,7 @@ class TestAllMechanismsPresent:
 
     def test_personality_modules_importable(self):
         """Test all personality modules can be imported"""
-        from civis_lucri_faber.core.personality import (
+        from simulacrum.core.personality import (
             TripartiteCompetitiveEngine,
             StreamingIdentityCore,
             RelationalEmbedding,
@@ -207,7 +207,7 @@ class TestAgentDeathAndSurvival:
             task_reward_max=0.0,
         )
 
-        agent = CivisLucriFaber(config=config)
+        agent = Simulacrum(config=config)
 
         # Run until dead
         for _ in range(10):

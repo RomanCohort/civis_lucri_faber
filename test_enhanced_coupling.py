@@ -9,7 +9,7 @@
 
 import sys
 import os
-# 添加父目录以正确导入 civis_lucri_faber 包
+# 添加父目录以正确导入 simulacrum 包
 _parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _parent_dir)
 # 当前目录
@@ -24,14 +24,14 @@ def test_exp3_cortisol_novelty_coupling():
     print("测试 Exp 3: cortisol→novelty_weight 耦合")
     print("="*60)
 
-    from core.agent import CivisLucriFaber
+    from core.agent import Simulacrum
     from utils.config import Config
 
     config = Config(
         hpa_stress_reactivity=5.0,
         curiosity_alpha=0.4,  # 初始 novelty 权重
     )
-    agent = CivisLucriFaber(config)
+    agent = Simulacrum(config)
 
     # 注入高皮质醇模拟慢性应激
     agent.pharma.inject("cortisol", 0.85)
@@ -155,7 +155,7 @@ def test_exp9_resonance_empathy():
     print("测试 Exp 9: resonance_baseline→共情 (不被催产素完全覆盖)")
     print("="*60)
 
-    from core.agent import CivisLucriFaber
+    from core.agent import Simulacrum
     from utils.config import Config
 
     # 创建三个不同 resonance_baseline 的 Agent
@@ -163,7 +163,7 @@ def test_exp9_resonance_empathy():
 
     for resonance_level, resonance_val in [("Low", -1.0), ("Medium", 0.5), ("High", 3.0)]:
         config = Config()
-        agent = CivisLucriFaber(config)
+        agent = Simulacrum(config)
 
         # 设置 resonance_baseline (模拟镜像神经元基础连接)
         agent._internal_state['mirror_resonance_baseline'] = resonance_val
@@ -195,7 +195,7 @@ def test_exp9_resonance_empathy():
 
 if __name__ == "__main__":
     print("="*60)
-    print("CLF 增强耦合通路验证测试")
+    print("Simulacrum 增强耦合通路验证测试")
     print("="*60)
 
     results = {

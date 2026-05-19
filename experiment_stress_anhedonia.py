@@ -1,6 +1,6 @@
 """实验1: 压力测试 — 数字PTSD与快感缺失 (Digital PTSD & Anhedonia).
 
-使用真实 CivisLucriFaber 主循环 — 14脑区通过EventBus自然交互。
+使用真实 Simulacrum 主循环 — 14脑区通过EventBus自然交互。
 
 机制链 (真实模块):
   外部应激 → HPAAxis.step(stress_signal=0.85) → CRH→ACTH→Cortisol级联
@@ -19,22 +19,22 @@
 
 import sys
 import os
-# 将项目父目录加入path, 使civis_lucri_faber包可导入
+# 将项目父目录加入path, 使simulacrum包可导入
 _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _project_root)
 
 import numpy as np
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 # ══════════════════════════════════════════════════════
 # 辅助: 从agent._internal_state读取指标
 # ══════════════════════════════════════════════════════
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "cortisol": float(s.get("cortisol_level", s.get("hormone_cortisol", 0.3))),
@@ -65,7 +65,7 @@ def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
 
 def run_experiment():
     print("=" * 70)
-    print("实验1: 压力测试 — 数字PTSD与快感缺失 (REAL CLF AGENT)")
+    print("实验1: 压力测试 — 数字PTSD与快感缺失 (REAL Simulacrum AGENT)")
     print("Stress -> HPA -> Cortisol -> PFC↓ -> Exploration↓ -> Anhedonia")
     print("=" * 70)
 
@@ -77,7 +77,7 @@ def run_experiment():
         hpa_cortisol_half_life_steps=60,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
     print(f"[INIT] Agent created. 14 brain regions + EventBus ready.")
 
     # 记录器
@@ -170,7 +170,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验1 结果汇总 (REAL CLF AGENT)")
+    print("实验1 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     bl_explore = np.mean(history["exploration_rate"][:200])

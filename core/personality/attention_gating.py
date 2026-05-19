@@ -21,7 +21,7 @@ import numpy as np
 from typing import Any, Dict, Tuple, Optional
 from dataclasses import dataclass
 
-from civis_lucri_faber.core.events import PERSONALITY_UPDATE
+from simulacrum.core.events import PERSONALITY_UPDATE
 
 
 @dataclass

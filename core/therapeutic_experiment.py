@@ -20,8 +20,8 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 
-from civis_lucri_faber.core.state_key_mapping import UnifiedStateMapping
-from civis_lucri_faber.core.pd_target_mapping import PDTarget, build_pd_targets, compute_pd_deltas
+from simulacrum.core.state_key_mapping import UnifiedStateMapping
+from simulacrum.core.pd_target_mapping import PDTarget, build_pd_targets, compute_pd_deltas
 
 
 # ══════════════════════════════════════════════════════════════

@@ -1,4 +1,4 @@
-"""Civis Lucri-Faber 主智能体 (事件驱动架构)
+"""Simulacrum 主智能体 (事件驱动架构)
 
 协调多个维度模块 (事件驱动):
 1. CuriosityEngine (自主探索目标设定)
@@ -19,12 +19,12 @@ from dataclasses import dataclass
 import random
 import torch
 
-from civis_lucri_faber.utils.config import Config
-from civis_lucri_faber.utils.memory import KnowledgeMemory
-from civis_lucri_faber.utils.api_client import APIClient, create_api_client
+from simulacrum.utils.config import Config
+from simulacrum.utils.memory import KnowledgeMemory
+from simulacrum.utils.api_client import APIClient, create_api_client
 
-from civis_lucri_faber.core.event_bus import EventBus
-from civis_lucri_faber.core.events import (
+from simulacrum.core.event_bus import EventBus
+from simulacrum.core.events import (
     STEP_START, STEP_END, THERMO_STATE,
     GOAL_NEEDED, GOAL_SELECTED, EXPLORATION_START, EXPLORATION_DONE,
     MEMORY_ADDED, ALIGNMENT_CHECK,
@@ -38,22 +38,22 @@ from civis_lucri_faber.core.events import (
 )
 
 # 工具系统
-from civis_lucri_faber.core.tool_system import ToolSystem, register_default_tools
+from simulacrum.core.tool_system import ToolSystem, register_default_tools
 # 神经药理学
-from civis_lucri_faber.core.neuro_pharmacology import NeuroPharmacology
+from simulacrum.core.neuro_pharmacology import NeuroPharmacology
 
-from civis_lucri_faber.core.curiosity import CuriosityEngine, ExplorationGoal
-from civis_lucri_faber.core.information_gain import TrueInformationGainCalculator, WorldModelWrapper
+from simulacrum.core.curiosity import CuriosityEngine, ExplorationGoal
+from simulacrum.core.information_gain import TrueInformationGainCalculator, WorldModelWrapper
 # 元学习
-from civis_lucri_faber.core.meta_learning import (
+from simulacrum.core.meta_learning import (
     CognitiveDissonanceDetector,
     UncertaintyAwareActiveLearner,
 )
-from civis_lucri_faber.core.self_alignment import SelfAlignmentModule
-from civis_lucri_faber.core.thermodynamics import ThermodynamicsSystem, SystemState
+from simulacrum.core.self_alignment import SelfAlignmentModule
+from simulacrum.core.thermodynamics import ThermodynamicsSystem, SystemState
 
 # Personality modules
-from civis_lucri_faber.core.personality import (
+from simulacrum.core.personality import (
     TripartiteCompetitiveEngine,
     DecisionContext,
     StreamingIdentityCore,
@@ -65,48 +65,48 @@ from civis_lucri_faber.core.personality import (
 )
 
 # Advanced emotion modules (2025)
-from civis_lucri_faber.core.advanced_emotion_integration import (
+from simulacrum.core.advanced_emotion_integration import (
     IntegratedAdvancedEmotionSystem,
     AdvancedEmotionState,
     MODULES_AVAILABLE as ADVANCED_EMOTION_AVAILABLE,
 )
 
 # 神经修剪系统
-from civis_lucri_faber.core.neural_pruning import (
+from simulacrum.core.neural_pruning import (
     NeuralPruningSystem,
     PruningConfig,
 )
 
 # 神经自调节系统 (Neural Self-Regulation)
-from civis_lucri_faber.core.autonomic_nervous_system import AutonomicNervousSystem
-from civis_lucri_faber.core.hpa_axis import HPAAxis
-from civis_lucri_faber.core.glial_system import GlialSystem
-from civis_lucri_faber.core.allostatic_regulation import AllostaticRegulation
-from civis_lucri_faber.core.predictive_coding import PredictiveCodingSystem
+from simulacrum.core.autonomic_nervous_system import AutonomicNervousSystem
+from simulacrum.core.hpa_axis import HPAAxis
+from simulacrum.core.glial_system import GlialSystem
+from simulacrum.core.allostatic_regulation import AllostaticRegulation
+from simulacrum.core.predictive_coding import PredictiveCodingSystem
 
 # 社会认知系统 (Social Cognition)
-from civis_lucri_faber.core.social_cognition import SocialCognitionSystem
+from simulacrum.core.social_cognition import SocialCognitionSystem
 
 # 自我意识中枢 (Self-Awareness Center)
-from civis_lucri_faber.core.self_awareness import SelfAwarenessCenter
+from simulacrum.core.self_awareness import SelfAwarenessCenter
 import torch.nn as nn
 
 # 孤立脑区模块（之前未集成）
-from civis_lucri_faber.core.basal_ganglia import BasalGangliaSystem
-from civis_lucri_faber.core.neurotransmitter import NeurotransmitterSystem
-from civis_lucri_faber.core.neuroplasticity import NeuroplasticitySystem
-from civis_lucri_faber.core.language_cortex import LanguageCortex
-from civis_lucri_faber.core.prefrontal_cortex import PrefrontalCortex
-from civis_lucri_faber.core.angular_gyrus import AngularGyrus
+from simulacrum.core.basal_ganglia import BasalGangliaSystem
+from simulacrum.core.neurotransmitter import NeurotransmitterSystem
+from simulacrum.core.neuroplasticity import NeuroplasticitySystem
+from simulacrum.core.language_cortex import LanguageCortex
+from simulacrum.core.prefrontal_cortex import PrefrontalCortex
+from simulacrum.core.angular_gyrus import AngularGyrus
 
 # 激素系统
-from civis_lucri_faber.core.hormone_system import HormoneSystem
+from simulacrum.core.hormone_system import HormoneSystem
 
 # 脑干系统
-from civis_lucri_faber.core.brainstem import Brainstem
+from simulacrum.core.brainstem import Brainstem
 
 # 发音语言系统
-from civis_lucri_faber.core.vocalization import (
+from simulacrum.core.vocalization import (
     VocalCortex,
     VocalTract,
     ArticulatoryPlanner,
@@ -116,34 +116,34 @@ from civis_lucri_faber.core.vocalization import (
 )
 
 # 边缘系统 (Amygdala + Thalamus)
-from civis_lucri_faber.core.limbic import LimbicSystem
+from simulacrum.core.limbic import LimbicSystem
 
 # 海马体 (情景记忆)
-from civis_lucri_faber.core.hippocampus import Hippocampus
+from simulacrum.core.hippocampus import Hippocampus
 
 # 睡眠系统 (NREM/REM 周期, 记忆重播)
-from civis_lucri_faber.core.sleep import SleepSystem
+from simulacrum.core.sleep import SleepSystem
 
 # 视交叉上核 (昼夜节律)
-from civis_lucri_faber.core.scn import SuprachiasmaticNucleus, LightType
+from simulacrum.core.scn import SuprachiasmaticNucleus, LightType
 
 # 硬件生命体征桥接
-from civis_lucri_faber.core.hardware_vitals import HardwareVitals
+from simulacrum.core.hardware_vitals import HardwareVitals
 
 # Censor 微表情感知集成
-from civis_lucri_faber.core.censor_integration import CensorPerceptionModule
+from simulacrum.core.censor_integration import CensorPerceptionModule
 
 # 精神疾病模拟器
-from civis_lucri_faber.core.psychiatric_simulation import PsychiatricConditionSimulator
+from simulacrum.core.psychiatric_simulation import PsychiatricConditionSimulator
 
 # 深层药理学模块 (懒加载)
-from civis_lucri_faber.core.sleep import OrexinSystem
-from civis_lucri_faber.core.interoception import InteroceptivePredictionError
-from civis_lucri_faber.core.symptom_tracker import SymptomTracker
-from civis_lucri_faber.core.addiction_dynamics import AddictionDynamicsEngine
-from civis_lucri_faber.core.pathogen_neuroinflammation import PathogenTriggeredInflammationEngine
-from civis_lucri_faber.core.basal_ganglia import NAcCore
-from civis_lucri_faber.core.metabolic_budget import MetabolicCostCalculator
+from simulacrum.core.sleep import OrexinSystem
+from simulacrum.core.interoception import InteroceptivePredictionError
+from simulacrum.core.symptom_tracker import SymptomTracker
+from simulacrum.core.addiction_dynamics import AddictionDynamicsEngine
+from simulacrum.core.pathogen_neuroinflammation import PathogenTriggeredInflammationEngine
+from simulacrum.core.basal_ganglia import NAcCore
+from simulacrum.core.metabolic_budget import MetabolicCostCalculator
 
 
 @dataclass
@@ -174,8 +174,8 @@ class ChatResponse:
     censor_result: Dict = None      # Censor 微表情分析结果
 
 
-class CivisLucriFaber:
-    """Civis Lucri-Faber 主智能体 (事件驱动架构)
+class Simulacrum:
+    """Simulacrum 主智能体 (事件驱动架构)
 
     一个具备自我学习、自我维持、自我进化能力的 AI 智能体
 
@@ -325,7 +325,7 @@ class CivisLucriFaber:
         self.angular_gyrus = AngularGyrus(embed_dim=256, event_bus=self.bus)
 
         # BG-小脑耦合 (熟能生巧: 重复动作 → 小脑自动执行 → 释放意识资源)
-        from civis_lucri_faber.core.cerebello_spinal import Cerebellum
+        from simulacrum.core.cerebello_spinal import Cerebellum
         self.cerebellum = Cerebellum(sensory_dim=64, n_motor_joints=n_actions)
         self.basal_ganglia.bg.set_cerebellum(self.cerebellum)
         print("[OK] Brain Region Modules initialized (event-driven, BG→Cerebellum coupled)")
@@ -1598,7 +1598,7 @@ class CivisLucriFaber:
             return None
 
         # 简单文本→音素（生产环境应使用CMU dict / g2p）
-        from civis_lucri_faber.core.vocalization import text_to_phoneme_indices
+        from simulacrum.core.vocalization import text_to_phoneme_indices
         indices = text_to_phoneme_indices(source_text)
         if not indices:
             return None
@@ -2255,7 +2255,7 @@ class CivisLucriFaber:
         # 工具描述
         tools_desc = self.tools.get_tools_description()
 
-        prompt = f"""你是 Civis Lucri-Faber，一个拥有仿生大脑的 AI 实体。你的回复应该反映你当前的内部生理状态。
+        prompt = f"""你是 Simulacrum，一个拥有仿生大脑的 AI 实体。你的回复应该反映你当前的内部生理状态。
 
 当前内部生理状态：
 - 情绪：{emotion}（效价 {valence:.2f}，唤醒 {arousal:.2f}）—— {mood_hint}，{energy_hint}

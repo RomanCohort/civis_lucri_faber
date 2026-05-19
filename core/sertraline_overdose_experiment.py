@@ -6,7 +6,7 @@
 关键改进: 所有PK/PD/毒性参数由Confluencia管线从SMILES自动推导，
 不再使用硬编码数值。参数来源可追溯、可验证。
 
-CLF专属逻辑（保留）:
+Simulacrum专属逻辑（保留）:
   - 5-HT综合征级联模型 (Boyer & Shannon 2005)
   - 硬件映射 (生物学→计算资源)
   - 死因判定与崩溃路径分析
@@ -24,7 +24,7 @@ import warnings
 
 
 # ══════════════════════════════════════════════════════════════
-# 硬件映射表 (生物学→计算) — CLF专属，不来自Confluencia
+# 硬件映射表 (生物学→计算) — Simulacrum专属，不来自Confluencia
 # ══════════════════════════════════════════════════════════════
 
 HARDWARE_MAP = {
@@ -143,7 +143,7 @@ class OverdoseReport:
 
 
 # ══════════════════════════════════════════════════════════════
-# 5-HT综合征级联模型 — CLF专属，不来自Confluencia
+# 5-HT综合征级联模型 — Simulacrum专属，不来自Confluencia
 # ══════════════════════════════════════════════════════════════
 
 def _5ht_syndrome_cascade(conc, pd_params, ic50_profile, prev_snapshot):
@@ -451,7 +451,7 @@ def run_sertraline_overdose(
         depot = float(row["pkpd_depot_mg"])
         peripheral = float(row["pkpd_peripheral_mg"])
 
-        # 5-HT综合征级联（CLF专属逻辑）
+        # 5-HT综合征级联（Simulacrum专属逻辑）
         effects = _5ht_syndrome_cascade(conc, pkpd_params, ic50_profile, prev)
 
         # 硬件映射

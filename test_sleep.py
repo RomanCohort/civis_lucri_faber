@@ -6,7 +6,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from civis_lucri_faber.core.sleep import (
+from simulacrum.core.sleep import (
     SleepSystem,
     SleepController,
     SleepStage,
@@ -127,7 +127,7 @@ def test_sleep_dream_generation():
     """测试梦境生成"""
     print("=== 测试梦境生成 ===")
 
-    from civis_lucri_faber.core.sleep import MemoryReplay, SleepController
+    from simulacrum.core.sleep import MemoryReplay, SleepController
 
     # 创建一些记忆
     memories = [

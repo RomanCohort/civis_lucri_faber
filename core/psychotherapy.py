@@ -34,7 +34,7 @@ import numpy as np
 import time
 
 try:
-    from civis_lucri_faber.core.events import (
+    from simulacrum.core.events import (
         THERAPY_SESSION_START,
         THERAPY_SESSION_END,
         THERAPY_PROGRESS_UPDATE,
@@ -279,7 +279,7 @@ def conduct_therapy_session(
 
     Args:
         modality: 治疗流派
-        agent: CLF智能体
+        agent: Simulacrum智能体
         session_intensity: 治疗强度 [0,1]
         synergy_bonus: 药物协同加成 [0,1]
         phase: 治疗阶段

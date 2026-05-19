@@ -34,23 +34,23 @@ import copy
 import numpy as np
 
 try:
-    from civis_lucri_faber.core.psychiatric_simulation import (
+    from simulacrum.core.psychiatric_simulation import (
         PsychiatricConditionSimulator,
         PSYCHIATRIC_PROFILES,
         EMOTION_STATE_PROFILES,
     )
-    from civis_lucri_faber.core.neuro_pharmacology import NeuroPharmacology, _PRESETS
-    from civis_lucri_faber.core.psychotherapy import (
+    from simulacrum.core.neuro_pharmacology import NeuroPharmacology, _PRESETS
+    from simulacrum.core.psychotherapy import (
         PsychotherapySystem,
         TherapyModality,
         TherapyPhase,
         THERAPY_TARGETS,
     )
-    from civis_lucri_faber.core.pharmacotherapy_synergy import (
+    from simulacrum.core.pharmacotherapy_synergy import (
         SynergyCalculator,
         SynergyType,
     )
-    from civis_lucri_faber.core.events import (
+    from simulacrum.core.events import (
         EXPERIMENT_START,
         EXPERIMENT_END,
         PSYCHIATRIC_CONDITION_CHANGE,
@@ -342,12 +342,12 @@ class PsychopharmacologySandbox:
         """运行实验
 
         对每个arm，创建独立的模拟环境并运行。
-        由于CLF agent是有状态的，这里用简化模拟：
+        由于Simulacrum agent是有状态的，这里用简化模拟：
         直接操作 internal_state 字典来模拟各arm的轨迹。
 
         Args:
             design: 实验设计
-            agent: CLF agent (用于获取初始状态)
+            agent: Simulacrum agent (用于获取初始状态)
             verbose: 是否打印进度
 
         Returns:

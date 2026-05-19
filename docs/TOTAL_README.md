@@ -1,8 +1,8 @@
-# Civis Lucri-Faber 完整技术文档
+# Simulacrum 完整技术文档
 
 > 生物启发式AI智能体系统 | Bio-Inspired Autonomous AI Agent System
 > 
-> **项目名称**: Civis Lucri-Faber (CLF) — 拉丁语"追求财富的工匠"
+> **项目名称**: Simulacrum (Simulacrum) — 拉丁语"追求财富的工匠"
 > 
 > **版本**: v2.1 | **日期**: 2026-05-17 | **作者**: YAN (吉林大学交叉学科)
 
@@ -279,15 +279,15 @@
 
 ### 1.1 标题与摘要
 
-**英文**: Civis Lucri-Faber: A Bio-Inspired Cognitive Architecture with 29+ Brain-Region Mechanisms, Event-Driven Architecture, and Adaptive Pruning
+**英文**: Simulacrum: A Bio-Inspired Cognitive Architecture with 29+ Brain-Region Mechanisms, Event-Driven Architecture, and Adaptive Pruning
 
-**中文**: Civis Lucri-Faber：集成29+脑区机制、事件驱动架构与自适应剪枝的生物启发式认知架构
+**中文**: Simulacrum：集成29+脑区机制、事件驱动架构与自适应剪枝的生物启发式认知架构
 
 **核心关键词**: 类脑计算 (Brain-Inspired Computing)、事件驱动架构 (Event-Driven Architecture)、认知心理学 (Cognitive Psychology)、神经调质 (Neuromodulation)、自我意识 (Self-Awareness)、表观遗传记忆 (Epigenetic Memory)、数字热力学 (Digital Thermodynamics)、代谢预算 (Metabolic Budget)、生物启发式发音 (Bio-Inspired Vocalization)
 
 **摘要**:
 
-> 传统AI智能体高度依赖人工奖励函数，缺乏内在动机、适应性、自我意识和资源约束。我们提出 Civis Lucri-Faber (CLF)，一个整合 **29+种脑区/神经机制** 的生物启发式AI认知架构。核心创新包括：
+> 传统AI智能体高度依赖人工奖励函数，缺乏内在动机、适应性、自我意识和资源约束。我们提出 Simulacrum (Simulacrum)，一个整合 **29+种脑区/神经机制** 的生物启发式AI认知架构。核心创新包括：
 >
 > (1) **事件驱动架构**：EventBus 发布/订阅模式，30种事件类型，模块仅在收到相关事件时激活，避免无效计算；
 >
@@ -311,7 +311,7 @@
 
 #### 1.2.1 人脑与计算机对比
 
-| 特性 | 人脑 | Transformer | CLF目标 |
+| 特性 | 人脑 | Transformer | Simulacrum目标 |
 |------|-----|----------|---------|
 | **能耗** | ~20W | 数百瓦-数千瓦 | 低功耗 |
 | **计算方式** | 事件驱动 | 全量计算 | 事件驱动 |
@@ -325,7 +325,7 @@
 
 #### 1.2.2 类脑计算历史渊源
 
-| 年份 | 里程碑 | 参考文献 | 与CLF的关系 |
+| 年份 | 里程碑 | 参考文献 | 与Simulacrum的关系 |
 |------|--------|----------|------------|
 | 1943 | McCulloch-Pitts神经元模型 | McCulloch & Pitts (1943) | 神经元基础 |
 | 1949 | Hebb学习规则 | Hebb (1949) | OjaRule实现 |
@@ -337,7 +337,7 @@
 
 #### 1.2.3 传统AI的五大挑战
 
-| # | 挑战 | 描述 | CLF解决方案 |
+| # | 挑战 | 描述 | Simulacrum解决方案 |
 |---|------|------|------------|
 | 1 | **奖励函数设计困难** | 需要丰富的领域知识，人工设计易偏差 | 好奇心驱动探索 + 信息增益内在动机 |
 | 2 | **缺少内在动机** | 无法探索任务特定目标之外 | VAE变分信息增益 + AUCB探索 |
@@ -440,15 +440,15 @@
 
 | 环境 | 样本量 | 方法 | 核心指标 | 数值 |
 |------|--------|------|----------|------|
-| **10x10 Grid** | 100 episodes | Civis vs Random | **Reward提升** | **+12.1%** |
+| **10x10 Grid** | 100 episodes | Simulacrum vs Random | **Reward提升** | **+12.1%** |
 | **10x10 Grid** | 100 episodes | State Coverage | **IG (nats)** | **2.93** |
-| **CartPole-v1** | 50 episodes | Civis vs Random | **Reward提升** | **+3.8%** |
-| 5x5 Grid | 100 episodes | Civis vs Random | Reward提升 | ±5-10% |
+| **CartPole-v1** | 50 episodes | Simulacrum vs Random | **Reward提升** | **+3.8%** |
+| 5x5 Grid | 100 episodes | Simulacrum vs Random | Reward提升 | ±5-10% |
 | FrozenLake 8x8 | 50 episodes | Success Rate | 0% | 太难 |
 
 **各环境详细性能对比：**
 
-| 环境 | 状态空间 | Random Mean | Civis Mean | Improvement | IG (nats) |
+| 环境 | 状态空间 | Random Mean | Simulacrum Mean | Improvement | IG (nats) |
 |------|---------|------------|------------|-------------|-----------|
 | 10x10 Grid | 100 | 0.433 | 0.518 | **+12.1%** | 2.93 |
 | CartPole-v1 | 64 | 23.3 | 24.2 | **+3.8%** | N/A |
@@ -497,7 +497,7 @@ $$IG_{\text{total}} = \sum_{s \in \text{visited}} H(s) - H(s \mid s')$$
 
 **目标期刊**: Neural Networks / Cognitive Computation / IEEE TNNLS
 
-- **第一章 引言**: 类脑计算背景、挑战、CLF定位
+- **第一章 引言**: 类脑计算背景、挑战、Simulacrum定位
 - **第二章 相关工作**: 事件驱动架构、认知心理学建模、类脑计算
 - **第三章 方法**:
   - 3.1 系统架构与事件驱动设计
@@ -518,7 +518,7 @@ $$IG_{\text{total}} = \sum_{s \in \text{visited}} H(s) - H(s \mid s')$$
 
 #### 2.1.1 EventBus 发布/订阅模式
 
-CLF 采用 **EventBus 发布/订阅** 模式作为核心通信机制。与传统智能体的直接函数调用不同，EventBus 实现了模块间的完全解耦：每个模块仅在收到相关事件时激活，避免无效计算。
+Simulacrum 采用 **EventBus 发布/订阅** 模式作为核心通信机制。与传统智能体的直接函数调用不同，EventBus 实现了模块间的完全解耦：每个模块仅在收到相关事件时激活，避免无效计算。
 
 **设计原则**:
 
@@ -957,7 +957,7 @@ flowchart TB
 
 ### 2.4 Agent step() 完整执行流程
 
-`step()` 是 CLF 智能体的核心执行方法，每调用一次推进一个时间步。整个流程分为 **18个阶段**，严格按照事件驱动架构执行。
+`step()` 是 Simulacrum 智能体的核心执行方法，每调用一次推进一个时间步。整个流程分为 **18个阶段**，严格按照事件驱动架构执行。
 
 **执行流程总览**:
 
@@ -1499,10 +1499,10 @@ def _neural_self_regulation_step(self, info_gain_reward: float, thermo_status: s
 
 #### 2.4.7 模块初始化顺序
 
-CLF Agent 的 `__init__` 方法按照严格的依赖顺序初始化所有38+个子系统：
+Simulacrum Agent 的 `__init__` 方法按照严格的依赖顺序初始化所有38+个子系统：
 
 ```python
-class CivisLucriFaber:
+class Simulacrum:
     def __init__(self, config, n_actions=16, ...):
         # 1. 事件总线 (所有模块的通信基础)
         self.bus = EventBus()
@@ -1604,7 +1604,7 @@ flowchart LR
 
 #### 3.1.2 数学定义
 
-CLF 好奇心引擎的核心公式：
+Simulacrum 好奇心引擎的核心公式：
 
 $$V_{\text{goal}}(s, g) = \alpha \cdot \text{Novelty}(g) + \beta \cdot \text{Complexity}(g) + \gamma \cdot \text{Utility}(g) + \text{AUCB}(g)$$
 
@@ -1975,7 +1975,7 @@ def _generate_uncertainty_goals(self, state_vector: np.ndarray, n: int) -> List[
 
 ```python
 # 创建好奇心引擎
-from civis_lucri_faber.core.curiosity import CuriosityEngine
+from simulacrum.core.curiosity import CuriosityEngine
 
 curiosity = CuriosityEngine(
     alpha=0.4, beta=0.3, gamma=0.3,
@@ -2067,7 +2067,7 @@ $$r_{\text{total}} = r_{\text{extrinsic}} + \lambda \cdot IG$$
 
 #### 3.2.3 变分世界模型 (VAE) 详细架构
 
-CLF 使用变分自编码器 (VAE) 作为世界模型，学习 $P(s' \mid s, a)$：
+Simulacrum 使用变分自编码器 (VAE) 作为世界模型，学习 $P(s' \mid s, a)$：
 
 ```mermaid
 flowchart LR
@@ -2172,7 +2172,7 @@ $$\log P(s' | s, a) \geq \int q(z | s, a) \log \frac{P(s' | s, a, z) P(z)}{q(z |
 
 $$\text{ELBO} = \underbrace{\mathbb{E}_{q(z|s,a)}[\log P(s' | s, a, z)]}_{\text{重建项 (Reconstruction)}} - \underbrace{D_{KL}(q(z | s, a) \| P(z))}_{\text{KL 正则项}}$$
 
-**在 CLF 中的具体实现**:
+**在 Simulacrum 中的具体实现**:
 
 - **重建项**: $\mathbb{E}_{q(z|s,a)}[\log P(s' | s, a, z)]$ = `pred_dist.log_prob(next_states).mean()`
   - 其中 $P(s' | s, a, z) = \mathcal{N}(\mu_{\text{dec}}(z, a), \sigma_{\text{dec}}(z, a))$
@@ -2227,7 +2227,7 @@ def train_step(self) -> Dict[str, float]:
 
 $$H(s) = -\mathbb{E}[\log P(s)]$$
 
-CLF 使用状态方差作为熵的代理：
+Simulacrum 使用状态方差作为熵的代理：
 
 $$H(s) \approx \frac{1}{2} \log(\text{Var}(s)) + C$$
 
@@ -2354,7 +2354,7 @@ def on_exploration_start(self, event) -> Dict[str, Any]:
 
 ```python
 # 创建信息增益计算器
-from civis_lucri_faber.core.information_gain import TrueInformationGainCalculator
+from simulacrum.core.information_gain import TrueInformationGainCalculator
 
 ig_calc = TrueInformationGainCalculator(
     state_dim=64, action_dim=16, latent_dim=32,
@@ -2672,7 +2672,7 @@ $$A = \sum_{i=1}^{n} w_i \cdot \text{Consistency}(c_i)$$
 
 #### 3.4.3 四维对齐检查
 
-CLF 使用四个维度进行对齐检查：
+Simulacrum 使用四个维度进行对齐检查：
 
 | 维度 | 名称 | 权重 | 检查内容 |
 |------|------|------|---------|
@@ -3178,7 +3178,7 @@ class PeriodicStarvation:
 
 ## 四、神经自调节系统详解
 
-神经自调节五联体 (Neural Self-Regulation Pentagon) 是 CLF 的核心内稳态维持系统，由五个相互耦合的子系统组成，模拟大脑的自主调节功能。
+神经自调节五联体 (Neural Self-Regulation Pentagon) 是 Simulacrum 的核心内稳态维持系统，由五个相互耦合的子系统组成，模拟大脑的自主调节功能。
 
 ```mermaid
 flowchart TB
@@ -3509,7 +3509,7 @@ $$F = \underbrace{D_{KL}[q(\theta) \| p(\theta)]}_{\text{complexity}} + \underbr
 ## 五、社会认知与自我意识详解
 
 > 人类是社会性动物。大脑进化出专门的神经回路来理解他人、感知自我。
-> 本节详细描述 CLF 的社会认知系统 (5个子系统) 和自我意识中枢 (6个子系统, L0-L5 层次模型)。
+> 本节详细描述 Simulacrum 的社会认知系统 (5个子系统) 和自我意识中枢 (6个子系统, L0-L5 层次模型)。
 
 ### 5.1 社会认知系统 (Social Cognition System)
 
@@ -3860,13 +3860,13 @@ $$\text{overall} = 0.2 \times \text{self\_ref} + 0.15 \times \text{self\_rel} + 
 ## 六、人格系统详解
 
 > 人格是个体在思维、情感和行为上表现出的稳定的、独特的模式。
-> CLF 人格系统由 7 个子系统组成，对应大脑的不同功能模块。
+> Simulacrum 人格系统由 7 个子系统组成，对应大脑的不同功能模块。
 
 ### 6.1 架构总览
 
 ```mermaid
 flowchart TB
-    subgraph PERSONALITY["CLF 人格系统架构"]
+    subgraph PERSONALITY["Simulacrum 人格系统架构"]
         subgraph ENGINE["三重竞逐决策引擎"]
             SURV["SurvivalModule<br/>(脑干)"]
             EMOT["EmotionModule<br/>(边缘系统)"]
@@ -4177,7 +4177,7 @@ result = system.process_interaction(
 
 神经调质是大脑的"全局增益调节器":
 
-| 神经调质 | 功能 | CLF 实现 |
+| 神经调质 | 功能 | Simulacrum 实现 |
 |---------|------|---------|
 | **多巴胺 (DA)** | 奖励预测误差、动机、学习 | DopamineGate: 价值/信心预测 |
 | **血清素 (5-HT)** | 风险感知、不确定性、保守性 | SerotoninGate: 温度调节 |
@@ -4220,7 +4220,7 @@ result = neuromod(
 
 对应 DNA 甲基化:
 
-| 生物机制 | CLF 映射 |
+| 生物机制 | Simulacrum 映射 |
 |---------|---------|
 | 环境压力 → 甲基化标签 | 重大事件 → LoRA 权重更新 |
 | 不修改基因序列，改变表达 | 不修改基模型，添加适配层 |
@@ -4284,7 +4284,7 @@ result = epigenetic.learn(
 
 ## 七、脑区模块详解
 
-> 除核心认知和人格系统外，CLF 还实现了多个脑区级模块，
+> 除核心认知和人格系统外，Simulacrum 还实现了多个脑区级模块，
 > 覆盖从脑干到皮层的完整神经解剖层次。
 
 ### 7.1 脑干 (Brainstem)
@@ -4337,7 +4337,7 @@ $$\text{target} = 0.3 \times \text{baseline} + 0.3 \times \text{sensory} + 0.2 \
 
 #### 7.2.2 杏仁核 (Amygdala)
 
-| 核团 | 功能 | CLF 实现 |
+| 核团 | 功能 | Simulacrum 实现 |
 |------|------|---------|
 | **基底外侧核 (BLA)** | 情绪记忆形成 | BasolateralAmygdala: 情绪编码器 |
 | **中央核 (CeA)** | 行为输出 | AmygdalaNucleus: 5情绪分类器 |
@@ -4352,7 +4352,7 @@ $$\text{memory\_strength} \times= 0.9 \quad \text{(每次安全暴露)}$$
 
 #### 7.2.3 丘脑 (Thalamus)
 
-| 核团 | 功能 | CLF 实现 |
+| 核团 | 功能 | Simulacrum 实现 |
 |------|------|---------|
 | **丘脑中继核** | 感觉信息中继 (视觉/听觉/触觉/本体感觉) | ThalamicRelay: 4感觉通道 |
 | **内侧背核 (MD)** | 工作记忆 | MDNucleus: deque maxlen=5 |
@@ -4409,7 +4409,7 @@ $$\text{retroactive: old\_mem} \times= (1 - \text{retroactive\_strength} \times 
 
 #### 7.4.2 三大通路
 
-| 通路 | 功能 | CLF 类 |
+| 通路 | 功能 | Simulacrum 类 |
 |------|------|--------|
 | **直接通路 (D1)** | GO: 促进动作执行 | `DirectPathway` |
 | **间接通路 (D2)** | NO-GO: 抑制动作执行 | `IndirectPathway` |
@@ -4450,7 +4450,7 @@ $$\text{conscious\_load} = \max(0.1, 1.0 - n\_skills \times 0.1)$$
 
 #### 7.5.2 核心功能
 
-| 功能 | 机制 | CLF 实现 |
+| 功能 | 机制 | Simulacrum 实现 |
 |------|------|---------|
 | **运动学习** | 浦肯野细胞误差学习 | CerebellarPatch: 纠错网络 |
 | **时间协调** | 精确时间编码 | LSTM 时序学习 |
@@ -4499,7 +4499,7 @@ $$\text{gate\_logits} = \text{content} + \text{membrane} + \text{emotion} + \tex
 
 #### 7.7.1 四大神经递质
 
-| 递质 | 来源 | CLF 实现 | 核心功能 |
+| 递质 | 来源 | Simulacrum 实现 | 核心功能 |
 |------|------|---------|---------|
 | **多巴胺 (DA)** | VTA/SNc | DopamineSystem (3通路加权) | 奖励预测误差, 动机, 学习 |
 | **血清素 (5-HT)** | 中缝核 | SerotoninSystem | 情绪稳定, 风险感知 |
@@ -4540,7 +4540,7 @@ $$\text{learning} = 0.4 \times DA + 0.3 \times ACh + 0.3 \times \text{glutamate}
 
 #### 7.8.1 激素网络
 
-| 激素 | 来源 | CLF 实现 | 核心功能 |
+| 激素 | 来源 | Simulacrum 实现 | 核心功能 |
 |------|------|---------|---------|
 | **皮质醇** | HPA 轴 | U型曲线 (Yerkes-Dodson) | 压力反应, 认知调控 |
 | **肾上腺素** | 肾上腺髓质 | 快速应激 | "战斗或逃跑" |
@@ -4569,7 +4569,7 @@ $$\text{5-HT}_{effective} = (1 - \text{coupling}) \times \text{central} + \text{
 
 #### 7.9.2 两过程睡眠模型 (Borbély)
 
-| 过程 | 机制 | CLF 实现 |
+| 过程 | 机制 | Simulacrum 实现 |
 |------|------|---------|
 | **Process S** (腺苷) | 清醒时积累, 睡眠时清除 | adenosine 累积/衰减 |
 | **Process C** (昼夜) | SCN 驱动的警觉节律 | 嵌入 SCN 模块 |
@@ -4767,7 +4767,7 @@ Hebb (1949): "Neurons that fire together wire together" (一起激活的神经�
 
 #### 7.14.2 核心机制
 
-| 机制 | 生物对应 | CLF 实现 |
+| 机制 | 生物对应 | Simulacrum 实现 |
 |------|---------|---------|
 | **突触增强** | LTP (长时程增强) | 活跃突触 += strengthen_rate (0.1), 上限 2.0 |
 | **突触弱化** | LTD (长时程抑制) | 不活跃突触 -= weaken_rate (0.05), 下限 0.1 |
@@ -5078,8 +5078,8 @@ vocal_result = self.bus.publish(VOCALIZATION_CONTROL, {
 #### 7.19.7 使用示例
 
 ```python
-from civis_lucri_faber.core.vocalization import text_to_phoneme_indices, VocalCortex
-from civis_lucri_faber.core.formant_synthesis import FormantToWaveform
+from simulacrum.core.vocalization import text_to_phoneme_indices, VocalCortex
+from simulacrum.core.formant_synthesis import FormantToWaveform
 
 # 文本→音素 (CMU风格274词发音字典, 未知词→逐字母回退)
 phoneme_indices = text_to_phoneme_indices("hello world")
@@ -5126,8 +5126,8 @@ if result and result.get("waveform") is not None:
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/YAN/civis_lucri_faber.git
-cd civis_lucri_faber
+git clone https://github.com/YAN/simulacrum.git
+cd simulacrum
 
 # 2. 创建虚拟环境
 python -m venv venv
@@ -5159,10 +5159,10 @@ tqdm                # 进度条
 #### 8.2.1 最简示例: 创建智能体
 
 ```python
-from civis_lucri_faber.core.agent import CivisLucriFaber
+from simulacrum.core.agent import Simulacrum
 
 # 创建智能体 (使用默认配置)
-agent = CivisLucriFaber()
+agent = Simulacrum()
 
 # 执行一步 (模拟环境交互)
 result = agent.step(observation={"position": [5, 5], "energy": 0.8})
@@ -5180,21 +5180,21 @@ print(result)
 #### 8.2.2 对话模式
 
 ```python
-from civis_lucri_faber.core.agent import CivisLucriFaber
+from simulacrum.core.agent import Simulacrum
 
-agent = CivisLucriFaber(config={"llm_provider": "deepseek"})
+agent = Simulacrum(config={"llm_provider": "deepseek"})
 
 # 三层认知管道对话
 response = agent.chat("你好，请介绍一下你自己。")
 print(response)
-# "你好！我是 Civis Lucri-Faber，一个生物启发式的AI认知系统..."
+# "你好！我是 Simulacrum，一个生物启发式的AI认知系统..."
 ```
 
 #### 8.2.3 自定义配置
 
 ```python
-from civis_lucri_faber.utils.config import load_config
-from civis_lucri_faber.core.agent import CivisLucriFaber
+from simulacrum.utils.config import load_config
+from simulacrum.core.agent import Simulacrum
 
 config = load_config(
     curiosity_alpha=0.5,       # 好奇心: Novelty 权重
@@ -5205,7 +5205,7 @@ config = load_config(
     device="cuda",             # 使用 GPU
 )
 
-agent = CivisLucriFaber(config=config)
+agent = Simulacrum(config=config)
 ```
 
 ### 8.3 运行实验
@@ -5234,7 +5234,7 @@ python experiments/run_custom_env.py --env YourEnv-v0
 
 ```python
 import gymnasium as gym
-from civis_lucri_faber.core.agent import CivisLucriFaber
+from simulacrum.core.agent import Simulacrum
 
 class CustomEnv(gym.Env):
     """自定义环境接口"""
@@ -5250,7 +5250,7 @@ class CustomEnv(gym.Env):
         return observation, reward, terminated, truncated, info
 
 # 使用
-agent = CivisLucriFaber()
+agent = Simulacrum()
 env = CustomEnv()
 
 obs, info = env.reset()
@@ -5299,11 +5299,11 @@ python demos/emotional_chat.py --provider deepseek
 | 状态空间 | 100 (位置编码) |
 | 动作空间 | 4 (上下左右) |
 | Episodes | 100 |
-| 方法 | CLF (好奇心+IG) vs Random |
+| 方法 | Simulacrum (好奇心+IG) vs Random |
 
 #### 9.1.2 结果
 
-| 指标 | Random Baseline | CLF | 提升 |
+| 指标 | Random Baseline | Simulacrum | 提升 |
 |------|----------------|-----|------|
 | **平均奖励** | 0.433 | 0.518 | **+12.1%** |
 | **信息增益** | — | 2.93 nats | — |
@@ -5315,7 +5315,7 @@ python demos/emotional_chat.py --provider deepseek
 
 #### 9.2.1 CartPole-v1
 
-| 指标 | Random Baseline | CLF | 提升 |
+| 指标 | Random Baseline | Simulacrum | 提升 |
 |------|----------------|-----|------|
 | **平均奖励** | 23.3 | 24.2 | **+3.8%** |
 
@@ -5323,7 +5323,7 @@ python demos/emotional_chat.py --provider deepseek
 
 ### 9.3 对比分析
 
-| 环境类型 | 状态空间 | CLF 效果 | 原因分析 |
+| 环境类型 | 状态空间 | Simulacrum 效果 | 原因分析 |
 |---------|---------|---------|---------|
 | 大离散 (10x10) | 100 | **显著提升** | 大量未探索→高新颖度 |
 | 小离散 (5x5) | 25 | 有限提升 | 快速饱和 |
@@ -5420,15 +5420,15 @@ python demos/emotional_chat.py --provider deepseek
 ### 11.1 创建智能体
 
 ```python
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import load_config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import load_config
 
 # 默认创建
-agent = CivisLucriFaber()
+agent = Simulacrum()
 
 # 自定义配置
 config = load_config(llm_provider="deepseek", device="cuda")
-agent = CivisLucriFaber(config=config)
+agent = Simulacrum(config=config)
 ```
 
 ### 11.2 运行接口
@@ -5465,9 +5465,9 @@ agent = CivisLucriFaber(config=config)
 ### 11.3 独立使用子系统
 
 ```python
-from civis_lucri_faber.core.curiosity import CuriosityEngine
-from civis_lucri_faber.core.information_gain import TrueInformationGainCalculator
-from civis_lucri_faber.core.thermodynamics import ThermodynamicsSystem
+from simulacrum.core.curiosity import CuriosityEngine
+from simulacrum.core.information_gain import TrueInformationGainCalculator
+from simulacrum.core.thermodynamics import ThermodynamicsSystem
 
 # 好奇心引擎
 curiosity = CuriosityEngine(state_dim=64, action_dim=16)
@@ -5508,13 +5508,13 @@ thermo.charge(task_reward=0.5)
 
 ### 12.1 生物隐喻 vs 工程实现
 
-**Q: CLF 是真的在模拟大脑吗?**
+**Q: Simulacrum 是真的在模拟大脑吗?**
 
-A: CLF 不是大脑的精确模拟，而是**受大脑启发的工程系统**。我们借鉴了大脑的组织原则 (分层、模块化、反馈调节) 和关键机制 (TD学习、突触可塑性、镜像神经元)，但用简化的数学模型实现。目标是在 AI 系统中复现大脑的**功能特性** (自适应、鲁棒、高效)，而非精确复制生物细节。
+A: Simulacrum 不是大脑的精确模拟，而是**受大脑启发的工程系统**。我们借鉴了大脑的组织原则 (分层、模块化、反馈调节) 和关键机制 (TD学习、突触可塑性、镜像神经元)，但用简化的数学模型实现。目标是在 AI 系统中复现大脑的**功能特性** (自适应、鲁棒、高效)，而非精确复制生物细节。
 
 ### 12.2 规模限制
 
-**Q: CLF 能用于大规模生产吗?**
+**Q: Simulacrum 能用于大规模生产吗?**
 
 A: 当前版本是**研究原型** (约 12M 参数)。28+ 个子系统的主要价值在于:
 1. **验证生物启发架构的可行性**
@@ -5525,9 +5525,9 @@ A: 当前版本是**研究原型** (约 12M 参数)。28+ 个子系统的主要�
 
 ### 12.3 与 LLM 对比
 
-**Q: CLF 和 ChatGPT 有什么区别?**
+**Q: Simulacrum 和 ChatGPT 有什么区别?**
 
-| 维度 | CLF | ChatGPT |
+| 维度 | Simulacrum | ChatGPT |
 |------|-----|---------|
 | **架构** | 模块化脑区 | 单一 Transformer |
 | **学习方式** | 内在动机+在线适应 | 预训练+微调 |
@@ -5733,7 +5733,7 @@ function compute_curiosity(state):
 
 ```bibtex
 @article{civis2026,
-  title={Civis Lucri-Faber: A Bio-Inspired Cognitive Architecture with 28+ Brain Mechanisms},
+  title={Simulacrum: A Bio-Inspired Cognitive Architecture with 28+ Brain Mechanisms},
   author={YAN},
   journal={Neural Networks / Cognitive Computation},
   year={2026},
@@ -5745,7 +5745,7 @@ function compute_curiosity(state):
 
 > **文档版本**: v2.2 (精神疾病模拟器) | **最后更新**: 2026-05-17
 >
-> **项目地址**: `D:\civis_lucri_faber`
+> **项目地址**: `D:\simulacrum`
 >
 > **联系作者**: YAN (吉林大学交叉学科)
 
@@ -5755,20 +5755,20 @@ function compute_curiosity(state):
 
 ### 13.1 集成概述
 
-Censor 是一个仿生双通路微表情识别系统 (Biomimetic Dual-Pathway MER)，68M 参数，已实时集成进 CLF 认知架构作为第 18 号子系统。
+Censor 是一个仿生双通路微表情识别系统 (Biomimetic Dual-Pathway MER)，68M 参数，已实时集成进 Simulacrum 认知架构作为第 18 号子系统。
 
 **生物对应关系:**
 
-| Censor 模块 | CLF 脑区 | 功能映射 |
+| Censor 模块 | Simulacrum 脑区 | 功能映射 |
 |---|---|---|
 | Fast Subcortical Pathway (3D ResNet-18) | 杏仁核快速威胁检测 | 皮下通路 → 快速情绪反应 |
 | Slow Cortical Pathway (3D Swin-Transformer) | FFA 面孔精细识别 | 皮层通路 → 面部表情解码 |
-| Amygdala Attention Prior Map | CLF 边缘系统 | 注意力调制 → 威胁优先 |
-| AU Intensities (28 FACS) | CLF 高级情绪系统 | 面部动作 → 情绪推断 |
-| ME Logits (7/11类) | CLF 海马体 | 微表情分类 → 情绪事件标记 |
-| Apex Scores | CLF 海马体 | 情绪峰值 → 情景记忆锚点 |
-| MoE Expert Gates (3专家) | CLF 基底神经节 | 专家路由 → 决策策略选择 |
-| Emotion Reporter | CLF 语言皮层 | 结构化报告 → 情绪词汇 |
+| Amygdala Attention Prior Map | Simulacrum 边缘系统 | 注意力调制 → 威胁优先 |
+| AU Intensities (28 FACS) | Simulacrum 高级情绪系统 | 面部动作 → 情绪推断 |
+| ME Logits (7/11类) | Simulacrum 海马体 | 微表情分类 → 情绪事件标记 |
+| Apex Scores | Simulacrum 海马体 | 情绪峰值 → 情景记忆锚点 |
+| MoE Expert Gates (3专家) | Simulacrum 基底神经节 | 专家路由 → 决策策略选择 |
+| Emotion Reporter | Simulacrum 语言皮层 | 结构化报告 → 情绪词汇 |
 
 ### 13.2 事件驱动集成
 
@@ -5789,7 +5789,7 @@ MICRO_EXPRESSION_DETECTED = "micro_expression_detected"  # 微表情检测完成
       → Censor 7-stage forward pass
         → 输出: me_logits, au_intensities, au_opd, apex_scores, expert_gates
       → MICRO_EXPRESSION_DETECTED 事件发布
-        → CLF 各脑区消费结果:
+        → Simulacrum 各脑区消费结果:
           - 边缘系统: threat_level (anger AU → 杏仁核威胁评估)
           - 高级情绪: emotion_map (AU → 7类基础情绪激活度)
           - 海马体: apex_frame (情绪峰值 → 情景记忆标记)
@@ -6058,7 +6058,7 @@ Input: (B, 3, T=16, H=224, W=224) RGB video
 
 ## 八、计算精神药理学沙盒 (Psychopharmacology Sandbox)
 
-> 将 CLF 已有的 30+ 神经子系统、26 种精神疾病 profile、9 种药物预设整合为一个**协同疗法探索沙盒**，
+> 将 Simulacrum 已有的 30+ 神经子系统、26 种精神疾病 profile、9 种药物预设整合为一个**协同疗法探索沙盒**，
 > 可以设计对照实验，研究药物+心理治疗的联合效应。
 
 ### 8.1 架构总览
@@ -6307,7 +6307,7 @@ r3 = sandbox.run_single("MDD", drug="antidepressant", therapy="CBT", duration=10
 
 **精神疾病不是新代码，而是现有 30+ 子系统的特定参数配置组合。**
 
-CLF 已有的 18 个子系统各自包含正常/异常阈值和病理机制：
+Simulacrum 已有的 18 个子系统各自包含正常/异常阈值和病理机制：
 - MoodDisorderSystem 的 MDD/Mania shift 向量
 - HPA 轴的 allostatic drift 和 GR 下调
 - PredictiveCoding 的 aberrant precision

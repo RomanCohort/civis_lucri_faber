@@ -1,7 +1,7 @@
 """
 对话情绪响应系统
 
-基于Civis Lucri-Faber的心理学期制
+基于Simulacrum的心理学期制
 实现具有情绪感知和同理心的对话AI
 """
 import torch

@@ -1,5 +1,5 @@
 """
-Civis Lucri-Faber -- GPU Training
+Simulacrum -- GPU Training
 =================================
 High-performance training pipeline with GPU acceleration.
 
@@ -38,12 +38,12 @@ from torch.utils.data import Dataset, DataLoader
 root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, root_dir)
 
-from civis_lucri_faber.utils.config import Config
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.core.information_gain import TrueInformationGainCalculator
-from civis_lucri_faber.core.meta_learning import FirstOrderMAML
-from civis_lucri_faber.core.curiosity import CuriosityEngine
-from civis_lucri_faber.core.thermodynamics import ThermodynamicsSystem
+from simulacrum.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.core.information_gain import TrueInformationGainCalculator
+from simulacrum.core.meta_learning import FirstOrderMAML
+from simulacrum.core.curiosity import CuriosityEngine
+from simulacrum.core.thermodynamics import ThermodynamicsSystem
 
 # Try to import pynvml for GPU monitoring
 try:
@@ -213,9 +213,9 @@ class CSVLogger:
 # Trainer
 # =============================================================================
 
-class CivisTrainer:
+class SimulacrumTrainer:
     """
-    Trainer for Civis Lucri-Faber with GPU support.
+    Trainer for Simulacrum with GPU support.
 
     Handles:
     - Information Gain Calculator training
@@ -409,7 +409,7 @@ def main():
     set_seed(args.seed)
 
     print("\n" + "="*50)
-    print("Civis Lucri-Faber GPU Training")
+    print("Simulacrum GPU Training")
     print("="*50)
 
     # Load config
@@ -420,7 +420,7 @@ def main():
     print(f"  Intrinsic Lambda: {config.intrinsic_motivation_lambda}")
 
     # Create trainer
-    trainer = CivisTrainer(config, args)
+    trainer = SimulacrumTrainer(config, args)
 
     # Resume if needed
     if args.resume:

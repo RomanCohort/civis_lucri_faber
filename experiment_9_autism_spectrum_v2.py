@@ -34,8 +34,8 @@ import torch
 from typing import Dict, List, Tuple
 import random
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 CONNECTIVITY_LEVELS = {
@@ -122,7 +122,7 @@ def generate_social_schedule(n_steps: int, interaction_probability: float = 0.3,
     return schedule
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "social_engagement": float(s.get("social_engagement", 0.5)),
@@ -171,7 +171,7 @@ def run_group(group_name: str, resonance_value: float) -> Dict:
         hpa_stress_reactivity=1.5,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     # 设置MirrorNeuron共振基线
     try:

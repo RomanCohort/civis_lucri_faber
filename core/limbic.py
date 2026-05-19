@@ -4,12 +4,20 @@
 对应生物学的：
 1. Amygdala - 情绪学习、恐惧条件化
 2. Thalamus - 感觉中继、时间信息流
+3. vmPFC - 恐惧消退学习 (新增)
 
 核心功能：
 1. 情绪编码与记忆
 2. 恐惧条件化
 3. 感觉中继
 4. 时间信息流
+5. 恐惧消退学习 - 新增
+6. 杏仁核-海马情绪调制连接 - 新增
+
+参考:
+- LeDoux (2000) - 恐惧条件化的神经机制
+- Milad & Quirk (2012) - vmPFC恐惧消退
+- Richter-Levin & Akirav (2010) - Amygdala-Hippocampus交互
 """
 import torch
 import torch.nn as nn
@@ -640,10 +648,13 @@ class LimbicSystem(nn.Module):
         self,
         state: torch.Tensor,
         sensory_inputs: List[torch.Tensor] = None,
+        apply_extinction: bool = True,
     ) -> Dict:
         """整合处理"""
-        # 情绪
-        emotion_result = self.amygdala.process(state)
+        # 情绪 (含vmPFC消退)
+        emotion_result = self.amygdala.process_with_extinction(
+            state, apply_extinction=apply_extinction
+        )
 
         # 丘脑
         if sensory_inputs is not None:
@@ -659,15 +670,17 @@ class LimbicSystem(nn.Module):
             'emotion': emotion_result['emotion'],
             'valence': emotion_result['valence'],
             'arousal': emotion_result['arousal'],
+            'intensity': emotion_result['intensity'],
             'response': emotion_result['response'],
             'attended_state': thalamus_result.get('attended'),
             'emotional_attention': emotional_attention,
+            'extinction_signal': emotion_result.get('extinction_signal', 0.0),
         }
 
     def get_summary(self) -> Dict:
         """获取摘要"""
         return {
-            'amygdala': self.amygdala.get_emotion_summary(),
+            'amygdala': self.amygdala.get_enhanced_summary(),
             'thalamus': self.thalamus.get_timing_info(),
         }
 
@@ -734,3 +747,423 @@ class AmygdalaWithPrior(nn.Module):
         learned_map = torch.sigmoid(self.fc2(h).view(-1, 1, 14, 14))
         attention_map = (1 - self.prior_strength) * learned_map + self.prior_strength * self.face_prior.view(1, 1, 14, 14)
         return {'attention_map': attention_map, 'prior_strength': self.prior_strength}
+
+
+# ══════════════════════════════════════════════════════
+# vmPFC恐惧消退机制 (新增)
+# 参考: Milad & Quirk (2012) - vmPFC在恐惧消退中的作用
+# ══════════════════════════════════════════════════════
+
+@dataclass
+class ExtinctionMemory:
+    """消退记忆
+
+    存储"安全"信号的记忆，用于抑制恐惧反应
+    """
+    cue: np.ndarray
+    safety_context: str
+    extinction_strength: float
+    extinction_trials: int
+    timestamp: int
+
+
+class vmPFCExtinction(nn.Module):
+    """腹内侧前额叶(vmPFC)恐惧消退学习
+
+    vmPFC的功能:
+    1. 存储恐惧消退记忆 (safe context)
+    2. 抑制杏仁核的恐惧反应
+    3. 检测安全信号，输出消退信号
+
+    参考:
+    - Milad & Quirk (2012): vmPFC的恐惧消退机制
+    - Sotres-Bayon et al. (2009): 消退学习的神经回路
+    """
+
+    def __init__(
+        self,
+        input_dim: int = 64,
+        extinction_rate: float = 0.05,
+        consolidation_rate: float = 0.02,
+    ):
+        super().__init__()
+        self.input_dim = input_dim
+        self.extinction_rate = extinction_rate
+        self.consolidation_rate = consolidation_rate
+
+        # 安全信号检测网络
+        self.safety_detector = nn.Sequential(
+            nn.Linear(input_dim, 32),
+            nn.ReLU(),
+            nn.Linear(32, 1),
+            nn.Sigmoid(),
+        )
+
+        # 消退信号输出网络
+        self.extinction_output = nn.Sequential(
+            nn.Linear(input_dim, 32),
+            nn.ReLU(),
+            nn.Linear(32, 1),
+            nn.Sigmoid(),
+        )
+
+        # 消退记忆存储
+        self.extinction_memories: List[ExtinctionMemory] = []
+        self.extinction_history: deque = deque(maxlen=50)
+
+        # 当前消退强度
+        self.current_extinction_signal = 0.0
+
+    def detect_safety(
+        self,
+        context: torch.Tensor,
+    ) -> float:
+        """检测安全信号
+
+        Args:
+            context: 当前情境编码
+
+        Returns:
+            safety_level: 安全水平 [0, 1]
+        """
+        if context.dim() == 1:
+            context = context.unsqueeze(0)
+        safety_level = self.safety_detector(context).squeeze().item()
+        return safety_level
+
+    def learn_extinction(
+        self,
+        fear_cue: np.ndarray,
+        safety_context: str = "default",
+        trial_count: int = 1,
+    ) -> Dict:
+        """学习恐惧消退
+
+        在安全暴露后，逐渐降低对恐惧cue的反应
+
+        Args:
+            fear_cue: 原恐惧条件刺激
+            safety_context: 安全情境标识
+            trial_count: 安全暴露次数
+
+        Returns:
+            extinction_result: 消退学习结果
+        """
+        # 检查是否已有消退记忆
+        existing = None
+        for mem in self.extinction_memories:
+            if np.allclose(mem.cue[:10], fear_cue[:10], atol=0.1):  # 简化匹配
+                existing = mem
+                break
+
+        if existing:
+            # 增强现有消退记忆
+            existing.extinction_strength += self.extinction_rate * trial_count
+            existing.extinction_strength = min(1.0, existing.extinction_strength)
+            existing.extinction_trials += trial_count
+        else:
+            # 创建新消退记忆
+            new_mem = ExtinctionMemory(
+                cue=fear_cue,
+                safety_context=safety_context,
+                extinction_strength=self.extinction_rate * trial_count,
+                extinction_trials=trial_count,
+                timestamp=len(self.extinction_memories),
+            )
+            self.extinction_memories.append(new_mem)
+
+        # 记录消退历史
+        self.extinction_history.append({
+            'trial_count': trial_count,
+            'safety_context': safety_context,
+        })
+
+        return {
+            'extinction_strength': existing.extinction_strength if existing else self.extinction_rate * trial_count,
+            'total_trials': existing.extinction_trials if existing else trial_count,
+        }
+
+    def output_extinction_signal(
+        self,
+        context: torch.Tensor,
+        fear_memories: List[FearCondition],
+    ) -> float:
+        """输出消退信号，抑制杏仁核
+
+        Args:
+            context: 当前情境
+            fear_memories: 杏仁核的恐惧记忆列表
+
+        Returns:
+            extinction_signal: 消退信号强度 [0, 1]
+        """
+        safety_level = self.detect_safety(context)
+
+        # 计算消退强度：基于安全信号和消退记忆
+        extinction_strength = safety_level
+
+        # 检查是否有匹配的消退记忆
+        context_np = context.squeeze(0).detach().numpy() if context.dim() > 1 else context.detach().numpy()
+        for mem in self.extinction_memories:
+            if np.allclose(mem.cue[:10], context_np[:10], atol=0.1):
+                extinction_strength = max(extinction_strength, mem.extinction_strength)
+
+        # vmPFC输出消退信号
+        extinction_output = self.extinction_output(context).squeeze().item()
+        self.current_extinction_signal = extinction_output * extinction_strength
+
+        return self.current_extinction_signal
+
+    def consolidate_extinction(self):
+        """巩固消退记忆
+
+        类似睡眠期间的记忆巩固
+        """
+        for mem in self.extinction_memories:
+            mem.extinction_strength += self.consolidation_rate
+            mem.extinction_strength = min(1.0, mem.extinction_strength)
+
+    def get_extinction_stats(self) -> Dict:
+        """获取消退统计"""
+        return {
+            'n_extinction_memories': len(self.extinction_memories),
+            'current_extinction_signal': self.current_extinction_signal,
+            'avg_extinction_strength': np.mean([m.extinction_strength for m in self.extinction_memories]) if self.extinction_memories else 0.0,
+            'total_extinction_trials': sum(m.extinction_trials for m in self.extinction_memories),
+        }
+
+
+# ══════════════════════════════════════════════════════
+# 杏仁核-海马情绪调制连接 (新增)
+# 参考: Richter-Levin & Akirav (2010)
+# ══════════════════════════════════════════════════════
+
+class AmygdalaHippocampusConnection(nn.Module):
+    """杏仁核-海马情绪调制连接
+
+    双向连接:
+    1. Amygdala→HC: 情绪增强记忆编码 (情绪性记忆更强)
+    2. HC→Amygdala: 情景记忆触发情绪反应 (回忆引发情绪)
+
+    参考:
+    - Richter-Levin & Akirav (2010): Amygdala-Hippocampus交互
+    - McGaugh (2004): 情绪增强记忆
+    """
+
+    def __init__(
+        self,
+        amygdala_dim: int = 64,
+        hippocampus_dim: int = 128,
+        modulation_strength: float = 0.5,
+    ):
+        super().__init__()
+        self.amygdala_dim = amygdala_dim
+        self.hippocampus_dim = hippocampus_dim
+
+        # Amygdala→HC: 情绪调制记忆编码强度
+        self.emotion_to_memory = nn.Sequential(
+            nn.Linear(amygdala_dim, hippocampus_dim),
+            nn.Tanh(),  # 调制信号 [-1, 1]
+        )
+
+        # HC→Amygdala: 记忆触发情绪
+        self.memory_to_emotion = nn.Sequential(
+            nn.Linear(hippocampus_dim, amygdala_dim),
+            nn.ReLU(),
+        )
+
+        # 调制强度
+        self.modulation_strength = nn.Parameter(torch.tensor(modulation_strength))
+
+        # 连接历史
+        self.connection_history: deque = deque(maxlen=50)
+
+    def modulate_memory_encoding(
+        self,
+        emotion_encoding: torch.Tensor,
+        arousal: float,
+        valence: float,
+    ) -> torch.Tensor:
+        """情绪调制记忆编码
+
+        高唤醒/强情绪 → 记忆编码更强
+
+        Args:
+            emotion_encoding: 杏仁核情绪编码 [amygdala_dim]
+            arousal: 唤醒水平 [0, 1]
+            valence: 效价 [-1, 1]
+
+        Returns:
+            memory_modulation: 记忆编码调制信号 [hippocampus_dim]
+        """
+        if emotion_encoding.dim() == 1:
+            emotion_encoding = emotion_encoding.unsqueeze(0)
+
+        # 情绪调制信号
+        modulation = self.emotion_to_memory(emotion_encoding)
+
+        # 基于唤醒和效价调整强度
+        # 高唤醒增强，负效价也增强 (恐惧记忆更强)
+        intensity_factor = arousal * (1.0 + 0.3 * abs(valence))
+        modulation = modulation * intensity_factor * self.modulation_strength
+
+        # 记录连接
+        self.connection_history.append({
+            'direction': 'emotion_to_memory',
+            'arousal': arousal,
+            'valence': valence,
+        })
+
+        return modulation
+
+    def trigger_emotion_from_memory(
+        self,
+        memory_encoding: torch.Tensor,
+    ) -> torch.Tensor:
+        """记忆触发情绪反应
+
+        回忆特定情景 → 触发相关情绪
+
+        Args:
+            memory_encoding: 海马记忆编码 [hippocampus_dim]
+
+        Returns:
+            emotion_signal: 情绪触发信号 [amygdala_dim]
+        """
+        if memory_encoding.dim() == 1:
+            memory_encoding = memory_encoding.unsqueeze(0)
+
+        # 记忆→情绪
+        emotion_signal = self.memory_to_emotion(memory_encoding)
+        emotion_signal = emotion_signal * self.modulation_strength
+
+        # 记录连接
+        self.connection_history.append({
+            'direction': 'memory_to_emotion',
+        })
+
+        return emotion_signal
+
+    def get_connection_stats(self) -> Dict:
+        """获取连接统计"""
+        emotion_to_mem = sum(1 for h in self.connection_history if h['direction'] == 'emotion_to_memory')
+        mem_to_emotion = sum(1 for h in self.connection_history if h['direction'] == 'memory_to_emotion')
+
+        return {
+            'modulation_strength': self.modulation_strength.item(),
+            'emotion_to_memory_count': emotion_to_mem,
+            'memory_to_emotion_count': mem_to_emotion,
+        }
+
+
+# ══════════════════════════════════════════════════════
+# 增强Amygdala类 - 整合vmPFC和HC连接
+# ══════════════════════════════════════════════════════
+
+class EnhancedAmygdala(Amygdala):
+    """增强版杏仁核 - 整合vmPFC消退和HC连接"""
+
+    def __init__(
+        self,
+        input_dim: int = 64,
+        hippocampus_dim: int = 128,
+    ):
+        super().__init__(input_dim)
+        self.hippocampus_dim = hippocampus_dim
+
+        # vmPFC消退系统
+        self.vmpfc = vmPFCExtinction(input_dim)
+
+        # HC连接
+        self.hc_connection = AmygdalaHippocampusConnection(
+            amygdala_dim=input_dim,
+            hippocampus_dim=hippocampus_dim,
+        )
+
+        # 消退抑制状态
+        self.extinction_suppression = 0.0
+
+    def process_with_extinction(
+        self,
+        state: torch.Tensor,
+        store: bool = True,
+        apply_extinction: bool = True,
+    ) -> Dict:
+        """处理情绪 + vmPFC消退调制
+
+        Args:
+            state: 输入状态
+            store: 是否存储情绪记忆
+            apply_extinction: 是否应用vmPFC消退
+
+        Returns:
+            result: 处理结果
+        """
+        # 基础情绪处理
+        result = super().process(state, store)
+
+        # vmPFC消退信号
+        if apply_extinction and self.fear.fear_memories:
+            extinction_signal = self.vmpfc.output_extinction_signal(
+                state, self.fear.fear_memories
+            )
+
+            # 消退信号抑制恐惧反应
+            if result['emotion'] == 'fear':
+                # 消退调制：降低恐惧强度
+                fear_suppression = extinction_signal * 0.5
+                result['arousal'] = result['arousal'] * (1.0 - fear_suppression)
+                result['intensity'] = result['intensity'] * (1.0 - fear_suppression)
+
+                # 如果消退足够强，改变反应
+                if extinction_signal > 0.7:
+                    result['response'] = 'calm'
+
+            self.extinction_suppression = extinction_signal
+            result['extinction_signal'] = extinction_signal
+
+        return result
+
+    def get_enhanced_summary(self) -> Dict:
+        """获取增强版摘要"""
+        base_summary = self.get_emotion_summary()
+        return {
+            **base_summary,
+            'vmpfc_stats': self.vmpfc.get_extinction_stats(),
+            'hc_connection_stats': self.hc_connection.get_connection_stats(),
+            'extinction_suppression': self.extinction_suppression,
+        }
+
+
+# ══════════════════════════════════════════════════════
+# 更新LimbicSystem以包含vmPFC
+# ══════════════════════════════════════════════════════
+
+
+class LimbicSystem(nn.Module):
+    """
+    边缘系统整合
+
+    Amygdala + Thalamus + vmPFC (新增)
+    """
+
+    def __init__(
+        self,
+        input_dim: int = 64,
+        hippocampus_dim: int = 128,
+        event_bus=None,
+    ):
+        super().__init__()
+
+        self.amygdala = EnhancedAmygdala(input_dim, hippocampus_dim)
+        self.thalamus = Thalamus(input_dim)
+        self.hippocampus_dim = hippocampus_dim
+
+        # Event-driven registration
+        if event_bus is not None:
+            event_bus.subscribe(
+                "sensory_process",
+                self._handle_sensory_process,
+                priority=0,
+                name="limbic",
+            )

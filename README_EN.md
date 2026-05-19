@@ -1,4 +1,4 @@
-# Civis Lucri-Faber 🧠
+# Simulacrum 🧠
 
 > Bio-Inspired Cognitive AI Architecture | 生物启发式认知AI架构
 
@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](https://opensource.org/licenses/MIT/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-red)](https://pytorch.org/)
 
-Civis Lucri-Faber (Latin "Craftsman Seeking Wealth") is a comprehensive bio-inspired AI agent system integrating **15 brain mechanisms**, **cognitive psychology**, and **adaptive pruning**.
+Simulacrum (Latin "Craftsman Seeking Wealth") is a comprehensive bio-inspired AI agent system integrating **15 brain mechanisms**, **cognitive psychology**, and **adaptive pruning**.
 
 ---
 
@@ -28,7 +28,7 @@ Civis Lucri-Faber (Latin "Craftsman Seeking Wealth") is a comprehensive bio-insp
 
 ## Overview
 
-Civis Lucri-Faber is a brain-inspired AI system that combines:
+Simulacrum is a brain-inspired AI system that combines:
 
 | Feature | Description |
 |---------|-------------|
@@ -39,7 +39,7 @@ Civis Lucri-Faber is a brain-inspired AI system that combines:
 
 ### Comparison with Transformer
 
-| Aspect | Transformer | Civis Lucri-Faber |
+| Aspect | Transformer | Simulacrum |
 |--------|-------------|------------------|
 | Routing | Full Attention | **Top-1 Selection** |
 | Memory | O(n) Context | **7-Slot Limit** |
@@ -54,7 +54,7 @@ Civis Lucri-Faber is a brain-inspired AI system that combines:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Civis Lucri-Faber                       │
+│                    Simulacrum                       │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
 │  │  Language  │  │  Auditory  │  │   Vision   │        │
@@ -318,7 +318,7 @@ print(f"Arousal: {result['emotion_state']['arousal']}")
 ## File Structure
 
 ```
-civis_lucri_faber/
+simulacrum/
 ├── core/
 │   ├── language_cortex.py    # Language + Bio-Gating
 │   ├── auditory_cortex.py   # Auditory + psychology
@@ -342,9 +342,9 @@ MIT License
 ## Citation
 
 ```bibtex
-@software{civis_lucri_faber,
-  title={Civis Lucri-Faber: Bio-Inspired Cognitive AI},
-  author={Civis Lab},
+@software{simulacrum,
+  title={Simulacrum: Bio-Inspired Cognitive AI},
+  author={Simulacrum Lab},
   year={2026},
   url={https://github.com/civis-lucri-faber}
 }

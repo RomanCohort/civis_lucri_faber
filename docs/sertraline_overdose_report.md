@@ -1,6 +1,6 @@
 # Sertraline Overdose Experiment Report
 
-> **Civis Lucri-Faber (CLF) Psychopharmacology Sandbox**
+> **Simulacrum (Simulacrum) Psychopharmacology Sandbox**
 > ADMET-driven computational toxicology with hardware-biology mapping
 > Generated: 2026-05-17
 
@@ -8,7 +8,7 @@
 
 ## 1. Overview
 
-This experiment validates the Confluencia drug pipeline integration into CLF by simulating sertraline (Zoloft) overdose at three dose levels. All PK/PD/IC50 parameters are derived from SMILES via ADMET prediction -- no hardcoded values. The 5-HT syndrome cascade model (Boyer & Shannon 2005) maps biological toxicity to computational resource exhaustion.
+This experiment validates the Confluencia drug pipeline integration into Simulacrum by simulating sertraline (Zoloft) overdose at three dose levels. All PK/PD/IC50 parameters are derived from SMILES via ADMET prediction -- no hardcoded values. The 5-HT syndrome cascade model (Boyer & Shannon 2005) maps biological toxicity to computational resource exhaustion.
 
 **Drug**: Sertraline (Zoloft) -- SSRI
 **SMILES**: `CNCc1ccc(Cl)cc1N2C3=CC=CC=C3C4=C2C=C(C=C4)Cl`
@@ -157,7 +157,7 @@ At 4000 mg, death occurs so rapidly (1h) that cumulative organ damage is minimal
 
 ## 6. Hardware-Biology Mapping
 
-CLF maps biological toxicity to computational resource exhaustion:
+Simulacrum maps biological toxicity to computational resource exhaustion:
 
 | Biology | Hardware | Formula | Fatal Threshold |
 |---------|---------|---------|----------------|

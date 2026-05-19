@@ -1,8 +1,8 @@
 """Memory Tests"""
 import pytest
 import numpy as np
-from civis_lucri_faber.core.hippocampus import Hippocampus
-from civis_lucri_faber.utils.memory import KnowledgeMemory
+from simulacrum.core.hippocampus import Hippocampus
+from simulacrum.utils.memory import KnowledgeMemory
 
 
 class TestHippocampus:

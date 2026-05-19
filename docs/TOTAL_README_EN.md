@@ -1,4 +1,4 @@
-# Civis Lucri-Faber Complete Technical Documentation
+# Simulacrum Complete Technical Documentation
 
 > Bio-Inspired AI Agent System | A Bio-Inspired Autonomous AI Agent System
 
@@ -36,7 +36,7 @@
 
 ### 1.1 Title & Abstract
 
-**Civis Lucri-Faber** (Latin for "wealth-seeking craftsman") is a bio-inspired autonomous AI agent system integrating five core biological mechanisms.
+**Simulacrum** (Latin for "wealth-seeking craftsman") is a bio-inspired autonomous AI agent system integrating five core biological mechanisms.
 
 Unlike traditional RL agents that rely on manually designed reward functions, our system can:
 - Autonomously set exploration goals
@@ -57,7 +57,7 @@ Traditional AI agents rely heavily on carefully designed reward functions. This 
 4. **Lack of Self-Awareness**: Cannot self-correct
 5. **Unlimited Resources**: No compute constraints
 
-Inspired by biological evolution and cognitive mechanisms, we propose Civis Lucri-Faber:
+Inspired by biological evolution and cognitive mechanisms, we propose Simulacrum:
 
 | Dimension | Biological Mechanism | Technical Implementation |
 |-----------|---------------------|------------------------|
@@ -77,15 +77,15 @@ Inspired by biological evolution and cognitive mechanisms, we propose Civis Lucr
 
 | Environment | Sample Size | Method | Core Metric | Value |
 |-------------|-------------|--------|------------|-------|
-| **10x10 Grid** | 100 episodes | Civis vs Random | **Reward Gain** | **+12.1%** |
+| **10x10 Grid** | 100 episodes | Simulacrum vs Random | **Reward Gain** | **+12.1%** |
 | **10x10 Grid** | 100 episodes | State Coverage | **IG (nats)** | **2.93** |
-| **CartPole-v1** | 50 episodes | Civis vs Random | **Reward Gain** | **+3.8%** |
-| 5x5 Grid | 100 episodes | Civis vs Random | Reward Gain | ±5-10% |
+| **CartPole-v1** | 50 episodes | Simulacrum vs Random | **Reward Gain** | **+3.8%** |
+| 5x5 Grid | 100 episodes | Simulacrum vs Random | Reward Gain | ±5-10% |
 | FrozenLake 8x8 | 50 episodes | Success Rate | 0% | Too Hard |
 
 **Performance by Environment:**
 
-| Environment | Random Mean | Civis Mean | Improvement | IG (nats) |
+| Environment | Random Mean | Simulacrum Mean | Improvement | IG (nats) |
 |-------------|-------------|-----------|------------|-------------|-----------|
 | 10x10 Grid | 0.433 | 0.518 | **+12.1%** | 2.93 |
 | CartPole-v1 | 23.3 | 24.2 | **+3.8%** | N/A |
@@ -151,7 +151,7 @@ where AUCB (Additive Upper Confidence Bound) balances exploration-exploitation.
 #### Code Implementation
 
 ```python
-# civis_lucri_faber/core/curiosity.py
+# simulacrum/core/curiosity.py
 class LearnedNoveltyEngine(nn.Module):
     """Learned novelty calculation"""
     
@@ -191,7 +191,7 @@ $$IG \approx \mathbb{E}_{q(z|s,a)}[\log p(s'|z,a)] - KL(q||p)$$
 #### Code Implementation
 
 ```python
-# civis_lucri_faber/core/information_gain.py
+# simulacrum/core/information_gain.py
 class VariationalWorldModel(nn.Module):
     """Variational world model"""
     
@@ -240,7 +240,7 @@ $$a^* = \arg\max_a \text{Uncertainty}(s, a) \times IG(s, a)$$
 #### Code Implementation
 
 ```python
-# civis_lucri_faber/core/meta_learning.py
+# simulacrum/core/meta_learning.py
 class FirstOrderMAML(nn.Module):
     """First-order MAML"""
     
@@ -281,7 +281,7 @@ where $c_i$ are self-consistency checks.
 #### Code Implementation
 
 ```python
-# civis_lucri_faber/core/self_alignment.py
+# simulacrum/core/self_alignment.py
 class SelfAlignmentModule:
     """Self-alignment module"""
     
@@ -317,7 +317,7 @@ $$\text{If } B_t < 0: \text{ Process Terminated}$$
 #### Code Implementation
 
 ```python
-# civis_lucri_faber/core/thermodynamics.py
+# simulacrum/core/thermodynamics.py
 class ThermodynamicsSystem:
     """Digital thermodynamics system"""
     
@@ -370,22 +370,22 @@ pip install -e .
 ### 3.2 Running Experiments
 
 ```bash
-cd civis_lucri_faber
+cd simulacrum
 python experiments/run_experiments.py
 ```
 
 **Output:**
 ```
 ==================================================
-  Civis Lucri-Faber REAL Experiments
+  Simulacrum REAL Experiments
 ==================================================
 
 [1] Curiosity Exploration
 ----------------------------------------
   Testing Random Agent...
     Random: 0.433 +/- 0.230
-  Testing Civis with Curiosity...
-    Civis:  0.518 +/- 0.284
+  Testing Simulacrum with Curiosity...
+    Simulacrum:  0.518 +/- 0.284
     Improvement: 12.1%
 
 ...
@@ -396,8 +396,8 @@ python experiments/run_experiments.py
 ### 3.3 Custom Environments
 
 ```python
-from civis_lucri_faber import CivisLucriFaber
-from civis_lucri_faber.utils.config import load_config
+from simulacrum import Simulacrum
+from simulacrum.utils.config import load_config
 
 # Create custom environment
 class MyGridWorld:
@@ -419,7 +419,7 @@ config = load_config(
     exploration_rate=0.1
 )
 
-agent = CivisLucriFaber(config=config)
+agent = Simulacrum(config=config)
 
 # Run
 for ep in range(100):
@@ -517,9 +517,9 @@ class Config:
 
 ```python
 # Main class
-from civis_lucri_faber import CivisLucriFaber
+from simulacrum import Simulacrum
 
-agent = CivisLucriFaber(config)
+agent = Simulacrum(config)
 state = agent.select_action(observation)
 agent.update(state, action, reward, next_state)
 
@@ -535,7 +535,7 @@ agent.thermodynamics.step()
 
 ```bibtex
 @article{civis2026,
-  title={Civis Lucri-Faber: A Bio-Inspired AI Agent System for Autonomous Learning},
+  title={Simulacrum: A Bio-Inspired AI Agent System for Autonomous Learning},
   author={},
   journal={},
   year={2026}
@@ -546,7 +546,7 @@ agent.thermodynamics.step()
 
 ## Summary
 
-Civis Lucri-Faber successfully integrates five bio-inspired mechanisms:
+Simulacrum successfully integrates five bio-inspired mechanisms:
 
 | Mechanism | Implementation | Experimental Validation |
 |-----------|---------------|------------------------|

@@ -25,7 +25,7 @@ from datetime import datetime
 import json
 import os
 
-from civis_lucri_faber.core.events import (
+from simulacrum.core.events import (
     STEP_START, THERMO_STATE, HIBERNATE_ENTER,
     SYSTEM_DEAD, COMPRESSION_NEEDED,
 )

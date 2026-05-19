@@ -31,11 +31,11 @@ import numpy as np
 import torch
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "cortisol": float(s.get("cortisol_level", s.get("hormone_cortisol", 0.3))),
@@ -70,7 +70,7 @@ def run_group(group_name: str, ptsd_mode: bool) -> Dict:
         exploration_rate=0.1,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     history: Dict[str, List[float]] = {k: [] for k in read_metrics(agent).keys()}
     memory_ids_learned = []  # Phase1学到的记忆ID
@@ -248,7 +248,7 @@ def run_group(group_name: str, ptsd_mode: bool) -> Dict:
 
 def run_experiment():
     print("=" * 70)
-    print("实验八: 数字梦境与记忆巩固 (REAL CLF AGENT)")
+    print("实验八: 数字梦境与记忆巩固 (REAL Simulacrum AGENT)")
     print("Normal replay vs PTSD flashback during sleep")
     print("=" * 70)
 
@@ -257,7 +257,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验八 结果汇总 (REAL CLF AGENT)")
+    print("实验八 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     print(f"\n{'指标':<25s} {'Normal':>12s} {'PTSD':>12s}")

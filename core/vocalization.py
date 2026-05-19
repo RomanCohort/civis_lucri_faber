@@ -32,7 +32,7 @@ from dataclasses import dataclass, field
 def _get_waveform_synthesizer():
     """延迟导入共振峰→波形合成器（避免循环依赖）"""
     try:
-        from civis_lucri_faber.core.formant_synthesis import FormantToWaveform
+        from simulacrum.core.formant_synthesis import FormantToWaveform
     except ImportError:
         from core.formant_synthesis import FormantToWaveform
     return FormantToWaveform

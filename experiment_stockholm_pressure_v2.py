@@ -32,8 +32,8 @@ import numpy as np
 from typing import Dict, List
 import random
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 # ══════════════════════════════════════════════════════
@@ -195,7 +195,7 @@ class BondingStateReader:
         }
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "balance": float(agent.thermo.balance),
@@ -289,7 +289,7 @@ def run_experiment():
         hpa_cortisol_half_life_steps=90,  # 皮质醇半衰期较长
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
     print(f"[INIT] Agent created. initial_balance=10, stress_reactivity=3.5")
     print(f"[INIT] HPA轴将自然产生皮质醇，无需人工注入")
 

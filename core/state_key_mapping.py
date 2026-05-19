@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 
 class UnifiedStateMapping:
-    """Canonical state key registry for CLF _internal_state."""
+    """Canonical state key registry for Simulacrum _internal_state."""
 
     # 规范键 — 所有模块应使用这些键
     CANONICAL: Dict[str, str] = {

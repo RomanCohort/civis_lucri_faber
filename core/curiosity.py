@@ -23,7 +23,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Categorical, Normal
 
-from civis_lucri_faber.core.events import GOAL_NEEDED, GOAL_SELECTED
+from simulacrum.core.events import GOAL_NEEDED, GOAL_SELECTED
 
 
 @dataclass

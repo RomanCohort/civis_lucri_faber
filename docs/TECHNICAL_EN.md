@@ -1,4 +1,4 @@
-# Civis Lucri-Faber Technical Documentation
+# Simulacrum Technical Documentation
 
 > Detailed Technical Specification v1.0
 
@@ -10,7 +10,7 @@
 
 ### 1.1 Research Motivation
 
-Civis Lucri-Faber (Latin "Craftsman Seeking Wealth", CLF) is a bio-inspired AI cognitive architecture with **8 implemented brain mechanisms**, **cognitive psychology**, and **adaptive pruning**. The core research question: **How to design more efficient, interpretable, and adaptive AI systems by inspired by the human brain?**
+Simulacrum (Latin "Craftsman Seeking Wealth", Simulacrum) is a bio-inspired AI cognitive architecture with **8 implemented brain mechanisms**, **cognitive psychology**, and **adaptive pruning**. The core research question: **How to design more efficient, interpretable, and adaptive AI systems by inspired by the human brain?**
 
 #### 1.1.1 Brain vs. Computer
 
@@ -45,7 +45,7 @@ The brain accomplishes vast cognitive tasks with ~20W power. This inspired our e
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Civis Lucri-Faber                       │
+│                    Simulacrum                       │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
 │  │  Language  │  │  Auditory  │  │   Vision   │        │
@@ -1346,7 +1346,7 @@ def mask_random_patches(x, mask_ratio=0.75):
 
 ### 6.2 Scale Limitations
 
-**Q: Human brain has 86B neurons, CLF has only ~12M parameters. Will bio-mechanisms work at scale?**
+**Q: Human brain has 86B neurons, Simulacrum has only ~12M parameters. Will bio-mechanisms work at scale?**
 
 **A: 大部分机制会失效或需要重构**
 
@@ -1360,17 +1360,17 @@ def mask_random_patches(x, mask_ratio=0.75):
 
 ### 6.3 Comparison with LLM
 
-**Q: Compared to mainstream LLMs, besides low-power narrative, does CLF have performance comparability?**
+**Q: Compared to mainstream LLMs, besides low-power narrative, does Simulacrum have performance comparability?**
 
 **A: 诚实的差距**
 
-| 能力 | 7B LLM | CLF当前 |
+| 能力 | 7B LLM | Simulacrum当前 |
 |------|--------|--------|
 | 复杂推理 | 自回归生成 | 原型阶段 |
 | 知识问答 | 预训练海量 | 无大规模训练 |
 | 上下文 | 32K+ tokens | 早期框架 |
 
-**CLF的价值定位**：
+**Simulacrum的价值定位**：
 - 低功耗实时场景（需验证）
 - 可解释性（模块化）
 - 持续学习（元学习）
@@ -1495,9 +1495,9 @@ result = model(flow, rgb)
 ## 10. Citation
 
 ```bibtex
-@software{civis_lucri_faber,
-  title={Civis Lucri-Faber Technical Documentation},
-  author={Civis Lab},
+@software{simulacrum,
+  title={Simulacrum Technical Documentation},
+  author={Simulacrum Lab},
   year={2026},
   version={1.0}
 }

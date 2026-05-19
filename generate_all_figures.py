@@ -1,4 +1,4 @@
-"""Generate detailed figures for all 10 CLF experiments.
+"""Generate detailed figures for all 10 Simulacrum experiments.
 
 Uses matplotlib to generate PNG images saved to docs/figures/.
 Each experiment generates 2-4 key figures.
@@ -1008,7 +1008,7 @@ def main():
         exp_ids = list(ALL_EXPERIMENTS.keys())
 
     print("=" * 60)
-    print("CLF Experiment Figure Generator")
+    print("Simulacrum Experiment Figure Generator")
     print(f"Generating {len(exp_ids)} experiments: {exp_ids}")
     print(f"Output: {FIGURES_DIR}")
     print("=" * 60)

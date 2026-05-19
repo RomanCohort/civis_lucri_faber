@@ -36,8 +36,8 @@ import torch
 from typing import Dict, List, Tuple
 import random
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 def generate_learning_schedule(n_steps: int, trauma_probability: float = 0.05) -> List[Dict]:
@@ -91,7 +91,7 @@ def generate_learning_schedule(n_steps: int, trauma_probability: float = 0.05) -
     return schedule
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "cortisol": float(s.get("cortisol_level", s.get("hormone_cortisol", 0.3))),
@@ -142,7 +142,7 @@ def run_group(group_name: str, ptsd_mode: bool) -> Dict:
         hpa_stress_reactivity=2.0,  # 允许较强应激反应
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     history: Dict[str, List[float]] = {k: [] for k in read_metrics(agent).keys()}
     memory_ids_learned = []

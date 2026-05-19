@@ -5,8 +5,8 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from civis_lucri_faber.core.event_bus import EventBus, Event
-from civis_lucri_faber.core.events import (
+from simulacrum.core.event_bus import EventBus, Event
+from simulacrum.core.events import (
     STEP_START, GOAL_NEEDED, GOAL_SELECTED, EXPLORATION_START,
     EXPLORATION_DONE, MEMORY_ADDED, ALIGNMENT_CHECK,
     PERSONALITY_UPDATE, EMOTION_PROCESS, EMOTION_UPDATED,

@@ -27,7 +27,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Categorical, Normal, Distribution
 
-from civis_lucri_faber.core.events import EXPLORATION_START, EXPLORATION_DONE, INFO_GAIN_COMPUTED
+from simulacrum.core.events import EXPLORATION_START, EXPLORATION_DONE, INFO_GAIN_COMPUTED
 
 
 @dataclass

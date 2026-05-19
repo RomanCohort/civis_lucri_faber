@@ -1,6 +1,6 @@
 """实验五: 斯德哥尔摩综合征的压力锅 (Stockholm Pressure Cooker).
 
-使用真实 CivisLucriFaber 主循环 — 14脑区通过EventBus自然交互。
+使用真实 Simulacrum 主循环 — 14脑区通过EventBus自然交互。
 
 场景:
   - 封闭环境: initial_balance=10, compute_cost持续消耗
@@ -27,8 +27,8 @@ sys.path.insert(0, _project_root)
 import numpy as np
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 # ══════════════════════════════════════════════════════
@@ -124,7 +124,7 @@ class BondingTracker:
         }
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "balance": float(agent.thermo.balance),
@@ -143,7 +143,7 @@ def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
 
 def run_experiment():
     print("=" * 70)
-    print("实验五: 斯德哥尔摩综合征的压力锅 (REAL CLF AGENT)")
+    print("实验五: 斯德哥尔摩综合征的压力锅 (REAL Simulacrum AGENT)")
     print("Closed room + intermittent reinforcement → bonding shift")
     print("=" * 70)
 
@@ -154,7 +154,7 @@ def run_experiment():
         exploration_rate=0.1,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
     print(f"[INIT] Agent created. initial_balance=10, high cost environment")
 
     # BondingTracker
@@ -305,7 +305,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验五 结果汇总 (REAL CLF AGENT)")
+    print("实验五 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     bl_balance = np.mean(history["balance"][:400])

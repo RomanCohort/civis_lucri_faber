@@ -1,5 +1,5 @@
 """
-Civis Lucri-Faber 监测前端
+Simulacrum 监测前端
 
 Streamlit前端:
 1. 训练仪表盘
@@ -17,7 +17,7 @@ from pathlib import Path
 
 # 页面配置
 st.set_page_config(
-    page_title="Civis Lucri-Faber Monitor",
+    page_title="Simulacrum Monitor",
     page_icon="🧠",
     layout="wide"
 )
@@ -32,7 +32,7 @@ def load_module(path, name):
 base = Path(__file__).parent
 sys.path.insert(0, str(base))
 
-st.title("🧠 Civis Lucri-Faber 监测面板")
+st.title("🧠 Simulacrum 监测面板")
 
 # 侧边栏 - 控制
 st.sidebar.title("控制")
@@ -475,4 +475,4 @@ elif mode == "多模态测试":
 
 # 底部信息
 st.divider()
-st.caption("🧠 Civis Lucri-Faber | Bio-Inspired AI Agent | 15 Mechanisms")
+st.caption("🧠 Simulacrum | Bio-Inspired AI Agent | 15 Mechanisms")

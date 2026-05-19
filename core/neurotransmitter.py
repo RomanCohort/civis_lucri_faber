@@ -40,12 +40,169 @@ class Neurotransmitter:
 
 @dataclass
 class Receptor:
-    """受体"""
+    """受体
+
+    新增: 完整受体动力学
+    """
     name: str
     neurotransmitter: str  # 对应递质
-    affinity: float   # 亲和力
-    density: float   # 密度
-    state: str       # "active" | "desensitized" | "downregulated"
+    affinity: float   # 亲和力 Kd (M)
+    density: float   # 密度 (mol/mol)
+    state: str       # "active" | "desensitized" | "downregulated" | "upregulated"
+    occupancy: float = 0.0  # 受体占有率 (新增)
+    desensitization_rate: float = 0.1  # 脱敏速率 (新增)
+    upregulation_rate: float = 0.05   # 上调速率 (新增)
+
+
+class DopamineReceptor:
+    """多巴胺受体动力学
+
+    参考:
+    - Seeman et al. (2005): D2受体密度与亲和力
+    - Laruelle (2000): 受体占有率计算
+
+    D2受体类型:
+    - D2_high: 高亲和力态 (占20%)
+    - D2_low: 低亲和力态 (占80%)
+    """
+
+    def __init__(
+        self,
+        receptor_type: str = "D2",      # D1, D2, D3, D4, D5
+        density: float = 1.0,           # 受体密度 (相对值)
+        high_affinity_fraction: float = 0.2,  # 高亲和力态比例
+    ):
+        self.receptor_type = receptor_type
+        self.density = density
+        self.high_affinity_fraction = high_affinity_fraction
+
+        # D2受体参数 (参考Seeman 2005)
+        if receptor_type == "D2":
+            self.Kd_high = 2.0e-9   # 高亲和力 Kd (nM)
+            self.Kd_low = 20.0e-9   # 低亲和力 Kd (nM)
+        elif receptor_type == "D1":
+            self.Kd_high = 5.0e-9
+            self.Kd_low = 50.0e-9
+        else:
+            self.Kd_high = 5.0e-9
+            self.Kd_low = 50.0e-9
+
+        # 状态
+        self.occupancy = 0.0
+        self.desensitization = 0.0
+        self.upregulation = 0.0
+
+    def compute_occupancy(
+        self,
+        dopamine_concentration: float,
+    ) -> float:
+        """计算受体占有率 - Langmuir吸附方程
+
+        occupancy = [DA] / ([DA] + Kd)
+
+        高亲和力态先饱和，低亲和力态后饱和
+
+        Args:
+            dopamine_concentration: DA浓度 (nM, 假设范围0-100)
+
+        Returns:
+            occupancy: 受体占有率 [0, 1]
+        """
+        # 高亲和力态占有率
+        occupancy_high = dopamine_concentration / (dopamine_concentration + self.Kd_high * 1e9)
+
+        # 低亲和力态占有率
+        occupancy_low = dopamine_concentration / (dopamine_concentration + self.Kd_low * 1e9)
+
+        # 总占有率 = weighted average
+        self.occupancy = (
+            self.high_affinity_fraction * occupancy_high +
+            (1 - self.high_affinity_fraction) * occupancy_low
+        ) * self.density
+
+        return self.occupancy
+
+    def apply_desensitization(self, chronic_da_level: float):
+        """应用受体脱敏/下调
+
+        高慢性DA → D2下调 (减少密度)
+        低慢性DA → D2上调 (增加密度)
+
+        参考: Wilson et al. (1996)
+        """
+        if chronic_da_level > 0.6:
+            # 高DA → 下调
+            self.desensitization = min(0.5, self.desensitization + 0.01)
+            self.density *= (1 - 0.005)
+        elif chronic_da_level < 0.2:
+            # 低DA → 上调
+            self.upregulation = min(0.5, self.upregulation + 0.01)
+            self.density *= (1 + 0.003)
+
+        # 密度限制
+        self.density = np.clip(self.density, 0.3, 2.0)
+
+    def get_available_receptors(self) -> float:
+        """获取可用受体数量 (考虑脱敏)"""
+        return self.density * (1 - self.desensitization)
+
+    def get_summary(self) -> Dict:
+        return {
+            'receptor_type': self.receptor_type,
+            'density': self.density,
+            'occupancy': self.occupancy,
+            'desensitization': self.desensitization,
+            'upregulation': self.upregulation,
+            'available': self.get_available_receptors(),
+        }
+
+
+class DATransporter:
+    """多巴胺转运体 (DAT)
+
+    重摄取机制:
+    - DAT密度决定清除速率
+    - 高DAT → 快清除 → 低DA持续时间
+    - 低DAT → 慢清除 → 高DA持续时间
+
+    参考: Bannon & Whitty (1997)
+    """
+
+    def __init__(
+        self,
+        density: float = 1.0,    # DAT密度 (相对值)
+        Vmax: float = 100.0,     # 最大转运速率
+        Km: float = 0.2,         # 半饱和浓度
+    ):
+        self.density = density
+        self.Vmax = Vmax
+        self.Km = Km
+
+    def compute_reuptake(
+        self,
+        extracellular_da: float,
+    ) -> float:
+        """计算重摄取速率
+
+        Michaelis-Menten动力学: v = Vmax * [DA] / (Km + [DA])
+
+        Args:
+            extracellular_da: 细胞外DA浓度 [0, 1]
+
+        Returns:
+            reuptake_rate: 重摄取速率
+        """
+        reuptake = self.Vmax * extracellular_da / (self.Km + extracellular_da)
+        return reuptake * self.density
+
+    def apply_blockade(self, blockade_level: float):
+        """应用转运体阻断 (如cocaine, methylphenidate)
+
+        Args:
+            blockade_level: 阻断程度 [0, 1]
+        """
+        effective_density = self.density * (1 - blockade_level)
+        return effective_density
 
 
 @dataclass
@@ -67,16 +224,28 @@ class DopamineSystem(nn.Module):
     - Mesolimbic: 奖励、动机 (VTA → NAc)
     - Nigrostriatal: 运动控制 (SNc → Striatum)
     - Mesocortical: 认知、注意力 (VTA → PFC)
+
+    新增: Tonic-Phasic分离
+    - Tonic: 慢变化基线水平 (背景DA，调节长期动机)
+    - Phasic: 快突发响应 (RPE信号，瞬时奖励)
     """
 
     def __init__(
         self,
         baseline: float = 0.5,
+        tonic_baseline: float = 0.3,    # Tonic基线 (新增)
+        phasic_decay_rate: float = 0.3, # Phasic衰减率 (新增)
     ):
         super().__init__()
 
         self.baseline = baseline
         self.current_level = baseline
+
+        # Tonic-Phasic分离 (新增)
+        self.dopamine_tonic = tonic_baseline    # 慢变化基线
+        self.dopamine_phasic = 0.0              # 瞬时突发
+        self.phasic_decay_rate = phasic_decay_rate
+        self.tonic_adaptation_rate = 0.01      # Tonic慢适应率
 
         # 三个通路
         self.meso_limbic = 0.5  # 奖励
@@ -93,22 +262,41 @@ class DopamineSystem(nn.Module):
         self,
         reward: float,
         expectation: float,
-    ) -> float:
+    ) -> Tuple[float, float, float]:
         """
-        计算奖励信号 (RPE)
+        计算奖励信号 (RPE) - Tonic-Phasic分离
+
+        Returns:
+            total_level: 总多巴胺水平
+            tonic: Tonic基线
+            phasic: Phasic突发
         """
         # 预测误差
         rpe = reward - expectation
 
+        # Phasic响应: 快突发/快衰减
         if rpe > 0:
-            # 正向误差 → 释放多巴胺
-            release = rpe * self.release_rate
-            self.meso_limbic = min(1.0, self.meso_limbic + release)
+            # 正向RPE → Phasic burst
+            self.dopamine_phasic = min(0.7, 0.5 * rpe)
+            self.meso_limbic = min(1.0, self.meso_limbic + rpe * self.release_rate)
         else:
-            # 负向误差 → 抑制
-            self.meso_limbic = max(0.0, self.meso_limbic + rpe * 0.05)
+            # 负向RPE → Phasic dip
+            self.dopamine_phasic = max(-0.3, 0.3 * rpe)
 
-        # 更新总水平
+        # Tonic响应: 慢适应
+        # RPE累积影响基线 (长期动机状态)
+        self.dopamine_tonic = np.clip(
+            self.dopamine_tonic + self.tonic_adaptation_rate * rpe,
+            0.1, 0.8
+        )
+
+        # Phasic衰减 (快速)
+        self.dopamine_phasic *= (1 - self.phasic_decay_rate)
+
+        # 总水平 = Tonic + Phasic
+        self.current_level = np.clip(self.dopamine_tonic + self.dopamine_phasic, 0.0, 1.0)
+
+        # 更新通路
         self.current_level = (
             self.meso_limbic * 0.4 +
             self.nigro_striatal * 0.3 +
@@ -117,7 +305,19 @@ class DopamineSystem(nn.Module):
 
         self.history.append(self.current_level)
 
-        return self.current_level
+        return self.current_level, self.dopamine_tonic, self.dopamine_phasic
+
+    def get_tonic_level(self) -> float:
+        """获取Tonic基线水平"""
+        return self.dopamine_tonic
+
+    def get_phasic_level(self) -> float:
+        """获取Phasic突发水平"""
+        return self.dopamine_phasic
+
+    def set_tonic_baseline(self, level: float):
+        """设置Tonic基线 (模拟慢性DA状态)"""
+        self.dopamine_tonic = np.clip(level, 0.1, 0.8)
 
     def compute_motor_signal(
         self,
@@ -664,6 +864,8 @@ def create_neurotransmitter_system() -> NeurotransmitterSystem:
 __all__ = [
     'Neurotransmitter',
     'Receptor',
+    'DopamineReceptor',
+    'DATransporter',
     'SynapticTransmission',
     'DopamineSystem',
     'SerotoninSystem',

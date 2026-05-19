@@ -6,16 +6,16 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from civis_lucri_faber.core.basal_ganglia import (
+from simulacrum.core.basal_ganglia import (
     BasalGanglia,
     BasalGangliaSystem,
     create_basal_ganglia,
 )
-from civis_lucri_faber.core.hippocampus import (
+from simulacrum.core.hippocampus import (
     Hippocampus,
     create_hippocampus,
 )
-from civis_lucri_faber.core.limbic import (
+from simulacrum.core.limbic import (
     Amygdala,
     Thalamus,
     LimbicSystem,
@@ -115,7 +115,7 @@ def test_amygdala_fear():
     """测试恐惧条件化"""
     print("=== Test Amygdala Fear Conditioning ===")
 
-    from civis_lucri_faber.core.limbic import FearConditioning, AmygdalaNucleus
+    from simulacrum.core.limbic import FearConditioning, AmygdalaNucleus
 
     fear = FearConditioning()
     amygdala = AmygdalaNucleus(64)

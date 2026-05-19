@@ -22,7 +22,7 @@ from dataclasses import dataclass
 import time
 from collections import deque
 
-from civis_lucri_faber.core.events import PERSONALITY_UPDATE
+from simulacrum.core.events import PERSONALITY_UPDATE
 
 
 @dataclass

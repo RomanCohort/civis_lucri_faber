@@ -1,7 +1,7 @@
 """
 听觉系统神经拟真改进方案 - 阶段2: 认知架构
 
-Civis Lucri-Faber - Spiking Auditory Cortex - Phase 2
+Simulacrum - Spiking Auditory Cortex - Phase 2
 
 从神经拟真 → 认知架构
 - 语音工作记忆 (phonological loop)

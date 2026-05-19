@@ -1,7 +1,7 @@
 """
 言语感知 - 事件驱动版本
 
-Civis Lucri-Faber - Event-Driven Phonetic Perception
+Simulacrum - Event-Driven Phonetic Perception
 
 基于脉冲神经网络:
 1. 音素识别 → Spiking

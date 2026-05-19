@@ -1,4 +1,4 @@
-"""CLF Flask Backend - 为 Electron 前端提供 API
+"""Simulacrum Flask Backend - 为 Electron 前端提供 API
 
 启动: python electron_app/server.py [--provider mock] [--port 5200]
 """
@@ -11,12 +11,12 @@ import collections
 import argparse
 import random
 
-# 项目根目录的父目录 (civis_lucri_faber 包所在的目录)
+# 项目根目录的父目录 (simulacrum 包所在的目录)
 # server.py 在 electron_app/ 下
-# D:\civis_lucri_faber\electron_app\server.py → 需要 D:\ 在 sys.path
-# 才能 import civis_lucri_faber
+# D:\simulacrum\electron_app\server.py → 需要 D:\ 在 sys.path
+# 才能 import simulacrum
 _this_dir = os.path.dirname(os.path.abspath(__file__))
-_project_root = os.path.dirname(_this_dir)        # D:\civis_lucri_faber
+_project_root = os.path.dirname(_this_dir)        # D:\simulacrum
 _parent_dir = os.path.dirname(_project_root)      # D:\
 for _p in [_parent_dir, _project_root]:
     if _p not in sys.path:
@@ -24,7 +24,7 @@ for _p in [_parent_dir, _project_root]:
 
 from flask import Flask, request, jsonify, Response, send_from_directory
 
-# ── 初始化 CLF Agent ──────────────────────────────────────────
+# ── 初始化 Simulacrum Agent ──────────────────────────────────────────
 
 _agent = None
 _history = collections.deque(maxlen=500)
@@ -37,16 +37,16 @@ app = Flask(__name__, static_folder="renderer", static_url_path="")
 
 def _init_agent(provider="mock"):
     global _agent
-    from civis_lucri_faber.utils.config import load_config
-    from civis_lucri_faber.core.agent import CivisLucriFaber
+    from simulacrum.utils.config import load_config
+    from simulacrum.core.agent import Simulacrum
 
     config = load_config(
         llm_provider=provider,
         device="cpu",
         initial_balance=100.0,
     )
-    _agent = CivisLucriFaber(config=config)
-    print(f"[OK] CLF Agent initialized (provider={provider})")
+    _agent = Simulacrum(config=config)
+    print(f"[OK] Simulacrum Agent initialized (provider={provider})")
 
 
 # ── API 路由 ──────────────────────────────────────────────────
@@ -171,7 +171,7 @@ def api_pharma():
 @app.route("/api/pharma/presets")
 def api_pharma_presets():
     """获取药理预设列表"""
-    from civis_lucri_faber.core.neuro_pharmacology import _PRESETS
+    from simulacrum.core.neuro_pharmacology import _PRESETS
     presets = {}
     for k, v in _PRESETS.items():
         presets[k] = {
@@ -185,14 +185,14 @@ def api_pharma_presets():
 @app.route("/api/pharma/regions")
 def api_pharma_regions():
     """获取脑区列表"""
-    from civis_lucri_faber.core.neuro_pharmacology import Region
+    from simulacrum.core.neuro_pharmacology import Region
     return jsonify([r.value for r in Region])
 
 
 @app.route("/api/pharma/neurotransmitters")
 def api_pharma_neurotransmitters():
     """获取神经递质列表"""
-    from civis_lucri_faber.core.neuro_pharmacology import Neurotransmitter
+    from simulacrum.core.neuro_pharmacology import Neurotransmitter
     return jsonify([n.value for n in Neurotransmitter])
 
 
@@ -220,7 +220,7 @@ def _snapshot_state():
 # ── 入口 ──────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="CLF Backend Server")
+    parser = argparse.ArgumentParser(description="Simulacrum Backend Server")
     parser.add_argument("--provider", default="mock", help="LLM provider")
     parser.add_argument("--port", type=int, default=5200, help="Server port")
     parser.add_argument("--host", default="127.0.0.1", help="Server host")
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print("=" * 50)
-    print("  CLF Neuro Engine - Backend Server")
+    print("  Simulacrum Neuro Engine - Backend Server")
     print("=" * 50)
     _init_agent(args.provider)
     print(f"[SERVE] http://{args.host}:{args.port}")

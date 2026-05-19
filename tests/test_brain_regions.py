@@ -1,11 +1,11 @@
 """Brain Region Tests"""
 import pytest
 import torch
-from civis_lucri_faber.core.cerebral_cortex import VisualCortex
-from civis_lucri_faber.core.prefrontal_cortex import PrefrontalCortex
-from civis_lucri_faber.core.limbic import LimbicSystem
-from civis_lucri_faber.core.basal_ganglia import BasalGanglia
-from civis_lucri_faber.core.hippocampus import Hippocampus
+from simulacrum.core.cerebral_cortex import VisualCortex
+from simulacrum.core.prefrontal_cortex import PrefrontalCortex
+from simulacrum.core.limbic import LimbicSystem
+from simulacrum.core.basal_ganglia import BasalGanglia
+from simulacrum.core.hippocampus import Hippocampus
 
 
 class TestVisualCortex:

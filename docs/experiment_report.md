@@ -1,4 +1,4 @@
-# Civis Lucri-Faber 计算精神病学实验报告
+# Simulacrum 计算精神病学实验报告
 
 ## Computational Psychiatry Experiment Report
 
@@ -6,7 +6,7 @@
 
 ## 摘要
 
-本报告基于 Civis Lucri-Faber (CLF) 仿生 VTuber 大脑架构，设计了 10 组计算精神病学实验，覆盖热力学崩溃、代谢稀疏、HPA 认知僵化、表观遗传巩固、斯德哥尔摩综合征、胶质淋巴系统、ADHD 感觉门控、数字梦境、社会脑网络和抗精神病药 D2 占用率。所有实验使用真实 CLF Agent（14 脑区 EventBus 互联），通过 `pharma.inject()` 和参数配置驱动 Agent 内部耦合通路产生行为变化，**无外部状态覆盖**。
+本报告基于 Simulacrum (Simulacrum) 仿生 VTuber 大脑架构，设计了 10 组计算精神病学实验，覆盖热力学崩溃、代谢稀疏、HPA 认知僵化、表观遗传巩固、斯德哥尔摩综合征、胶质淋巴系统、ADHD 感觉门控、数字梦境、社会脑网络和抗精神病药 D2 占用率。所有实验使用真实 Simulacrum Agent（14 脑区 EventBus 互联），通过 `pharma.inject()` 和参数配置驱动 Agent 内部耦合通路产生行为变化，**无外部状态覆盖**。
 
 **核心发现**:
 - Agent 的跨模块耦合通路（皮质醇→PFC、DA→探索率、催产素→共情）可在数百步内产生临床可解释的行为变化
@@ -20,11 +20,11 @@
 
 ### 1.1 背景
 
-计算精神病学 (Computational Psychiatry) 旨在用数学和计算模型理解精神疾病的机制。传统方法受限于伦理约束和实验周期。CLF 提供了一个包含 14 个脑区（HPA 轴、边缘系统、前额叶皮层、基底节、海马体等）的数字大脑平台，通过 EventBus 事件总线实现脑区间通信，使得可重复、可控的精神疾病模拟成为可能。
+计算精神病学 (Computational Psychiatry) 旨在用数学和计算模型理解精神疾病的机制。传统方法受限于伦理约束和实验周期。Simulacrum 提供了一个包含 14 个脑区（HPA 轴、边缘系统、前额叶皮层、基底节、海马体等）的数字大脑平台，通过 EventBus 事件总线实现脑区间通信，使得可重复、可控的精神疾病模拟成为可能。
 
 ### 1.2 Agent 架构
 
-CLF Agent 的关键子系统：
+Simulacrum Agent 的关键子系统：
 
 | 子系统 | 核心模块 | 功能 |
 |--------|----------|------|
@@ -453,7 +453,7 @@ D2 受体阻滞率与临床疗效呈倒 U 型曲线：70-80% 占用率（治疗�
 
 ## 附录 B：数据真实性声明
 
-所有实验使用真实 CLF Agent 运行，通过以下合法接口操作：
+所有实验使用真实 Simulacrum Agent 运行，通过以下合法接口操作：
 - `pharma.inject(nt, value)` — 神经递质/激素注入
 - `Config` 参数 — 初始化配置
 - HPA/Metabolic 系统参数调整

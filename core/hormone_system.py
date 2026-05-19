@@ -26,7 +26,7 @@ from typing import Dict
 from dataclasses import dataclass
 
 try:
-    from civis_lucri_faber.core.scn import (
+    from simulacrum.core.scn import (
         SuprachiasmaticNucleus,
         LightType,
         CircadianOutput,

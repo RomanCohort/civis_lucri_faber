@@ -1,6 +1,6 @@
 """实验2: 药物干预 — 决策模式漂移 (Drug-Induced Decision Drift).
 
-使用真实 CivisLucriFaber 主循环 — 14脑区通过EventBus自然交互。
+使用真实 Simulacrum 主循环 — 14脑区通过EventBus自然交互。
 
 机制链 (真实模块):
   药物 → NeuroPharmacology.prescribe() → NT水平突变
@@ -21,22 +21,22 @@
 
 import sys
 import os
-# 将项目父目录加入path, 使civis_lucri_faber包可导入
+# 将项目父目录加入path, 使simulacrum包可导入
 _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _project_root)
 
 import numpy as np
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 # ══════════════════════════════════════════════════════
 # 辅助: 从agent读取指标
 # ══════════════════════════════════════════════════════
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "da": float(s.get("nt_dopamine", 0.5)),
@@ -68,7 +68,7 @@ def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
 
 def run_experiment():
     print("=" * 70)
-    print("实验2: 药物干预 — 决策模式漂移 (REAL CLF AGENT)")
+    print("实验2: 药物干预 — 决策模式漂移 (REAL Simulacrum AGENT)")
     print("Drug -> NT mutation -> Behavior adjustment -> Symptom detection")
     print("=" * 70)
 
@@ -78,7 +78,7 @@ def run_experiment():
         exploration_rate=0.1,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
     print(f"[INIT] Agent created. 14 brain regions + EventBus ready.")
 
     # 记录器
@@ -190,7 +190,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验2 结果汇总 (REAL CLF AGENT)")
+    print("实验2 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     print(f"\n{'指标':<25s} {'Baseline':>10s} {'致幻剂':>10s} {'镇静剂':>10s} {'兴奋剂':>10s} {'Washout':>10s}")

@@ -34,8 +34,8 @@ sys.path.insert(0, _project_root)
 import numpy as np
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 # D2 blockade levels
@@ -46,7 +46,7 @@ BLOCKADE_LEVELS = {
 }
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "da": float(s.get("nt_dopamine", 0.5)),
@@ -74,7 +74,7 @@ def compute_positive_symptom_index(metrics: Dict[str, float]) -> float:
     return float(np.clip(0.3 * da + 0.3 * hypervig + 0.2 * cort + 0.2 * rumination, 0, 1))
 
 
-def compute_eps_index(agent: CivisLucriFaber, da_level: float) -> float:
+def compute_eps_index(agent: Simulacrum, da_level: float) -> float:
     """计算EPS (锥体外系副作用) 指数
 
     EPS = 动作僵硬 + 运动迟缓
@@ -106,7 +106,7 @@ def run_group(group_name: str, d2_blockade: float) -> Dict:
         exploration_rate=0.1,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     history: Dict[str, List[float]] = {k: [] for k in read_metrics(agent).keys()}
     positive_symptoms = []
@@ -235,7 +235,7 @@ def run_group(group_name: str, d2_blockade: float) -> Dict:
 
 def run_experiment():
     print("=" * 70)
-    print("实验十: D2受体占用率模拟 (REAL CLF AGENT)")
+    print("实验十: D2受体占用率模拟 (REAL Simulacrum AGENT)")
     print("3 Groups: Low(30%) / Medium(75%) / High(95%) D2 blockade")
     print("=" * 70)
 
@@ -245,7 +245,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验十 结果汇总 (REAL CLF AGENT)")
+    print("实验十 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     print(f"\n{'指标':<25s} {'Low(30%)':>12s} {'Medium(75%)':>12s} {'High(95%)':>12s}")

@@ -1,7 +1,7 @@
 """
 双耳听觉系统 - ITD/ILD/HRTF
 
-Civis Lucri-Faber - 双耳听觉机制
+Simulacrum - 双耳听觉机制
 
 关键机制:
 1. ITD: 互相关计算时间差

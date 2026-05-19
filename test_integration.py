@@ -5,10 +5,10 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
+from simulacrum.core.agent import Simulacrum
 
 # 创建Agent
-agent = CivisLucriFaber()
+agent = Simulacrum()
 
 # 运行5步
 states = agent.run_episodes(5, verbose=True)

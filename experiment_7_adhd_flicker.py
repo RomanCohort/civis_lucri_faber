@@ -30,11 +30,11 @@ sys.path.insert(0, _project_root)
 import numpy as np
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "exploration_rate": float(agent.config.exploration_rate),
@@ -67,7 +67,7 @@ def run_group(group_name: str, adhd_mode: bool) -> Dict:
         exploration_rate=0.1,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     # 调整丘脑门控参数
     if adhd_mode:
@@ -200,7 +200,7 @@ def run_group(group_name: str, adhd_mode: bool) -> Dict:
 
 def run_experiment():
     print("=" * 70)
-    print("实验七: ADHD临界闪烁频率测试 (REAL CLF AGENT)")
+    print("实验七: ADHD临界闪烁频率测试 (REAL Simulacrum AGENT)")
     print("Normal (gated) vs ADHD (ungated) under noise overload")
     print("=" * 70)
 
@@ -209,7 +209,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验七 结果汇总 (REAL CLF AGENT)")
+    print("实验七 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     print(f"\n{'指标':<25s} {'Normal':>12s} {'ADHD':>12s}")

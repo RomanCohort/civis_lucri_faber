@@ -17,7 +17,7 @@ import torch.nn as nn
 from typing import Dict, Tuple, Optional, Any
 from dataclasses import dataclass
 
-from civis_lucri_faber.core.events import EMOTION_UPDATED
+from simulacrum.core.events import EMOTION_UPDATED
 import numpy as np
 
 

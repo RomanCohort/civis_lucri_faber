@@ -35,8 +35,8 @@ import torch
 from typing import Dict, List, Tuple
 import random
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 BLOCKADE_LEVELS = {
@@ -101,7 +101,7 @@ def generate_psychosis_schedule(n_steps: int, episode_probability: float = 0.15)
     return schedule
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "da": float(s.get("nt_dopamine", 0.5)),
@@ -128,7 +128,7 @@ def compute_positive_symptom_index(metrics: Dict[str, float]) -> float:
     return float(np.clip(0.3 * da + 0.3 * hypervig + 0.2 * cort + 0.2 * rumination, 0, 1))
 
 
-def compute_eps_index(agent: CivisLucriFaber, da_level: float) -> float:
+def compute_eps_index(agent: Simulacrum, da_level: float) -> float:
     """计算EPS (锥体外系副作用) 指数"""
     bg_temp = float(np.clip(0.5 + da_level, 0.3, 2.0))
     eps = float(np.clip(1.0 - bg_temp, 0, 1.0))
@@ -166,7 +166,7 @@ def run_group(group_name: str, d2_blockade: float) -> Dict:
         hpa_stress_reactivity=1.5,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     history: Dict[str, List[float]] = {k: [] for k in read_metrics(agent).keys()}
     positive_symptoms = []

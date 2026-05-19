@@ -1,4 +1,4 @@
-"""CLF Neuro Monitor - 仿生大脑参数实时监测面板
+"""Simulacrum Neuro Monitor - 仿生大脑参数实时监测面板
 
 基于 Confluencia Studio 架构，使用 PyQt6 + Matplotlib 显示所有大脑参数的
 分类实时曲线。
@@ -692,7 +692,7 @@ class DemoStateGenerator:
 # ═══════════════════════════════════════════════════════════════
 
 class NeuroMonitorWindow(QMainWindow):
-    """CLF 大脑参数实时监测面板"""
+    """Simulacrum 大脑参数实时监测面板"""
 
     def __init__(self, agent=None, interval=250, parent=None):
         super().__init__(parent)
@@ -701,7 +701,7 @@ class NeuroMonitorWindow(QMainWindow):
         self._paused = False
         self._interval = interval
 
-        self.setWindowTitle("CLF Neuro Monitor - Civis Lucri-Faber")
+        self.setWindowTitle("Simulacrum Neuro Monitor - Simulacrum")
         self.setMinimumSize(1280, 720)
         self.resize(1400, 800)
 
@@ -947,9 +947,9 @@ class NeuroMonitorWindow(QMainWindow):
 # ═══════════════════════════════════════════════════════════════
 
 def main():
-    parser = argparse.ArgumentParser(description="CLF Neuro Monitor")
+    parser = argparse.ArgumentParser(description="Simulacrum Neuro Monitor")
     parser.add_argument("--agent", action="store_true",
-                        help="Connect to a live CLF agent (use with chat_main.py)")
+                        help="Connect to a live Simulacrum agent (use with chat_main.py)")
     parser.add_argument("--interval", type=int, default=250,
                         help="Refresh interval in ms (default: 250)")
     parser.add_argument("--provider", default="mock",
@@ -959,16 +959,16 @@ def main():
 
     agent = None
     if args.agent:
-        from civis_lucri_faber.utils.config import load_config
-        from civis_lucri_faber.core.agent import CivisLucriFaber
+        from simulacrum.utils.config import load_config
+        from simulacrum.core.agent import Simulacrum
 
         config = load_config(
             llm_provider=args.provider,
             device=args.device,
             initial_balance=100.0,
         )
-        print("[INIT] Creating CLF agent...")
-        agent = CivisLucriFaber(config=config)
+        print("[INIT] Creating Simulacrum agent...")
+        agent = Simulacrum(config=config)
         print("[OK] Agent ready")
 
     from PyQt6.QtWidgets import QApplication

@@ -1,4 +1,4 @@
-"""Civis Lucri-Faber 工具注册与执行系统
+"""Simulacrum 工具注册与执行系统
 
 事件驱动架构下的工具调用系统:
 - ToolSpec: 工具描述（名称、参数 schema、处理函数、是否需要授权）

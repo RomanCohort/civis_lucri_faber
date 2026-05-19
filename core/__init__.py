@@ -1,4 +1,4 @@
-"""Civis Lucri-Faber Core Modules"""
+"""Simulacrum Core Modules"""
 
 import sys
 import os
@@ -9,36 +9,36 @@ if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
 try:
-    from civis_lucri_faber.core.agent import CivisLucriFaber
+    from simulacrum.core.agent import Simulacrum
 except ImportError:
-    from core.agent import CivisLucriFaber
-from civis_lucri_faber.core.curiosity import CuriosityEngine
-from civis_lucri_faber.core.information_gain import InformationGainCalculator
-from civis_lucri_faber.core.meta_learning import MetaLearner, ActiveLearner
-from civis_lucri_faber.core.self_alignment import SelfAlignmentModule
-from civis_lucri_faber.core.thermodynamics import ThermodynamicsSystem
-from civis_lucri_faber.core.metabolic_budget import (
+    from core.agent import Simulacrum
+from simulacrum.core.curiosity import CuriosityEngine
+from simulacrum.core.information_gain import InformationGainCalculator
+from simulacrum.core.meta_learning import MetaLearner, ActiveLearner
+from simulacrum.core.self_alignment import SelfAlignmentModule
+from simulacrum.core.thermodynamics import ThermodynamicsSystem
+from simulacrum.core.metabolic_budget import (
     MetabolicBudget,
     MetabolicCostCalculator,
     PeriodicStarvation,
     MetabolicState,
     create_metabolic_budget,
 )
-from civis_lucri_faber.core.sleep import (
+from simulacrum.core.sleep import (
     SleepSystem,
     SleepController,
     SleepStage,
     MemoryReplayer,
     create_sleep_system,
 )
-from civis_lucri_faber.core.neuromodulation_integration import (
+from simulacrum.core.neuromodulation_integration import (
     NeuromodulationIntegration,
     RewardModulation,
     TemporalDiscount,
     AttentionModulator,
     create_neuromodulation_integration,
 )
-from civis_lucri_faber.core.cerebello_spinal import (
+from simulacrum.core.cerebello_spinal import (
     CerebelloSpinalCoordination,
     SpinalCord,
     CentralPatternGenerator,
@@ -46,22 +46,22 @@ from civis_lucri_faber.core.cerebello_spinal import (
     Cerebellum,
     create_cerebello_spinal,
 )
-from civis_lucri_faber.core.basal_ganglia import (
+from simulacrum.core.basal_ganglia import (
     BasalGangliaSystem,
     BasalGanglia,
     create_basal_ganglia,
 )
-from civis_lucri_faber.core.hippocampus import (
+from simulacrum.core.hippocampus import (
     Hippocampus,
     create_hippocampus,
 )
-from civis_lucri_faber.core.limbic import (
+from simulacrum.core.limbic import (
     LimbicSystem,
     Amygdala,
     Thalamus,
     create_limbic_system,
 )
-from civis_lucri_faber.core.neurotransmitter import (
+from simulacrum.core.neurotransmitter import (
     NeurotransmitterSystem,
     DopamineSystem,
     SerotoninSystem,
@@ -70,7 +70,7 @@ from civis_lucri_faber.core.neurotransmitter import (
 )
 
 # 前额叶皮质
-from civis_lucri_faber.core.prefrontal_cortex import (
+from simulacrum.core.prefrontal_cortex import (
     PrefrontalCortex,
     MaturationTracker,
     CostBenefitAnalyzer,
@@ -83,7 +83,7 @@ from civis_lucri_faber.core.prefrontal_cortex import (
 )
 
 # 角回 — 跨模态翻译器
-from civis_lucri_faber.core.angular_gyrus import (
+from simulacrum.core.angular_gyrus import (
     AngularGyrus,
     ModalityProjector,
     TranslationMatrix,
@@ -95,7 +95,7 @@ from civis_lucri_faber.core.angular_gyrus import (
 
 # 高级情绪系统
 try:
-    from civis_lucri_faber.core.advanced_emotion_integration import (
+    from simulacrum.core.advanced_emotion_integration import (
         IntegratedAdvancedEmotionSystem,
         AdvancedEmotionState,
         create_advanced_emotion_system,
@@ -113,7 +113,7 @@ except ImportError:
         ADVANCED_EMOTION_AVAILABLE = False
 
 # 情绪调节系统
-from civis_lucri_faber.core.emotion_regulation import (
+from simulacrum.core.emotion_regulation import (
     EmotionRegulationSystem,
     PrefrontalRegulation,
     MetabolicRegulation,
@@ -122,41 +122,41 @@ from civis_lucri_faber.core.emotion_regulation import (
 )
 
 # 心境系统
-from civis_lucri_faber.core.mood_system import (
+from simulacrum.core.mood_system import (
     MoodSystem,
     MoodState,
 )
 
 # 情绪记忆巩固
-from civis_lucri_faber.core.emotion_memory_consolidation import (
+from simulacrum.core.emotion_memory_consolidation import (
     EmotionalMemoryConsolidation,
     SleepStageData,
 )
 
 # 社会情绪
-from civis_lucri_faber.core.social_emotions import (
+from simulacrum.core.social_emotions import (
     SocialEmotionSystem,
 )
 
 # 情绪传染
-from civis_lucri_faber.core.emotional_contagion import (
+from simulacrum.core.emotional_contagion import (
     EmotionalContagionSystem,
 )
 
 # 内感受系统
-from civis_lucri_faber.core.interoception import (
+from simulacrum.core.interoception import (
     InteroceptionSystem,
     InteroceptiveState,
     GutState,
 )
 
 # 情绪动力学
-from civis_lucri_faber.core.emotion_dynamics import (
+from simulacrum.core.emotion_dynamics import (
     EmotionDynamicsSystem,
 )
 
 # 神经修剪系统
-from civis_lucri_faber.core.neural_pruning import (
+from simulacrum.core.neural_pruning import (
     NeuralPruningSystem,
     PruningConfig,
     NeuronState,
@@ -165,7 +165,7 @@ from civis_lucri_faber.core.neural_pruning import (
 )
 
 # 神经自调节系统
-from civis_lucri_faber.core.autonomic_nervous_system import (
+from simulacrum.core.autonomic_nervous_system import (
     AutonomicNervousSystem,
     ANSState,
     SympatheticBranch,
@@ -174,7 +174,7 @@ from civis_lucri_faber.core.autonomic_nervous_system import (
     PolyvagalSystem,
     create_autonomic_nervous_system,
 )
-from civis_lucri_faber.core.hpa_axis import (
+from simulacrum.core.hpa_axis import (
     HPAAxis,
     HPAState,
     HypothalamicCRH,
@@ -184,7 +184,7 @@ from civis_lucri_faber.core.hpa_axis import (
     AllostaticLoadTracker,
     create_hpa_axis,
 )
-from civis_lucri_faber.core.glial_system import (
+from simulacrum.core.glial_system import (
     GlialSystem,
     GlialState,
     AstrocyteSystem,
@@ -192,7 +192,7 @@ from civis_lucri_faber.core.glial_system import (
     OligodendrocyteSystem,
     create_glial_system,
 )
-from civis_lucri_faber.core.allostatic_regulation import (
+from simulacrum.core.allostatic_regulation import (
     AllostaticRegulation,
     AllostaticState,
     PredictiveRegulator,
@@ -200,7 +200,7 @@ from civis_lucri_faber.core.allostatic_regulation import (
     RegimeSelector,
     create_allostatic_regulation,
 )
-from civis_lucri_faber.core.predictive_coding import (
+from simulacrum.core.predictive_coding import (
     PredictiveCodingSystem,
     GenerativeLayer,
     HierarchicalGenerativeModel,
@@ -210,7 +210,7 @@ from civis_lucri_faber.core.predictive_coding import (
 )
 
 # 社会认知系统
-from civis_lucri_faber.core.social_cognition import (
+from simulacrum.core.social_cognition import (
     SocialCognitionSystem,
     SocialCognitionState,
     MirrorNeuronSystem,
@@ -226,7 +226,7 @@ from civis_lucri_faber.core.social_cognition import (
 )
 
 # 脑干系统
-from civis_lucri_faber.core.brainstem import (
+from simulacrum.core.brainstem import (
     Brainstem,
     BrainstemState,
     RespiratoryPhase,
@@ -240,7 +240,7 @@ from civis_lucri_faber.core.brainstem import (
 )
 
 # 发音语言系统 (Bio-Inspired Vocalization)
-from civis_lucri_faber.core.vocalization import (
+from simulacrum.core.vocalization import (
     VocalCortex,
     VocalTract,
     ArticulatoryPlanner,
@@ -255,13 +255,13 @@ from civis_lucri_faber.core.vocalization import (
 )
 
 # 共振峰波形合成器 (Formant -> Waveform)
-from civis_lucri_faber.core.formant_synthesis import (
+from simulacrum.core.formant_synthesis import (
     FormantToWaveform,
     create_formant_synthesizer,
 )
 
 # 心理治疗系统 (Psychotherapy)
-from civis_lucri_faber.core.psychotherapy import (
+from simulacrum.core.psychotherapy import (
     TherapyModality,
     SessionFrequency,
     TherapyPhase,
@@ -276,7 +276,7 @@ from civis_lucri_faber.core.psychotherapy import (
 )
 
 # 药物-治疗协同引擎 (Pharmacotherapy Synergy)
-from civis_lucri_faber.core.pharmacotherapy_synergy import (
+from simulacrum.core.pharmacotherapy_synergy import (
     SynergyType,
     SynergyRecord,
     SynergyCalculator,
@@ -285,7 +285,7 @@ from civis_lucri_faber.core.pharmacotherapy_synergy import (
 )
 
 # 计算精神药理学沙盒 (Psychopharmacology Sandbox)
-from civis_lucri_faber.core.psychopharmacology_sandbox import (
+from simulacrum.core.psychopharmacology_sandbox import (
     ExperimentMode,
     TreatmentArm,
     ExperimentDesign,
@@ -296,17 +296,17 @@ from civis_lucri_faber.core.psychopharmacology_sandbox import (
 )
 
 # 统一状态键映射
-from civis_lucri_faber.core.state_key_mapping import UnifiedStateMapping
+from simulacrum.core.state_key_mapping import UnifiedStateMapping
 
 # PD靶点映射
-from civis_lucri_faber.core.pd_target_mapping import (
+from simulacrum.core.pd_target_mapping import (
     PDTarget,
     build_pd_targets,
     compute_pd_deltas,
 )
 
 # 治疗实验 (Therapeutic Experiment)
-from civis_lucri_faber.core.therapeutic_experiment import (
+from simulacrum.core.therapeutic_experiment import (
     DrugConfig,
     TherapyConfig,
     ExperimentConfig,
@@ -316,22 +316,22 @@ from civis_lucri_faber.core.therapeutic_experiment import (
 )
 
 # 心理测量指标
-from civis_lucri_faber.core.psychometric_indicators import (
+from simulacrum.core.psychometric_indicators import (
     PsychometricSnapshot,
     PsychometricIndicatorTracker,
 )
 
 # LLM临床评估器
-from civis_lucri_faber.core.llm_evaluator import (
+from simulacrum.core.llm_evaluator import (
     LLMEvaluationResult,
     LLMEvaluator,
 )
 
 # 治疗报告生成器
-from civis_lucri_faber.core.therapeutic_report import generate_markdown_report
+from simulacrum.core.therapeutic_report import generate_markdown_report
 
 # 药物相互作用 (DDI)
-from civis_lucri_faber.core.drug_pipeline.ddi import (
+from simulacrum.core.drug_pipeline.ddi import (
     DDIPairRecord,
     DDIResult,
     assess_ddi,
@@ -340,7 +340,7 @@ from civis_lucri_faber.core.drug_pipeline.ddi import (
 )
 
 # 受体亚型药效动力学
-from civis_lucri_faber.core.drug_pipeline.receptor_pd import (
+from simulacrum.core.drug_pipeline.receptor_pd import (
     ReceptorSubtype,
     ReceptorPDTarget,
     RECEPTOR_REGISTRY,
@@ -351,7 +351,7 @@ from civis_lucri_faber.core.drug_pipeline.receptor_pd import (
 )
 
 # 成瘾动力学
-from civis_lucri_faber.core.addiction_dynamics import (
+from simulacrum.core.addiction_dynamics import (
     ToleranceState,
     WithdrawalState,
     CravingState,
@@ -360,7 +360,7 @@ from civis_lucri_faber.core.addiction_dynamics import (
 )
 
 # 病原体神经炎症
-from civis_lucri_faber.core.pathogen_neuroinflammation import (
+from simulacrum.core.pathogen_neuroinflammation import (
     PathogenProfile,
     PathogenState,
     PathogenTriggeredInflammationEngine,
@@ -368,7 +368,7 @@ from civis_lucri_faber.core.pathogen_neuroinflammation import (
 )
 
 # 症状追踪器
-from civis_lucri_faber.core.symptom_tracker import (
+from simulacrum.core.symptom_tracker import (
     SymptomEpisode,
     PersistentSymptom,
     SymptomSnapshot,
@@ -376,14 +376,14 @@ from civis_lucri_faber.core.symptom_tracker import (
 )
 
 # 硬件生命体征桥接
-from civis_lucri_faber.core.hardware_vitals import (
+from simulacrum.core.hardware_vitals import (
     HardwareState,
     HardwareVitals,
     create_hardware_vitals,
 )
 
 # 自我意识中枢
-from civis_lucri_faber.core.self_awareness import (
+from simulacrum.core.self_awareness import (
     SelfAwarenessCenter,
     mPFCState,
     PCCState,
@@ -402,7 +402,7 @@ from civis_lucri_faber.core.self_awareness import (
 )
 
 __all__ = [
-    "CivisLucriFaber",
+    "Simulacrum",
     "CuriosityEngine",
     "InformationGainCalculator",
     "MetaLearner",

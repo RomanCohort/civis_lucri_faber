@@ -1,4 +1,4 @@
-"""Civis Lucri-Faber API 客户端
+"""Simulacrum API 客户端
 
 支持 OpenAI GPT、Anthropic Claude、DeepSeek、Ollama 本地模型
 """

@@ -12,6 +12,13 @@
 2. 空间表征 (place cells)
 3. 情景想象 (forward/backward replay)
 4. 联想学习
+5. Sharp-wave ripple回放 (~200Hz) - 新增
+6. 海马-前额叶双向连接 - 新增
+
+参考:
+- Buzsáki (2015) - Hippocampal sharp-wave ripples
+- Eichenbaum (2017) - Hippocampus as cognitive map
+- Preston & Eichenbaum (2013) - HC-PFC interactions
 """
 import torch
 import torch.nn as nn
@@ -23,7 +30,7 @@ from collections import deque
 
 # 延迟导入，避免循环引用
 try:
-    from civis_lucri_faber.core.interference_forgetting import InterferenceEngine
+    from simulacrum.core.interference_forgetting import InterferenceEngine
 except ImportError:
     from interference_forgetting import InterferenceEngine
 
@@ -475,6 +482,378 @@ class EntorhinalCortex(nn.Module):
         return torch.stack(responses).numpy()
 
 
+# ══════════════════════════════════════════════════════
+# Sharp-wave Ripple 机制 (新增)
+# 参考: Buzsáki (2015) - Hippocampal sharp-wave ripples
+# ══════════════════════════════════════════════════════
+
+@dataclass
+class SharpWaveRippleConfig:
+    """Sharp-wave ripple配置参数
+
+    参考: Buzsáki (2015)
+    - Ripple频率: ~200Hz (100-250Hz)
+    - Ripple持续时间: 50-100ms
+    - 触发条件: 慢波睡眠、静息状态、记忆巩固
+    """
+    ripple_frequency: float = 200.0     # Hz
+    ripple_duration_ms: float = 80.0    # ms
+    ripple_amplitude: float = 1.0       # 基础振幅
+    propagation_rate: float = 0.8       # ripple传播速度
+    min_interval_ms: float = 500.0      # ripple最小间隔
+
+
+class SharpWaveRipple(nn.Module):
+    """Sharp-wave ripple事件
+
+    高频(~200Hz)局部场电位震荡，发生在:
+    1. 慢波睡眠(SWS)期间 - 记忆巩固
+    2. 静息状态 - 最近经历的回放
+    3. 决策前的计划模拟
+
+    功能:
+    - 快速压缩回放最近经历序列
+    - 向PFC传递整合后的记忆
+    - 支持离线学习(无外部输入时的学习)
+
+    参考: Buzsáki (2015), Jadhav et al. (2012)
+    """
+
+    def __init__(
+        self,
+        n_neurons: int = 128,
+        config: Optional[SharpWaveRippleConfig] = None,
+    ):
+        super().__init__()
+        self.n_neurons = n_neurons
+        self.config = config or SharpWaveRippleConfig()
+
+        # Ripple状态
+        self.is_active = False
+        self.current_phase = 0.0  # ripple相位 [0, 2π]
+        self.step_count = 0
+
+        # Ripple历史 (用于统计)
+        self.ripple_events: List[Dict] = []
+        self.last_ripple_step = 0
+
+        # 神经元相位偏移 (模拟空间传播)
+        phase_offsets = torch.linspace(0, 2*np.pi, n_neurons)
+        self.register_buffer('phase_offsets', phase_offsets)
+
+    def check_ripple_trigger(
+        self,
+        sleep_stage: str = "awake",
+        arousal_level: float = 0.5,
+        recent_activity: float = 0.3,
+    ) -> bool:
+        """检查是否触发ripple
+
+        触发条件:
+        1. 慢波睡眠(SWS/REM)期间 - 高概率
+        2. 低唤醒状态(arousal < 0.3) - 中概率
+        3. 近期高活动后静息 - 高概率
+
+        Args:
+            sleep_stage: 睡眠阶段 ("awake", "NREM", "REM")
+            arousal_level: 唤醒水平 [0, 1]
+            recent_activity: 近期活动强度 [0, 1]
+
+        Returns:
+            should_trigger: 是否触发ripple
+        """
+        # 基础触发概率
+        base_prob = 0.02  # 每步2%基础概率
+
+        # 睡眠阶段调制
+        stage_factor = {
+            "awake": 0.3,      # 清醒期低概率
+            "NREM": 3.0,       # 慢波睡眠高概率
+            "REM": 1.5,        # REM中等概率
+        }.get(sleep_stage, 0.3)
+
+        # 低唤醒增强概率
+        arousal_factor = 1.0 + 0.5 * (1.0 - arousal_level)
+
+        # 近期活动后静息增强概率 (经验回放需要)
+        activity_factor = 1.0 + recent_activity
+
+        # 最终触发概率
+        trigger_prob = base_prob * stage_factor * arousal_factor * activity_factor
+        trigger_prob = min(0.5, trigger_prob)  # 上限50%
+
+        return np.random.random() < trigger_prob
+
+    def start_ripple(self, sequence: List[np.ndarray]) -> Dict:
+        """启动ripple事件
+
+        Args:
+            sequence: 要回放的记忆序列编码
+
+        Returns:
+            ripple_info: ripple启动信息
+        """
+        self.is_active = True
+        self.current_phase = 0.0
+
+        ripple_info = {
+            'start_step': self.step_count,
+            'sequence_length': len(sequence),
+            'frequency': self.config.ripple_frequency,
+            'duration_ms': self.config.ripple_duration_ms,
+        }
+        self.ripple_events.append(ripple_info)
+        self.last_ripple_step = self.step_count
+
+        return ripple_info
+
+    def propagate_ripple(
+        self,
+        encoding: torch.Tensor,
+        phase: float,
+    ) -> torch.Tensor:
+        """传播ripple信号
+
+        高频振荡调制神经元输出:
+        - 每个神经元有不同的相位偏移(模拟空间传播)
+        - ripple相位调制激活强度
+
+        Args:
+            encoding: 记忆编码 [n_neurons]
+            phase: 当前ripple相位 [0, 2π]
+
+        Returns:
+            modulated: ripple调制后的输出
+        """
+        # 各神经元相位 = 全局相位 + 偏移
+        neuron_phases = phase + self.phase_offsets
+
+        # 调制因子 = sin(phase)的高频震荡
+        # ~200Hz意味着每~5ms完成一个周期
+        modulation = torch.sin(neuron_phases) * self.config.ripple_amplitude
+
+        # 调制激活
+        modulated = encoding * (1.0 + 0.3 * modulation)
+
+        return modulated
+
+    def step(
+        self,
+        sleep_stage: str = "awake",
+        arousal_level: float = 0.5,
+        recent_sequence: Optional[List[np.ndarray]] = None,
+    ) -> Dict:
+        """执行一步ripple
+
+        Args:
+            sleep_stage: 睡眠阶段
+            arousal_level: 唤醒水平
+            recent_sequence: 待回放的记忆序列
+
+        Returns:
+            result: ripple执行结果
+        """
+        self.step_count += 1
+
+        result = {
+            'is_active': self.is_active,
+            'phase': self.current_phase,
+            'ripple_triggered': False,
+            'replay_output': None,
+        }
+
+        # 检查是否触发新ripple
+        if not self.is_active and self.step_count - self.last_ripple_step > 50:
+            recent_activity = len(recent_sequence) / 20.0 if recent_sequence else 0.0
+            if self.check_ripple_trigger(sleep_stage, arousal_level, recent_activity):
+                if recent_sequence:
+                    ripple_info = self.start_ripple(recent_sequence)
+                    result['ripple_triggered'] = True
+                    result['ripple_info'] = ripple_info
+
+        # 活跃ripple的相位推进
+        if self.is_active:
+            # 每步推进相位 (模拟~200Hz)
+            phase_increment = 2 * np.pi * 0.2  # 每步0.2个周期
+            self.current_phase += phase_increment
+
+            # 检查ripple结束
+            ripple_steps = self.config.ripple_duration_ms / 5.0  # ~16步
+            if self.current_phase > 2 * np.pi * ripple_steps / 5.0:
+                self.is_active = False
+                self.current_phase = 0.0
+                result['ripple_ended'] = True
+
+            # 回放输出
+            if recent_sequence and len(recent_sequence) > 0:
+                # 选择当前相位对应的记忆
+                seq_idx = int(self.current_phase / (2 * np.pi) * len(recent_sequence)) % len(recent_sequence)
+                current_encoding = torch.tensor(recent_sequence[seq_idx], dtype=torch.float32)
+
+                # ripple调制
+                modulated = self.propagate_ripple(current_encoding, self.current_phase)
+                result['replay_output'] = modulated.detach().numpy()
+
+        return result
+
+    def get_ripple_stats(self) -> Dict:
+        """获取ripple统计"""
+        return {
+            'total_ripples': len(self.ripple_events),
+            'is_active': self.is_active,
+            'current_phase': self.current_phase,
+            'last_ripple_step': self.last_ripple_step,
+        }
+
+
+# ══════════════════════════════════════════════════════
+# 海马-前额叶双向连接 (新增)
+# 参考: Preston & Eichenbaum (2013)
+# ══════════════════════════════════════════════════════
+
+class HCPFCConnection(nn.Module):
+    """海马-前额叶双向连接
+
+    功能:
+    1. HC→PFC: 传递情景记忆、预测、空间信息
+    2. PFC→HC: 执行目标调制、注意门控、策略指导
+
+    参考:
+    - Preston & Eichenbaum (2013): HC-PFC交互在记忆中的作用
+    - Eichenbaum (2017): 海马作为认知地图
+    - Bayer et al. (2017): HC-PFC在决策中的协同
+    """
+
+    def __init__(
+        self,
+        hc_dim: int = 128,
+        pfc_dim: int = 64,
+        connection_strength: float = 0.5,
+    ):
+        super().__init__()
+        self.hc_dim = hc_dim
+        self.pfc_dim = pfc_dim
+
+        # HC→PFC 传递通路
+        self.hc_to_pfc = nn.Sequential(
+            nn.Linear(hc_dim, pfc_dim),
+            nn.ReLU(),
+            nn.Linear(pfc_dim, pfc_dim),
+        )
+
+        # PFC→HC 调制通路 (目标、注意)
+        self.pfc_to_hc = nn.Sequential(
+            nn.Linear(pfc_dim, hc_dim),
+            nn.Tanh(),  # 调制信号用Tanh [-1, 1]
+        )
+
+        # 连接强度 (可调节)
+        self.connection_strength = nn.Parameter(torch.tensor(connection_strength))
+
+        # 最近传输记录
+        self.transfer_history: deque = deque(maxlen=50)
+
+    def transfer_to_pfc(
+        self,
+        hc_encoding: torch.Tensor,
+        transfer_type: str = "episodic",
+    ) -> torch.Tensor:
+        """HC→PFC传输
+
+        传输类型:
+        - episodic: 情景记忆编码
+        - prediction: 未来预测
+        - spatial: 空间位置信息
+
+        Args:
+            hc_encoding: 海马编码 [hc_dim]
+            transfer_type: 传输类型
+
+        Returns:
+            pfc_input: 前额叶输入信号 [pfc_dim]
+        """
+        # 确保维度
+        if hc_encoding.dim() == 1:
+            hc_encoding = hc_encoding.unsqueeze(0)
+
+        # 传输
+        pfc_input = self.hc_to_pfc(hc_encoding)
+
+        # 类型调制
+        type_factors = {
+            "episodic": 1.0,
+            "prediction": 0.7,  # 预测信号稍弱
+            "spatial": 0.5,     # 空间信息更弱
+        }
+        factor = type_factors.get(transfer_type, 0.8)
+        pfc_input = pfc_input * factor * self.connection_strength
+
+        # 记录传输
+        self.transfer_history.append({
+            'direction': 'hc_to_pfc',
+            'type': transfer_type,
+            'strength': self.connection_strength.item(),
+        })
+
+        return pfc_input
+
+    def modulate_from_pfc(
+        self,
+        pfc_signal: torch.Tensor,
+        modulation_type: str = "goal",
+    ) -> torch.Tensor:
+        """PFC→HC调制
+
+        调制类型:
+        - goal: 目标导向的检索调制
+        - attention: 注意门控
+        - strategy: 策略指导
+
+        Args:
+            pfc_signal: 前额叶信号 [pfc_dim]
+            modulation_type: 调制类型
+
+        Returns:
+            hc_modulation: 海马调制信号 [hc_dim]
+        """
+        # 确保维度
+        if pfc_signal.dim() == 1:
+            pfc_signal = pfc_signal.unsqueeze(0)
+
+        # 调制信号
+        hc_modulation = self.pfc_to_hc(pfc_signal)
+
+        # 类型调制
+        type_factors = {
+            "goal": 1.0,        # 目标调制最强
+            "attention": 0.6,   # 注意门控中等
+            "strategy": 0.4,    # 策略指导较弱
+        }
+        factor = type_factors.get(modulation_type, 0.5)
+        hc_modulation = hc_modulation * factor * self.connection_strength
+
+        # 记录传输
+        self.transfer_history.append({
+            'direction': 'pfc_to_hc',
+            'type': modulation_type,
+            'strength': self.connection_strength.item(),
+        })
+
+        return hc_modulation
+
+    def get_connection_stats(self) -> Dict:
+        """获取连接统计"""
+        hc_to_pfc_count = sum(1 for h in self.transfer_history if h['direction'] == 'hc_to_pfc')
+        pfc_to_hc_count = sum(1 for h in self.transfer_history if h['direction'] == 'pfc_to_hc')
+
+        return {
+            'connection_strength': self.connection_strength.item(),
+            'hc_to_pfc_transfers': hc_to_pfc_count,
+            'pfc_to_hc_transfers': pfc_to_hc_count,
+            'total_transfers': len(self.transfer_history),
+        }
+
+
 @dataclass
 class HippocampusState:
     """海马状态"""
@@ -487,25 +866,36 @@ class Hippocampus(nn.Module):
     """
     完整海马体系统
 
-    整合DG + CA3 + CA1 + EC
+    整合DG + CA3 + CA1 + EC + Sharp-wave Ripple + HC-PFC连接
     """
 
     def __init__(
         self,
         input_dim: int = 64,
         encoding_dim: int = 128,
+        pfc_dim: int = 64,
         event_bus=None,
     ):
         super().__init__()
 
         self.input_dim = input_dim
         self.encoding_dim = encoding_dim
+        self.pfc_dim = pfc_dim
 
         # 各子区
         self.dg = DentateGyrus(input_dim, encoding_dim)
         self.ca3 = CA3Region(encoding_dim, 64)
         self.ca1 = CA1Region(encoding_dim, 64)
         self.ec = EntorhinalCortex(input_dim)
+
+        # Sharp-wave ripple机制 (新增)
+        self.sharp_wave_ripple = SharpWaveRipple(n_neurons=encoding_dim)
+
+        # 海马-前额叶双向连接 (新增)
+        self.hc_pfc_connection = HCPFCConnection(
+            hc_dim=encoding_dim,
+            pfc_dim=pfc_dim,
+        )
 
         # 记忆存储
         self.episodic_memory: List[EpisodeMemory] = []
@@ -788,6 +1178,75 @@ class Hippocampus(nn.Module):
         """获取空间表征"""
         return self.ec.grid_cell_response(position)
 
+    def transfer_to_pfc(
+        self,
+        encoding: np.ndarray,
+        transfer_type: str = "episodic",
+    ) -> np.ndarray:
+        """向PFC传输信息 (新增)
+
+        Args:
+            encoding: 海马编码
+            transfer_type: 传输类型 (episodic/prediction/spatial)
+
+        Returns:
+            pfc_input: 前额叶输入
+        """
+        encoding_t = torch.tensor(encoding, dtype=torch.float32)
+        pfc_input = self.hc_pfc_connection.transfer_to_pfc(encoding_t, transfer_type)
+        return pfc_input.squeeze(0).detach().numpy()
+
+    def receive_pfc_modulation(
+        self,
+        pfc_signal: np.ndarray,
+        modulation_type: str = "goal",
+    ) -> np.ndarray:
+        """接收PFC调制 (新增)
+
+        Args:
+            pfc_signal: 前额叶信号
+            modulation_type: 调制类型 (goal/attention/strategy)
+
+        Returns:
+            hc_modulation: 海马调制信号
+        """
+        pfc_t = torch.tensor(pfc_signal, dtype=torch.float32)
+        hc_modulation = self.hc_pfc_connection.modulate_from_pfc(pfc_t, modulation_type)
+        return hc_modulation.squeeze(0).detach().numpy()
+
+    def trigger_ripple_replay(
+        self,
+        sleep_stage: str = "awake",
+        arousal_level: float = 0.5,
+    ) -> Dict:
+        """触发sharp-wave ripple回放 (新增)
+
+        在睡眠或低唤醒状态下，高频压缩回放近期经历
+
+        Args:
+            sleep_stage: 睡眠阶段 (awake/NREM/REM)
+            arousal_level: 唤醒水平 [0, 1]
+
+        Returns:
+            replay_result: 回放结果
+        """
+        # 获取近期记忆编码
+        recent_encodings = [m.encoding for m in self.episodic_memory[-20:]]
+
+        ripple_result = self.sharp_wave_ripple.step(
+            sleep_stage=sleep_stage,
+            arousal_level=arousal_level,
+            recent_sequence=recent_encodings,
+        )
+
+        # 如果有回放输出，传递给PFC
+        if ripple_result.get('replay_output') is not None:
+            replay_encoding = ripple_result['replay_output']
+            pfc_input = self.transfer_to_pfc(replay_encoding, transfer_type="episodic")
+            ripple_result['pfc_transfer'] = pfc_input
+
+        return ripple_result
+
     def get_summary(self) -> Dict:
         """获取摘要"""
         return {
@@ -795,6 +1254,8 @@ class Hippocampus(nn.Module):
             'replay_mode': self.state.replay_mode,
             'current_position': self.state.current_position,
             'avg_reward': np.mean([m.reward for m in self.episodic_memory[-10:]]) if self.episodic_memory else 0,
+            'ripple_stats': self.sharp_wave_ripple.get_ripple_stats(),
+            'hc_pfc_stats': self.hc_pfc_connection.get_connection_stats(),
         }
 
 
@@ -816,6 +1277,9 @@ __all__ = [
     'CA3Region',
     'CA1Region',
     'EntorhinalCortex',
+    'SharpWaveRippleConfig',
+    'SharpWaveRipple',
+    'HCPFCConnection',
     'HippocampusState',
     'Hippocampus',
     'create_hippocampus',

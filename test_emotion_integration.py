@@ -6,8 +6,8 @@ import os
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, root_dir)
 
-from civis_lucri_faber.utils.config import load_config
-from civis_lucri_faber.core.agent import CivisLucriFaber
+from simulacrum.utils.config import load_config
+from simulacrum.core.agent import Simulacrum
 
 
 def test_emotion_integration():
@@ -17,7 +17,7 @@ def test_emotion_integration():
     print("=" * 60)
 
     config = load_config(seed=42)
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     # Test 1: 默认调用（无情绪输入）
     print("\n[1] step() - without emotion input")

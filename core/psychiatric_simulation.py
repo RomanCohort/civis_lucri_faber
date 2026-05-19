@@ -34,7 +34,7 @@ from enum import Enum
 import numpy as np
 import time
 
-from civis_lucri_faber.core.events import PSYCHIATRIC_CONDITION_CHANGE
+from simulacrum.core.events import PSYCHIATRIC_CONDITION_CHANGE
 
 
 # ===== 枚举与数据结构 =====

@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from dataclasses import dataclass
 import time
 
-from civis_lucri_faber.core.events import PERSONALITY_UPDATE
+from simulacrum.core.events import PERSONALITY_UPDATE
 
 
 @dataclass

@@ -1,7 +1,7 @@
 """
 听觉系统 - 事件驱动 (Spiking) 版本
 
-Civis Lucri-Faber - Event-Driven Auditory Cortex
+Simulacrum - Event-Driven Auditory Cortex
 
 基于 SNN 架构:
 1. Gammatone → Spiking Encoder

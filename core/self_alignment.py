@@ -20,8 +20,8 @@ from datetime import datetime
 import json
 import os
 
-from civis_lucri_faber.utils.api_client import APIClient
-from civis_lucri_faber.core.events import ALIGNMENT_CHECK
+from simulacrum.utils.api_client import APIClient
+from simulacrum.core.events import ALIGNMENT_CHECK
 
 
 @dataclass
@@ -75,7 +75,7 @@ class SelfAlignmentModule:
             self._bus.subscribe(ALIGNMENT_CHECK, self.on_alignment_check, priority=0, name="self_alignment")
 
         # 系统提示词
-        self.system_prompt = """你是 Civis Lucri-Faber 的自审助手。
+        self.system_prompt = """你是 Simulacrum 的自审助手。
 
 你的任务是:
 1. 审查智能体的思考过程

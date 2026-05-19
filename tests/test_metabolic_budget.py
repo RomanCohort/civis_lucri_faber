@@ -1,7 +1,7 @@
 """Metabolic Budget Tests"""
 import pytest
 import torch
-from civis_lucri_faber.core.metabolic_budget import (
+from simulacrum.core.metabolic_budget import (
     MetabolicBudget, MetabolicCostCalculator, PeriodicStarvation
 )
 

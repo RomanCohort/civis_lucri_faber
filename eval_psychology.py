@@ -148,7 +148,7 @@ def evaluate_metacognition():
 def test_all():
     """完整评测"""
     print("=" * 40)
-    print("Civis Lucri-Faber 认知心理学评测")
+    print("Simulacrum 认知心理学评测")
     print("=" * 40)
 
     results = {}

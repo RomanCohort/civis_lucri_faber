@@ -1,4 +1,4 @@
-"""Civis Lucri-Faber 测试入口
+"""Simulacrum 测试入口
 
 运行示例:
     python main.py
@@ -14,14 +14,14 @@ if root_dir not in sys.path:
 import numpy as np
 import random
 
-from civis_lucri_faber.utils.config import Config, load_config
-from civis_lucri_faber.core.agent import CivisLucriFaber
+from simulacrum.utils.config import Config, load_config
+from simulacrum.core.agent import Simulacrum
 
 
 def main():
     """主函数"""
     print("=" * 60)
-    print("Civis Lucri-Faber - Bio-Inspired AI Agent System")
+    print("Simulacrum - Bio-Inspired AI Agent System")
     print("=" * 60)
 
     # 加载配置 (或使用默认值)
@@ -73,7 +73,7 @@ def main():
 
     # 实例化智能体
     print("\n[INIT] Initializing agent...")
-    agent = CivisLucriFaber(
+    agent = Simulacrum(
         config=config,
         memory_path="civis_memory.json",
         alignment_log_path="civis_alignment.json",

@@ -1,7 +1,7 @@
 """
 双耳听觉 - 事件驱动版本
 
-Civis Lucri-Faber - Event-Driven Binaural
+Simulacrum - Event-Driven Binaural
 
 基于脉冲神经网络:
 1. ITD → Spiking Cross-Correlation

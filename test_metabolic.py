@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 
 # 直接读取模块源码，动态定义 (使用UTF-8编码)
-exec(open(os.path.join(parent, 'civis_lucri_faber', 'core', 'metabolic_budget.py'), encoding='utf-8').read())
+exec(open(os.path.join(parent, 'simulacrum', 'core', 'metabolic_budget.py'), encoding='utf-8').read())
 
 
 # 测试用简单模型

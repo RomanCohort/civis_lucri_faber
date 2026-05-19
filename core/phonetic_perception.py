@@ -1,7 +1,7 @@
 """
 言语感知机制 - 麦格尔效应/语音切分/范畴感知
 
-Civis Lucri-Faber - 言语感知
+Simulacrum - 言语感知
 
 关键机制:
 1. 麦格尔效应 (Meyg effect) - 视觉辅助语音感知

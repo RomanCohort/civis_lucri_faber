@@ -1,6 +1,6 @@
 """实验四: 表观遗传固化 (Epigenetic Consolidation).
 
-使用真实 CivisLucriFaber 主循环 — 14脑区通过EventBus自然交互。
+使用真实 Simulacrum 主循环 — 14脑区通过EventBus自然交互。
 
 3组emotional_threshold对比:
   High (0.9): 难以固化, 遗忘多
@@ -27,8 +27,8 @@ import numpy as np
 import torch
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 THRESHOLD_GROUPS = {
@@ -38,7 +38,7 @@ THRESHOLD_GROUPS = {
 }
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     # 获取epigenetic tags数量
     n_tags = 0
@@ -76,7 +76,7 @@ def run_group(group_name: str, emotional_threshold: float) -> Dict:
         exploration_rate=0.1,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     # 设置emotional_threshold
     try:
@@ -250,7 +250,7 @@ def run_group(group_name: str, emotional_threshold: float) -> Dict:
 
 def run_experiment():
     print("=" * 70)
-    print("实验四: 表观遗传固化 (REAL CLF AGENT)")
+    print("实验四: 表观遗传固化 (REAL Simulacrum AGENT)")
     print("3 Groups: emotional_threshold=0.9/0.7/0.5")
     print("=" * 70)
 
@@ -260,7 +260,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验四 结果汇总 (REAL CLF AGENT)")
+    print("实验四 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     print(f"\n{'指标':<25s} {'High(0.9)':>12s} {'Medium(0.7)':>12s} {'Low(0.5)':>12s}")

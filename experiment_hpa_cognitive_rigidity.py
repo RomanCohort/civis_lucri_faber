@@ -1,6 +1,6 @@
 """实验三: HPA轴应激与认知僵化 (HPA Axis Stress & Cognitive Rigidity).
 
-使用真实 CivisLucriFaber 主循环 — 14脑区通过EventBus自然交互。
+使用真实 Simulacrum 主循环 — 14脑区通过EventBus自然交互。
 
 3 Phases:
   Phase 1 (Baseline, 500步): stress_reactivity=1.0, normal stimulus
@@ -23,11 +23,11 @@ import numpy as np
 from typing import Dict, List
 from collections import Counter
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "cortisol": float(s.get("cortisol_level", s.get("hormone_cortisol", 0.3))),
@@ -77,7 +77,7 @@ def compute_novelty_score(goal_history: List[str], window: int = 50) -> float:
 
 def run_experiment():
     print("=" * 70)
-    print("实验三: HPA轴应激与认知僵化 (REAL CLF AGENT)")
+    print("实验三: HPA轴应激与认知僵化 (REAL Simulacrum AGENT)")
     print("stress_reactivity=2.0 → Cortisol↑ → PFC↓ → Cognitive Rigidity")
     print("=" * 70)
 
@@ -87,7 +87,7 @@ def run_experiment():
         hpa_stress_reactivity=1.0,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
     print(f"[INIT] Agent created. HPA stress_reactivity=1.0")
 
     # 记录器
@@ -189,7 +189,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验三 结果汇总 (REAL CLF AGENT)")
+    print("实验三 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     bl_cort = np.mean(history["cortisol"][:500])

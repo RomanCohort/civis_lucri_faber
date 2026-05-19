@@ -1,7 +1,7 @@
 """
 脉冲神经网络 (SNN) 基础架构 - 事件驱动
 
-Civis Lucri-Faber - SNN Core
+Simulacrum - SNN Core
 
 特点:
 1. Leaky Integrate-and-Fire (LIF) 神经元
@@ -27,6 +27,8 @@ class SNNConfig:
     v_rest: float = -70e-3       # 静息电位 (mV)
     v_reset: float = -75e-3    # 重置电位 (mV)
     tau_ref: float = 1e-3      # 不应期 (1ms)
+    tau_adapt: float = 100e-3   # 适应性时间常数 (新增, 100ms)
+    adapt_rate: float = 0.1     # 适应性发放率 (新增)
 
 
 class LeakyIntegrateAndFire(nn.Module):
@@ -36,6 +38,10 @@ class LeakyIntegrateAndFire(nn.Module):
     核心Spiking神经元模型:
     1. tau * dV/dt = -(V - V_rest) + I*R
     2. V > V_thresh → spike → V_reset
+
+    新增功能:
+    3. 不应期 (refractory period) - spike后一段时间内不响应输入
+    4. 适应性发放 (adaptation) - 随着连续spike阈值逐渐升高
     """
     def __init__(self, n_neurons: int, config: Optional[SNNConfig] = None):
         super().__init__()
@@ -46,9 +52,19 @@ class LeakyIntegrateAndFire(nn.Module):
         self.register_buffer('v_mem', torch.full((n_neurons,), self.config.v_rest))
         self.register_buffer('last_spike', torch.zeros(n_neurons, dtype=torch.long))
 
+        # 不应期状态 (新增)
+        self.register_buffer('in_refractory', torch.zeros(n_neurons, dtype=torch.bool))
+
+        # 适应性电流 (新增)
+        self.register_buffer('adaptation_current', torch.zeros(n_neurons))
+        self.adapt_increment = self.config.adapt_rate  # 每次spike增加的适应性
+
         # 可学习参数
         self.weight = nn.Parameter(torch.randn(n_neurons) * 0.1)
         self.threshold = nn.Parameter(torch.tensor(self.config.v_thresh))
+
+        # 时间计数 (用于不应期计算)
+        self.current_time_step = 0
 
     def forward(self, current: torch.Tensor) -> Dict:
         """
@@ -58,9 +74,10 @@ class LeakyIntegrateAndFire(nn.Module):
             current: [B, n_neurons] 输入电流
 
         Returns:
-            {spikes, v_mem}
+            {spikes, v_mem, in_refractory, adaptation}
         """
         B = current.shape[0]
+        self.current_time_step += 1
 
         # 初始化膜电位
         if self.v_mem.dim() == 1:
@@ -68,17 +85,52 @@ class LeakyIntegrateAndFire(nn.Module):
         else:
             v_mem = self.v_mem
 
-        # 膜电位更新 (leak)
+        # ── 不应期检查 (新增) ──
+        # 计算从上次spike到现在的步数
+        time_since_spike = self.current_time_step - self.last_spike
+        refractory_steps = int(self.config.tau_ref * 1000)  # 转换ms到steps
+
+        # 创建不应期mask: 时间 < refractory_steps → 不响应
+        refractory_mask = (time_since_spike < refractory_steps).float()
+        self.in_refractory = refractory_mask.bool()
+
+        # ── 适应性阈值调整 (新增) ──
+        # 有效阈值 = base_threshold + adaptation_current
+        effective_threshold = self.threshold + self.adaptation_current
+
+        # ── 膜电位更新 ──
+        # 1. Leak衰减
         v_mem = v_mem * np.exp(-1 / (self.config.tau_mem * 1000))
 
-        # 输入驱动
-        v_mem = v_mem + current * self.weight
+        # 2. 输入驱动 (但在不应期内被阻断)
+        current_masked = current * (1 - refractory_mask.unsqueeze(0))
+        v_mem = v_mem + current_masked * self.weight
 
-        # 检查spike
-        spikes = (v_mem > self.threshold).float()
+        # 3. 适应性电流衰减
+        self.adaptation_current = self.adaptation_current * np.exp(-1 / (self.config.tau_adapt * 1000))
 
-        # 重置触发spike的神经元
+        # ── Spike生成 ──
+        # 使用有效阈值
+        spikes = (v_mem > effective_threshold.unsqueeze(0)).float()
+
+        # ── Spike后处理 ──
+        # 1. 重置触发spike的神经元
         v_mem = v_mem * (1 - spikes) + spikes * self.config.v_reset
+
+        # 2. 记录spike时间 (用于不应期)
+        new_spike_mask = spikes[0] > 0  # [n_neurons]
+        self.last_spike = torch.where(
+            new_spike_mask,
+            torch.full_like(self.last_spike, self.current_time_step),
+            self.last_spike
+        )
+
+        # 3. 增加适应性电流 (每次spike后增加)
+        self.adaptation_current = torch.where(
+            new_spike_mask,
+            self.adaptation_current + self.adapt_increment,
+            self.adaptation_current
+        )
 
         # 更新状态
         self.v_mem = v_mem.mean(0).detach()
@@ -86,7 +138,19 @@ class LeakyIntegrateAndFire(nn.Module):
         return {
             'spikes': spikes,
             'v_mem': v_mem,
+            'in_refractory': self.in_refractory,
+            'adaptation': self.adaptation_current,
+            'effective_threshold': effective_threshold,
         }
+
+    def reset_adaptation(self):
+        """重置适应性电流"""
+        self.adaptation_current.zero_()
+
+    def get_firing_rate(self, window: int = 100) -> float:
+        """获取最近window步的平均发放率"""
+        # 简化: 返回当前适应性电流的倒数作为发放率估计
+        return 1.0 / (1.0 + self.adaptation_current.mean().item())
 
 
 class SpikingLayer(nn.Module):

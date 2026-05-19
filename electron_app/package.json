@@ -1,7 +1,7 @@
 {
-  "name": "clf-neuro-monitor",
+  "name": "simulacrum-neuro-monitor",
   "version": "1.0.0",
-  "description": "Civis Lucri-Faber Bio-Inspired Neuro Monitor",
+  "description": "Simulacrum Bio-Inspired Neuro Monitor",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -18,8 +18,8 @@
     "electron-builder": "^25.0.0"
   },
   "build": {
-    "appId": "com.clf.neuro-monitor",
-    "productName": "CLF Neuro Monitor",
+    "appId": "com.simulacrum.neuro-monitor",
+    "productName": "Simulacrum Neuro Monitor",
     "directories": {
       "output": "../dist_electron"
     },

@@ -1,4 +1,4 @@
-"""Civis Lucri-Faber 配置管理"""
+"""Simulacrum 配置管理"""
 import os
 from dataclasses import dataclass, field
 from typing import Dict, Any

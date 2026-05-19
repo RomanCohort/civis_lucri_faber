@@ -1,4 +1,4 @@
-"""Civis Lucri-Faber 知识记忆系统"""
+"""Simulacrum 知识记忆系统"""
 import json
 import os
 from dataclasses import dataclass, field

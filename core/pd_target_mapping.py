@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
-from civis_lucri_faber.core.state_key_mapping import UnifiedStateMapping
+from simulacrum.core.state_key_mapping import UnifiedStateMapping
 
 
 @dataclass

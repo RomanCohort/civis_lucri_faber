@@ -23,7 +23,7 @@ import torch.nn.functional as F
 from torch.distributions import Categorical, Normal
 from torch.utils.data import DataLoader, TensorDataset
 
-from civis_lucri_faber.core.events import MEMORY_ADDED, DISSONANCE_DETECTED
+from simulacrum.core.events import MEMORY_ADDED, DISSONANCE_DETECTED
 
 
 @dataclass

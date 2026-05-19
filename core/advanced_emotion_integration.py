@@ -23,20 +23,20 @@ import torch.nn.functional as F
 import numpy as np
 from typing import Any, Dict, Optional, List
 from dataclasses import dataclass
-from civis_lucri_faber.core.events import EMOTION_PROCESS, EMOTION_UPDATED, HIBERNATE_ENTER
+from simulacrum.core.events import EMOTION_PROCESS, EMOTION_UPDATED, HIBERNATE_ENTER
 from collections import deque
 
 # 尝试导入，失败则设置标志
 MODULES_AVAILABLE = False
 
 try:
-    from civis_lucri_faber.core.emotion_regulation import EmotionRegulationSystem
-    from civis_lucri_faber.core.mood_system import MoodSystem
-    from civis_lucri_faber.core.emotion_memory_consolidation import EmotionalMemoryConsolidation
-    from civis_lucri_faber.core.social_emotions import SocialEmotionSystem
-    from civis_lucri_faber.core.emotional_contagion import EmotionalContagionSystem
-    from civis_lucri_faber.core.interoception import InteroceptionSystem, InteroceptiveState, GutState
-    from civis_lucri_faber.core.emotion_dynamics import EmotionDynamicsSystem
+    from simulacrum.core.emotion_regulation import EmotionRegulationSystem
+    from simulacrum.core.mood_system import MoodSystem
+    from simulacrum.core.emotion_memory_consolidation import EmotionalMemoryConsolidation
+    from simulacrum.core.social_emotions import SocialEmotionSystem
+    from simulacrum.core.emotional_contagion import EmotionalContagionSystem
+    from simulacrum.core.interoception import InteroceptionSystem, InteroceptiveState, GutState
+    from simulacrum.core.emotion_dynamics import EmotionDynamicsSystem
     MODULES_AVAILABLE = True
 except ImportError as e:
     print(f"[WARN] Advanced emotion modules not available: {e}")

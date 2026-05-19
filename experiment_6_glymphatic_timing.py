@@ -31,11 +31,11 @@ sys.path.insert(0, _project_root)
 import numpy as np
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "brain_waste": float(s.get("brain_waste", 0.2)),
@@ -69,7 +69,7 @@ def run_group(group_name: str, strategy: str) -> Dict:
         exploration_rate=0.1,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     history: Dict[str, List[float]] = {k: [] for k in read_metrics(agent).keys()}
     waste_cleared_total = 0.0
@@ -205,7 +205,7 @@ def run_group(group_name: str, strategy: str) -> Dict:
 
 def run_experiment():
     print("=" * 70)
-    print("实验六: 胶质淋巴系统的时间窗口验证 (REAL CLF AGENT)")
+    print("实验六: 胶质淋巴系统的时间窗口验证 (REAL Simulacrum AGENT)")
     print("3 Strategies: Continuous / Sleep-gated / Gamma-triggered")
     print("=" * 70)
 
@@ -216,7 +216,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验六 结果汇总 (REAL CLF AGENT)")
+    print("实验六 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     print(f"\n{'指标':<25s} {'Continuous':>12s} {'SleepGated':>12s} {'Gamma':>12s}")

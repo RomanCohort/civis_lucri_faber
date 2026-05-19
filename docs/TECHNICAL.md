@@ -1,4 +1,4 @@
-# Civis Lucri-Faber 技术文档
+# Simulacrum 技术文档
 
 > 详细技术规格说明书 v2.0
 
@@ -8,7 +8,7 @@
 
 ### 1.1 研究动机
 
-Civis Lucri-Faber（拉丁语"追求财富的工匠"，简称 CLF）是一个生物启发式 AI 认知架构，实现了 **20+ 种脑区/神经机制**、**认知心理学模型**、**事件驱动架构**和**自适应剪枝**。核心研究问题：**如何借鉴人脑的工作原理，设计更高效、更可解释、更具适应性的 AI 系统？**
+Simulacrum（拉丁语"追求财富的工匠"，简称 Simulacrum）是一个生物启发式 AI 认知架构，实现了 **20+ 种脑区/神经机制**、**认知心理学模型**、**事件驱动架构**和**自适应剪枝**。核心研究问题：**如何借鉴人脑的工作原理，设计更高效、更可解释、更具适应性的 AI 系统？**
 
 #### 1.1.1 人脑与计算机的对比
 
@@ -39,7 +39,7 @@ Civis Lucri-Faber（拉丁语"追求财富的工匠"，简称 CLF）是一个生
 
 ### 2.1 事件驱动架构 (Event-Driven Architecture)
 
-CLF 采用 **EventBus 发布/订阅** 模式，模块仅在收到相关事件时激活，避免无效计算。
+Simulacrum 采用 **EventBus 发布/订阅** 模式，模块仅在收到相关事件时激活，避免无效计算。
 
 ```python
 # 事件总线核心
@@ -851,7 +851,7 @@ PFC审核基底神经节的动作选择: 强抑制时 (>0.7) 用PFC决策替代B
 
 ### 6.2 规模限制
 
-**问**：人脑860亿神经元，CLF才~12M参数。规模化后生物机制会失效吗？
+**问**：人脑860亿神经元，Simulacrum才~12M参数。规模化后生物机制会失效吗？
 
 **答**：大部分会失效或需要重构
 
@@ -863,7 +863,7 @@ PFC审核基底神经节的动作选择: 强抑制时 (>0.7) 用PFC决策替代B
 
 ### 6.3 与LLM对比
 
-| 能力 | 7B LLM | CLF当前 |
+| 能力 | 7B LLM | Simulacrum当前 |
 |------|--------|--------|
 | 复杂推理 | 自回归生成 | 原型阶段 |
 | 知识问答 | 预训练海量 | 无大规模训练 |
@@ -871,7 +871,7 @@ PFC审核基底神经节的动作选择: 强抑制时 (>0.7) 用PFC决策替代B
 | 社会认知 | 无 | 镜像/共情/ToM |
 | 自我意识 | 无 | mPFC/DMN/元意识 |
 
-**CLF定位**：特定场景补充，非LLM替代品
+**Simulacrum定位**：特定场景补充，非LLM替代品
 
 ### 6.4 内存不足
 
@@ -896,9 +896,9 @@ torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
 ### 7.1 创建智能体
 
 ```python
-from civis_lucri_faber.core.agent import CivisLucriFaber
+from simulacrum.core.agent import Simulacrum
 
-agent = CivisLucriFaber(config=None, state_dim=4, n_actions=4)
+agent = Simulacrum(config=None, state_dim=4, n_actions=4)
 ```
 
 ### 7.2 运行
@@ -918,15 +918,15 @@ stats = agent.get_full_statistics()
 
 ```python
 # ANS
-from civis_lucri_faber.core.autonomic_nervous_system import create_autonomic_nervous_system
+from simulacrum.core.autonomic_nervous_system import create_autonomic_nervous_system
 ans = create_autonomic_nervous_system()
 
 # 自我意识
-from civis_lucri_faber.core.self_awareness import create_self_awareness_center
+from simulacrum.core.self_awareness import create_self_awareness_center
 sa = create_self_awareness_center(state_dim=64, hidden_dim=64)
 
 # 社会认知
-from civis_lucri_faber.core.social_cognition import create_social_cognition
+from simulacrum.core.social_cognition import create_social_cognition
 sc = create_social_cognition(action_dim=16, state_dim=64, emotion_dim=8)
 ```
 
@@ -990,11 +990,11 @@ sc = create_social_cognition(action_dim=16, state_dim=64, emotion_dim=8)
 ## 十、引用
 
 ```bibtex
-@software{civis_lucri_faber,
-  title={Civis Lucri-Faber: Bio-Inspired Cognitive Architecture},
-  author={Civis Lab},
+@software{simulacrum,
+  title={Simulacrum: Bio-Inspired Cognitive Architecture},
+  author={Simulacrum Lab},
   year={2026},
   version={2.0},
-  url={https://github.com/your-repo/civis_lucri_faber}
+  url={https://github.com/your-repo/simulacrum}
 }
 ```

@@ -1,7 +1,7 @@
 """ADMET risk → organ IC50 threshold bridge.
 
 Converts Confluencia ADMET risk scores (0-1) into organ-specific IC50
-concentration thresholds (mg/L) that CLF's Hill-equation damage accumulation
+concentration thresholds (mg/L) that Simulacrum's Hill-equation damage accumulation
 can use. This replaces hardcoded IC50 values with data-driven ones.
 
 Key insight: higher ADMET risk → lower IC50 → more toxic at lower concentrations.

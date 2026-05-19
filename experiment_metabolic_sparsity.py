@@ -1,6 +1,6 @@
 """实验二: 代谢预算与稀疏性 (Metabolic Budget & Sparsity).
 
-使用真实 CivisLucriFaber 主循环 — 14脑区通过EventBus自然交互。
+使用真实 Simulacrum 主循环 — 14脑区通过EventBus自然交互。
 
 2组对比:
   Control:      resource_budget=1.0 (无限制), starvation_prob=0.0
@@ -26,11 +26,11 @@ sys.path.insert(0, _project_root)
 import numpy as np
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "exploration_rate": float(agent.config.exploration_rate),
@@ -59,7 +59,7 @@ def run_group(group_name: str, resource_budget: float, starvation_prob: float) -
         resource_budget=resource_budget,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     history: Dict[str, List[float]] = {k: [] for k in read_metrics(agent).keys()}
 
@@ -157,7 +157,7 @@ def run_group(group_name: str, resource_budget: float, starvation_prob: float) -
 
 def run_experiment():
     print("=" * 70)
-    print("实验二: 代谢预算与稀疏性 (REAL CLF AGENT)")
+    print("实验二: 代谢预算与稀疏性 (REAL Simulacrum AGENT)")
     print("Control (budget=1.0) vs Experimental (budget=0.3)")
     print("=" * 70)
 
@@ -166,7 +166,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验二 结果汇总 (REAL CLF AGENT)")
+    print("实验二 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     print(f"\n{'指标':<25s} {'Control':>12s} {'Experimental':>12s}")

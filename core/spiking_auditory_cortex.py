@@ -1,7 +1,7 @@
 """
 听觉系统神经拟真改进方案
 
-Civis Lucri-Faber - Spiking Auditory Cortex
+Simulacrum - Spiking Auditory Cortex
 
 从系统工程 → 神经拟真
 """

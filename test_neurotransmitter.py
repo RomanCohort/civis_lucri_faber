@@ -6,7 +6,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from civis_lucri_faber.core.neurotransmitter import (
+from simulacrum.core.neurotransmitter import (
     NeurotransmitterSystem,
     DopamineSystem,
     SerotoninSystem,

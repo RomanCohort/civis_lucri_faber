@@ -30,8 +30,8 @@ from typing import Dict, List, Tuple
 from collections import Counter
 import random
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 def generate_stress_schedule(n_steps: int, base_rate: float = 0.15,
@@ -80,7 +80,7 @@ def generate_stress_schedule(n_steps: int, base_rate: float = 0.15,
     return schedule
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "cortisol": float(s.get("cortisol_level", s.get("hormone_cortisol", 0.3))),
@@ -154,7 +154,7 @@ def run_experiment():
         hpa_stress_reactivity=1.0,  # Phase 1 基线
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
     print(f"[INIT] Agent created. HPA stress_reactivity=1.0 (基线)")
 
     # 记录器

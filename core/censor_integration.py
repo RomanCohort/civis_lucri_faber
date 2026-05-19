@@ -1,6 +1,6 @@
 """Censor 微表情感知集成模块
 
-将 D:\\censor 仿生双通路微表情识别系统实时集成进 CLF 认知架构。
+将 D:\\censor 仿生双通路微表情识别系统实时集成进 Simulacrum 认知架构。
 
 生物对应:
     - 快通路 (3D ResNet-18) → 皮下通路 (杏仁核快速威胁检测)
@@ -14,11 +14,11 @@
     - 发布 MICRO_EXPRESSION_DETECTED: 输出 AU/ME/情绪结果
 
 集成点:
-    1. AU intensities → CLF 情绪系统 (AdvancedEmotionModule)
-    2. ME logits → CLF 边缘系统 (LimbicSystem 杏仁核威胁评估)
-    3. Apex scores → CLF 海马体 (Hippocampus 情绪事件标记)
-    4. Emotion reports → CLF 语言皮层 (LanguageCortex 情绪词汇)
-    5. Expert gates → CLF 基底神经节 (BasalGanglia 决策路由)
+    1. AU intensities → Simulacrum 情绪系统 (AdvancedEmotionModule)
+    2. ME logits → Simulacrum 边缘系统 (LimbicSystem 杏仁核威胁评估)
+    3. Apex scores → Simulacrum 海马体 (Hippocampus 情绪事件标记)
+    4. Emotion reports → Simulacrum 语言皮层 (LanguageCortex 情绪词汇)
+    5. Expert gates → Simulacrum 基底神经节 (BasalGanglia 决策路由)
 """
 
 import sys
@@ -31,7 +31,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from civis_lucri_faber.core.events import (
+from simulacrum.core.events import (
     MICRO_EXPRESSION_PROCESS,
     MICRO_EXPRESSION_DETECTED,
     SENSORY_PROCESS,
@@ -44,7 +44,7 @@ from civis_lucri_faber.core.events import (
 class MicroExpressionResult:
     """Censor 单次推理结果
 
-    封装所有 Censor 输出，供 CLF 各脑区消费。
+    封装所有 Censor 输出，供 Simulacrum 各脑区消费。
     """
     # 微表情分类 logits (7类或11类)
     me_logits: np.ndarray          # (num_me_classes,)
@@ -272,7 +272,7 @@ class CensorPerceptionModule:
     def _on_sensory_process(self, event) -> Optional[Dict[str, Any]]:
         """响应 SENSORY_PROCESS 事件 — 自动桥接
 
-        当 CLF 感知阶段有视频输入时，自动触发 Censor 推理。
+        当 Simulacrum 感知阶段有视频输入时，自动触发 Censor 推理。
         不阻塞主感知流 (低优先级)。
         """
         data = event.data if hasattr(event, 'data') else event
@@ -465,7 +465,7 @@ class CensorPerceptionModule:
     def _fallback_result(self, video: torch.Tensor = None) -> MicroExpressionResult:
         """Censor 不可用时的降级结果
 
-        返回全零/中性结果，不阻塞 CLF 主流程。
+        返回全零/中性结果，不阻塞 Simulacrum 主流程。
         """
         num_classes = 7
         num_aus = 28
@@ -494,7 +494,7 @@ class CensorPerceptionModule:
     # ===== 状态向量注入 =====
 
     def get_state_vector(self) -> np.ndarray:
-        """提取 16 维 Censor 状态向量，注入 CLF _build_state_vector()
+        """提取 16 维 Censor 状态向量，注入 Simulacrum _build_state_vector()
 
         维度分配:
             [0]  me_confidence     微表情置信度

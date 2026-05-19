@@ -1,8 +1,8 @@
-"""Civis Lucri-Faber Utilities"""
+"""Simulacrum Utilities"""
 
-from civis_lucri_faber.utils.config import Config, load_config
-from civis_lucri_faber.utils.memory import KnowledgeMemory, MemoryItem, Experience
-from civis_lucri_faber.utils.api_client import APIClient
+from simulacrum.utils.config import Config, load_config
+from simulacrum.utils.memory import KnowledgeMemory, MemoryItem, Experience
+from simulacrum.utils.api_client import APIClient
 
 __all__ = [
     "Config",

@@ -6,7 +6,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from civis_lucri_faber.core.neuromodulation_integration import (
+from simulacrum.core.neuromodulation_integration import (
     NeuromodulationIntegration,
     RewardModulation,
     TemporalDiscount,

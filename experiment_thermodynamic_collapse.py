@@ -1,6 +1,6 @@
 """实验一: 数字热力学崩溃 (Digital Thermodynamic Collapse).
 
-使用真实 CivisLucriFaber 主循环 — 14脑区通过EventBus自然交互。
+使用真实 Simulacrum 主循环 — 14脑区通过EventBus自然交互。
 
 3组对比:
   Rich:     initial_balance=200, compress_threshold=5,  compute_cost=0.005
@@ -24,8 +24,8 @@ import numpy as np
 from typing import Dict, List
 from collections import Counter
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 # ══════════════════════════════════════════════════════
@@ -60,7 +60,7 @@ GROUPS = {
 }
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "balance": float(agent.thermo.balance),
@@ -103,7 +103,7 @@ def run_group(group_name: str, group_config: dict, n_steps: int = 1000) -> Dict:
         exploration_rate=0.1,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     # 调整热力学任务参数以匹配组配置
     agent.thermo.task_reward_min = group_config.get("task_reward_min", 0.1)
@@ -172,7 +172,7 @@ def run_group(group_name: str, group_config: dict, n_steps: int = 1000) -> Dict:
 
 def run_experiment():
     print("=" * 70)
-    print("实验一: 数字热力学崩溃 (REAL CLF AGENT)")
+    print("实验一: 数字热力学崩溃 (REAL Simulacrum AGENT)")
     print("3 Groups: Rich / Balanced / Poverty × 1000 steps")
     print("=" * 70)
 
@@ -182,7 +182,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验一 结果汇总 (REAL CLF AGENT)")
+    print("实验一 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     print(f"\n{'指标':<25s} {'Rich':>12s} {'Balanced':>12s} {'Poverty':>12s}")

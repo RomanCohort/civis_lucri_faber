@@ -1,4 +1,4 @@
-# Civis Lucri-Faber 🧠
+# Simulacrum 🧠
 
 > 生物启发式认知AI架构 | Bio-Inspired Cognitive AI System
 
@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](https://opensource.org/licenses/MIT/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-red)](https://pytorch.org/)
 
-Civis Lucri-Faber（拉丁语"追求财富的工匠"）是一个整合了**15种脑区机制**、**认知心理学**和**自适应剪枝**的生物启发式AI系统。
+Simulacrum（拉丁语"追求财富的工匠"）是一个整合了**15种脑区机制**、**认知心理学**和**自适应剪枝**的生物启发式AI系统。
 
 ---
 
@@ -26,7 +26,7 @@ Civis Lucri-Faber（拉丁语"追求财富的工匠"）是一个整合了**15种
 
 ## 概述
 
-Civis Lucri-Faber是一个生物启发式AI系统，整合了：
+Simulacrum是一个生物启发式AI系统，整合了：
 
 | 特性 | 描述 |
 |-------|------|
@@ -37,7 +37,7 @@ Civis Lucri-Faber是一个生物启发式AI系统，整合了：
 
 ### 与Transformer对比
 
-| 特性 | Transformer | Civis Lucri-Faber |
+| 特性 | Transformer | Simulacrum |
 |------|-------------|------------------|
 | 路由 | 全量Attention | **Top-1选择** |
 | 记忆 | O(n)上下文 | **7槽限制** |
@@ -52,7 +52,7 @@ Civis Lucri-Faber是一个生物启发式AI系统，整合了：
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Civis Lucri-Faber                 │
+│                    Simulacrum                 │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │
 │  │  语言皮层  │  │  听觉皮层  │  │  视觉     │ │
@@ -316,7 +316,7 @@ print(f"唤醒度: {result['emotion_state']['arousal']}")
 ## 文件结构
 
 ```
-civis_lucri_faber/
+simulacrum/
 ├── core/
 │   ├── language_cortex.py    # 语言 + Bio-Gating
 │   ├── auditory_cortex.py   # 听觉 + 心理学
@@ -340,10 +340,10 @@ MIT License
 ## 引用
 
 ```bibtex
-@software{civis_lucri_faber,
-  title={Civis Lucri-Faber: Bio-Inspired Cognitive AI},
-  author={Civis Lab},
+@software{simulacrum,
+  title={Simulacrum: Bio-Inspired Cognitive AI},
+  author={Simulacrum Lab},
   year={2026},
-  url={https://github.com/civis-lucri-faber}
+  url={https://github.com/RomanCohort/Simulacrum}
 }
 ```

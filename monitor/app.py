@@ -1,5 +1,5 @@
 """
-Civis Lucri-Faber Training Monitor
+Simulacrum Training Monitor
 ==================================
 Streamlit dashboard for real-time training monitoring.
 
@@ -231,7 +231,7 @@ def render_sidebar():
 
 def render_status_panel(config):
     """Render training status panel."""
-    st.title("🧬 Civis Lucri-Faber Monitor")
+    st.title("🧬 Simulacrum Monitor")
 
     # Get current metrics
     reader = MetricsReader(config['csv_path'])
@@ -578,11 +578,11 @@ def render_model_info():
     st.subheader("🤖 Model Information")
 
     try:
-        from civis_lucri_faber.core.agent import CivisLucriFaber
-        from civis_lucri_faber.utils.config import Config
+        from simulacrum.core.agent import Simulacrum
+        from simulacrum.utils.config import Config
 
         config = Config()
-        agent = CivisLucriFaber(config=config)
+        agent = Simulacrum(config=config)
 
         # Count parameters
         total_params = sum(p.numel() for p in agent.info_gain_calc.world_model.parameters())
@@ -650,7 +650,7 @@ def main():
     # Footer
     st.markdown("---")
     st.caption(
-        f"Civis Lucri-Faber Monitor | "
+        f"Simulacrum Monitor | "
         f"Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     )
 

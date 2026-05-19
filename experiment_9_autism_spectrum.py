@@ -33,8 +33,8 @@ import numpy as np
 import torch
 from typing import Dict, List
 
-from civis_lucri_faber.core.agent import CivisLucriFaber
-from civis_lucri_faber.utils.config import Config
+from simulacrum.core.agent import Simulacrum
+from simulacrum.utils.config import Config
 
 
 # connectivity_level → resonance_baseline值映射
@@ -45,7 +45,7 @@ CONNECTIVITY_LEVELS = {
 }
 
 
-def read_metrics(agent: CivisLucriFaber) -> Dict[str, float]:
+def read_metrics(agent: Simulacrum) -> Dict[str, float]:
     s = agent._internal_state
     return {
         "social_engagement": float(s.get("social_engagement", 0.5)),
@@ -80,7 +80,7 @@ def run_group(group_name: str, resonance_value: float) -> Dict:
         exploration_rate=0.1,
         seed=42,
     )
-    agent = CivisLucriFaber(config=config)
+    agent = Simulacrum(config=config)
 
     # 设置MirrorNeuron共振基线
     try:
@@ -203,7 +203,7 @@ def run_group(group_name: str, resonance_value: float) -> Dict:
 
 def run_experiment():
     print("=" * 70)
-    print("实验九: 社会脑网络与孤独症光谱 (REAL CLF AGENT)")
+    print("实验九: 社会脑网络与孤独症光谱 (REAL Simulacrum AGENT)")
     print("3 Groups: Low / Medium / High mirror connectivity")
     print("=" * 70)
 
@@ -213,7 +213,7 @@ def run_experiment():
 
     # ── 结果汇总 ──
     print("\n" + "=" * 70)
-    print("实验九 结果汇总 (REAL CLF AGENT)")
+    print("实验九 结果汇总 (REAL Simulacrum AGENT)")
     print("=" * 70)
 
     print(f"\n{'指标':<25s} {'Low':>12s} {'Medium':>12s} {'High':>12s}")

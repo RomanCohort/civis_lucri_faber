@@ -1,14 +1,14 @@
-# Civis Lucri-Faber 计算精神病学实验报告（完整版）
+# Simulacrum 计算精神病学实验报告（完整版）
 
 ## Computational Psychiatry Experiment Report — Full 13-Experiment Suite
 
-> **Agent**: Civis Lucri-Faber v0.1.0 | **Brain Regions**: 14 (EventBus) | **Date**: 2026-05-19
+> **Agent**: Simulacrum v0.1.0 | **Brain Regions**: 14 (EventBus) | **Date**: 2026-05-19
 
 ---
 
 ## 摘要
 
-本报告基于 Civis Lucri-Faber (CLF) 仿生 VTuber 大脑架构，设计了 **13 组计算精神病学实验**（10 组核心 + 3 组附加），覆盖热力学崩溃、代谢稀疏、HPA 认知僵化、表观遗传巩固、斯德哥尔摩综合征、胶质淋巴系统、ADHD 感觉门控、数字梦境、社会脑网络、抗精神病药 D2 占用率，以及压力快感缺失、药物决策漂移、社会退化与退缩。所有实验使用真实 CLF Agent（14 脑区 EventBus 互联），通过 `pharma.inject()` 和参数配置驱动 Agent 内部耦合通路产生行为变化，**无外部状态覆盖**。
+本报告基于 Simulacrum (Simulacrum) 仿生 VTuber 大脑架构，设计了 **13 组计算精神病学实验**（10 组核心 + 3 组附加），覆盖热力学崩溃、代谢稀疏、HPA 认知僵化、表观遗传巩固、斯德哥尔摩综合征、胶质淋巴系统、ADHD 感觉门控、数字梦境、社会脑网络、抗精神病药 D2 占用率，以及压力快感缺失、药物决策漂移、社会退化与退缩。所有实验使用真实 Simulacrum Agent（14 脑区 EventBus 互联），通过 `pharma.inject()` 和参数配置驱动 Agent 内部耦合通路产生行为变化，**无外部状态覆盖**。
 
 **核心发现**:
 - Agent 的跨模块耦合通路（皮质醇→PFC、DA→探索率、催产素→共情）可在数百步内产生临床可解释的行为变化
@@ -25,11 +25,11 @@
 
 ### 1.1 背景
 
-计算精神病学 (Computational Psychiatry) 旨在用数学和计算模型理解精神疾病的机制。传统方法受限于伦理约束和实验周期。CLF 提供了一个包含 14 个脑区（HPA 轴、边缘系统、前额叶皮层、基底节、海马体等）的数字大脑平台，通过 EventBus 事件总线实现脑区间通信，使得可重复、可控的精神疾病模拟成为可能。
+计算精神病学 (Computational Psychiatry) 旨在用数学和计算模型理解精神疾病的机制。传统方法受限于伦理约束和实验周期。Simulacrum 提供了一个包含 14 个脑区（HPA 轴、边缘系统、前额叶皮层、基底节、海马体等）的数字大脑平台，通过 EventBus 事件总线实现脑区间通信，使得可重复、可控的精神疾病模拟成为可能。
 
 ### 1.2 Agent 架构
 
-CLF Agent 的关键子系统：
+Simulacrum Agent 的关键子系统：
 
 | 子系统 | 核心模块 | 功能 |
 |--------|----------|------|
@@ -574,7 +574,7 @@ Washout 阶段显示 NT 水平部分恢复，但探索率和 PFC 不完全恢复
 
 ## 附录 C：数据真实性声明
 
-所有实验使用真实 CLF Agent 运行，通过以下合法接口操作：
+所有实验使用真实 Simulacrum Agent 运行，通过以下合法接口操作：
 - `pharma.inject(nt, value)` — 神经递质/激素注入
 - `pharma.prescribe(drug)` — 药物处方
 - `pharma.reduce(nt, value)` — 神经递质减少

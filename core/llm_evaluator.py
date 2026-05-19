@@ -19,7 +19,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from civis_lucri_faber.core.psychometric_indicators import PsychometricSnapshot
+from simulacrum.core.psychometric_indicators import PsychometricSnapshot
 
 
 @dataclass

@@ -1,4 +1,4 @@
-"""Civis Lucri-Faber 神经药理学接口
+"""Simulacrum 神经药理学接口
 
 像药理实验一样操控 agent 的大脑:
 - 麻醉 (anesthesia): 抑制特定脑区，降低输出但不完全关闭
