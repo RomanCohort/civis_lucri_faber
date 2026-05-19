@@ -701,6 +701,44 @@ class NeurotransmitterSystem(nn.Module):
                 priority=1,
                 name="neurotransmitter",
             )
+            event_bus.subscribe(
+                "sensory_neuro_update",
+                self._handle_sensory_neuro_update,
+                priority=2,
+                name="neurotransmitter_sensory",
+            )
+
+    def _handle_sensory_neuro_update(self, event) -> Dict:
+        """处理感觉-神经递质耦合事件。
+
+        从感觉驱动的神经化学释放更新递质水平。
+        """
+        sensory_neuro = event.data.get('sensory_neurochemical', {})
+
+        # 感觉驱动的肾上腺素 → 去甲肾上腺素系统
+        sensory_adrenaline = sensory_neuro.get('sensory_adrenaline', 0.0)
+        if sensory_adrenaline > 0.1:
+            # 增加去甲肾上腺素警觉性
+            current_ne = self.norepinephrine.alertness_level
+            self.norepinephrine.alertness_level = min(1.0, current_ne + sensory_adrenaline * 0.15)
+
+        # 感觉驱动的多巴胺 → 多巴胺系统
+        sensory_dopamine = sensory_neuro.get('sensory_dopamine', 0.0)
+        if sensory_dopamine > 0.1:
+            # 增加多巴胺动机
+            current_dop = self.dopamine.current_level
+            self.dopamine.current_level = min(1.0, current_dop + sensory_dopamine * 0.10)
+            # 触发 phasic burst
+            self.dopamine.dopamine_phasic = min(0.5, self.dopamine.dopamine_phasic + sensory_dopamine * 0.15)
+
+        # 感觉驱动的乙酰胆碱 → 注意力系统
+        sensory_ach = sensory_neuro.get('sensory_acetylcholine', 0.0)
+        if sensory_ach > 0.1:
+            # 增加乙酰胆碱注意力
+            current_ach = self.acetylcholine.attention_level
+            self.acetylcholine.attention_level = min(1.0, current_ach + sensory_ach * 0.10)
+
+        return {}
 
     def _handle_brain_update(self, event) -> Dict:
         """Event-driven handler for brain_update events."""

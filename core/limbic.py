@@ -347,19 +347,27 @@ class Amygdala(nn.Module):
 
 class ThalamicRelay(nn.Module):
     """
-    丘脑中继
+    增强的丘脑中继
 
-    感觉信息路由
+    感觉信息路由 + 动态唤醒度调制
+
+    改进:
+    - 动态门控: 根据唤醒度调制感觉吞吐量
+    - 网状核抑制: 模拟丘脑网状核的抑制性门控
+    - 新颖性放大: 增强新颖刺激的信号
+    - 感觉特定增益: 每种感觉模态独立的增益控制
     """
 
     def __init__(
         self,
         input_dim: int = 64,
         n_senses: int = 4,  # 视觉、听觉、触觉、本体感觉
+        n_modalities: int = 3,  # 模态数量 (visual, auditory, language)
     ):
         super().__init__()
 
         self.n_senses = n_senses
+        self.n_modalities = n_modalities
 
         # 感觉网络
         self.sensory_nets = nn.ModuleList([
@@ -370,22 +378,118 @@ class ThalamicRelay(nn.Module):
             for _ in range(n_senses)
         ])
 
-        # 注意力门控
-        self.attention_gate = nn.Parameter(torch.ones(n_senses))
+        # 基础门控 (可学习基线，不是静态的)
+        self.base_gate = nn.Parameter(torch.ones(n_senses) * 0.5)
+
+        # 唤醒度增益: 高唤醒时增强威胁感觉
+        # 视觉 > 听觉 > 语言
+        self.arousal_gain = nn.Parameter(torch.tensor([1.2, 1.0, 0.8]))
+
+        # 感觉特定增益 (每种模态独立的可学习增益)
+        self.sensory_gains = nn.Parameter(torch.ones(n_modalities))
+
+        # 丘脑网状核模拟 (抑制性中间神经元)
+        # 学习基于注意力抑制特定感觉通道
+        self.reticular_nucleus = nn.Sequential(
+            nn.Linear(n_senses + 1, 16),  # +1 for arousal input
+            nn.ReLU(),
+            nn.Linear(16, n_senses),
+            nn.Sigmoid(),  # 输出 0=完全抑制, 1=无抑制
+        )
+
+        # 新颖性检测
+        self.novelty_threshold = 0.3
+        self._previous_sensory_input = None
 
     def relay(
         self,
         sensory_inputs: List[torch.Tensor],
+        arousal: float = 0.5,
     ) -> torch.Tensor:
         """
         中继感觉信息
+
+        Args:
+            sensory_inputs: 感觉输入张量列表
+            arousal: 当前唤醒度水平 [0, 1]
         """
         outputs = []
+
+        # 合并所有感觉输入用于处理
+        batch_size = sensory_inputs[0].shape[0] if sensory_inputs else 1
+        device = sensory_inputs[0].device if sensory_inputs else 'cpu'
+
+        # 1. 基础门控 (可学习的基线)
+        base_gated = torch.sigmoid(self.base_gate)  # [n_senses]
+
+        # 2. 唤醒度调制
+        # 高唤醒 → 放大威胁感觉; 低唤醒 → 抑制所有感觉
+        arousal_tensor = torch.tensor(arousal, device=device)
+        arousal_factor = 1.0 + (arousal_tensor - 0.5) * self.arousal_gain
+        arousal_factor = torch.clamp(arousal_factor, 0.1, 3.0)
+
+        # 扩展 arousal_factor 到所有感觉通道
+        senses_per_modality = self.n_senses // self.n_modalities
+        if senses_per_modality == 0:
+            senses_per_modality = 1
+        arousal_expanded = arousal_factor.repeat(senses_per_modality)
+        if len(arousal_expanded) < self.n_senses:
+            arousal_expanded = torch.cat([
+                arousal_expanded,
+                torch.ones(self.n_senses - len(arousal_expanded), device=device)
+            ])
+        elif len(arousal_expanded) > self.n_senses:
+            arousal_expanded = arousal_expanded[:self.n_senses]
+
+        # 3. 感觉特定增益
+        gains_expanded = torch.sigmoid(self.sensory_gains).repeat(senses_per_modality)
+        if len(gains_expanded) < self.n_senses:
+            gains_expanded = torch.cat([
+                gains_expanded,
+                torch.ones(self.n_senses - len(gains_expanded), device=device)
+            ])
+        elif len(gains_expanded) > self.n_senses:
+            gains_expanded = gains_expanded[:self.n_senses]
+
+        # 4. 网状核抑制
+        # 组合感觉输入用于网状核输入
+        combined_input = torch.stack(sensory_inputs).mean(dim=0)  # [batch, dim]
+        reticular_input = torch.cat([
+            combined_input,
+            arousal_tensor.expand(batch_size, 1)
+        ], dim=-1)
+        inhibition = self.reticular_nucleus(reticular_input)  # [batch, n_senses]
+        # 网状核输出是 [0,1]，1表示无抑制，需要反转
+        inhibition = 1.0 - inhibition
+
+        # 5. 新颖性放大
+        novelty_gate = torch.ones(batch_size, self.n_senses, device=device)
+        if self._previous_sensory_input is not None and len(self._previous_sensory_input) == len(sensory_inputs):
+            for i, sensory in enumerate(sensory_inputs):
+                if i < len(self._previous_sensory_input):
+                    delta = torch.abs(sensory - self._previous_sensory_input[i])
+                    novelty_mask = (delta > self.novelty_threshold).float()
+                    novelty_gate[:, i] = 1.0 + novelty_mask * 0.5  # 新颖信号放大50%
+
+        # 更新历史记录
+        self._previous_sensory_input = [s.detach().clone() for s in sensory_inputs]
+
+        # 6. 组合所有门控因子
         for i, sensory in enumerate(sensory_inputs):
             if i < len(self.sensory_nets):
                 out = self.sensory_nets[i](sensory)
-                att = self.attention_gate[i].sigmoid()
-                outputs.append(out * att)
+
+                # 组合门控: 基础 × 唤醒度 × 增益 × 网状核抑制 × 新颖性
+                gate = (
+                    base_gated[i] *
+                    arousal_expanded[i] *
+                    gains_expanded[i] *
+                    inhibition[:, i].mean() *  # 取平均抑制
+                    novelty_gate[:, i].mean()  # 取平均新颖性
+                )
+                gate = torch.clamp(gate, 0.0, 1.0)
+
+                outputs.append(out * gate)
             else:
                 outputs.append(sensory)
 
@@ -396,56 +500,50 @@ class ThalamicRelay(nn.Module):
         self,
         sensory_inputs: List[torch.Tensor],
         noise_threshold: float = 0.3,
+        arousal: float = 0.5,
     ) -> List[torch.Tensor]:
         """
-        Exp 7改进: 丘脑门控噪声过滤
-
-        通过 attention_gate 参数实际过滤噪声信号:
-        - 高 attention_gate 值 → 低过滤 → ADHD模式 (噪声淹没信号)
-        - 低 attention_gate 值 → 高过滤 → 正常模式 (信号清晰)
+        增强的噪声过滤: 根据唤醒度和网状核活动动态调整
 
         Args:
             sensory_inputs: 感觉输入张量列表
             noise_threshold: 噪声过滤阈值
+            arousal: 当前唤醒度水平
 
         Returns:
             过滤后的感觉输入列表
         """
         filtered_inputs = []
 
+        # 根据唤醒度调整过滤强度
+        # 高唤醒 → 过滤弱 (保留信号); 低唤醒 → 过滤强
+        arousal_filter_factor = 0.3 + (arousal - 0.5) * 0.2  # [0.2, 0.4]
+
         for i, sensory in enumerate(sensory_inputs):
             if i >= len(self.sensory_nets):
                 filtered_inputs.append(sensory)
                 continue
 
-            # 获取门控值 (sigmoid输出)
-            gate_value = self.attention_gate[i].sigmoid().item()
+            # 获取基础门控值
+            gate_value = torch.sigmoid(self.base_gate[i]).item()
 
-            # 计算噪声过滤强度 (高门控→低过滤, 低门控→高过滤)
-            # 正常模式: gate=1.0 → filter_strength=0.3
-            # ADHD模式: gate=2.0 → filter_strength=0.1 (过滤弱)
-            filter_strength = noise_threshold * (1.5 - gate_value)
+            # 计算过滤强度
+            # 高门控 → 低过滤 (ADHD模式); 低门控 → 高过滤 (正常模式)
+            filter_strength = noise_threshold * (1.5 - gate_value) * arousal_filter_factor
             filter_strength = max(0.05, min(0.5, filter_strength))
 
-            # 应用噪声过滤: 保留信号成分，抑制高频噪声
+            # 应用噪声过滤
             if sensory.dim() >= 1 and sensory.shape[-1] > 0:
-                # 计算信号的标准差作为噪声估计
                 signal_std = sensory.std().item()
                 signal_mean = sensory.mean().item()
-
-                # 噪声估计: 高频波动成分
                 noise_estimate = (sensory - signal_mean).abs().std().item()
-
-                # 信号-噪声比
                 snr = signal_std / (noise_estimate + 1e-6)
 
-                # 根据SNR和门控强度调整过滤
-                if snr < 2.0:  # 低信噪比 → 噪声大
-                    # ADHD模式: gate高→过滤弱→保留更多噪声
-                    # Normal模式: gate低→过滤强→抑制噪声
+                if snr < 2.0:
+                    # 低信噪比 → 噪声过滤
                     filtered = sensory * (1 - filter_strength * (2.0 - snr) / 2.0)
                 else:
-                    filtered = sensory  # 高信噪比，无需过滤
+                    filtered = sensory
 
                 filtered_inputs.append(filtered)
             else:
@@ -455,12 +553,17 @@ class ThalamicRelay(nn.Module):
 
     def get_attention_stats(self) -> Dict[str, float]:
         """获取门控统计信息"""
-        gate_values = [g.sigmoid().item() for g in self.attention_gate]
+        gate_values = torch.sigmoid(self.base_gate).detach().cpu().numpy()
+        arousal_gains = torch.sigmoid(self.arousal_gain).detach().cpu().numpy()
+
         return {
-            'attention_gate_avg': np.mean(gate_values),
-            'attention_gate_min': min(gate_values),
-            'attention_gate_max': max(gate_values),
-            'noise_filtering_weak': np.mean(gate_values) > 0.85,  # Exp 7改进: 阈值从1.5调整为0.85
+            'attention_gate_avg': float(np.mean(gate_values)),
+            'attention_gate_min': float(np.min(gate_values)),
+            'attention_gate_max': float(np.max(gate_values)),
+            'arousal_gain_visual': float(arousal_gains[0]),
+            'arousal_gain_auditory': float(arousal_gains[1]),
+            'arousal_gain_language': float(arousal_gains[2]),
+            'dynamic_gating': True,  # 标记为动态门控模式
         }
 
 
@@ -551,7 +654,7 @@ class Thalamus(nn.Module):
         self.input_dim = input_dim
 
         # 子核
-        self.relay = ThalamicRelay(input_dim)
+        self.relay = ThalamicRelay(input_dim, n_modalities=3)
         self.md = MDNucleus(input_dim)
 
         # 时间信息流
@@ -561,10 +664,17 @@ class Thalamus(nn.Module):
         self,
         sensory_inputs: List[torch.Tensor],
         state: torch.Tensor = None,
+        arousal: float = 0.5,
     ) -> Dict:
-        """处理信息流"""
-        # 中继
-        relayed = self.relay.relay(sensory_inputs)
+        """处理信息流
+
+        Args:
+            sensory_inputs: 感觉输入张量列表
+            state: 当前状态张量
+            arousal: 当前唤醒度水平 [0, 1]
+        """
+        # 中继 (使用唤醒度调制)
+        relayed = self.relay.relay(sensory_inputs, arousal=arousal)
 
         # 工作记忆更新
         if state is not None:
@@ -656,9 +766,12 @@ class LimbicSystem(nn.Module):
             state, apply_extinction=apply_extinction
         )
 
-        # 丘脑
+        # 获取唤醒度用于丘脑门控
+        arousal = emotion_result.get("arousal", 0.5)
+
+        # 丘脑 (使用唤醒度调制)
         if sensory_inputs is not None:
-            thalamus_result = self.thalamus.process(sensory_inputs, state)
+            thalamus_result = self.thalamus.process(sensory_inputs, state, arousal=arousal)
         else:
             thalamus_result = {'relayed': state, 'temporal_features': None}
 
@@ -703,6 +816,10 @@ __all__ = [
     'FearConditioning',
     'Amygdala',
     'AmygdalaWithPrior',
+    'EnhancedAmygdala',
+    'vmPFCExtinction',
+    'ExtinctionMemory',
+    'AmygdalaHippocampusConnection',
     'ThalamicRelay',
     'MDNucleus',
     'Thalamus',

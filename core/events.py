@@ -39,6 +39,7 @@ COMPRESSION_DONE = "compression_done"  # 压缩完成
 NEURAL_REGULATION = "neural_regulation"  # 神经自调节 (ANS, HPA, Glial, Allostatic)
 BRAIN_UPDATE = "brain_update"            # 脑区更新 (Social, SelfAwareness, NT, Neuroplasticity, Hormones, Brainstem)
 SENSORY_PROCESS = "sensory_process"      # 感觉处理 (Limbic, LanguageCortex, AngularGyrus)
+SENSORY_NEURO_UPDATE = "sensory_neuro_update"  # 感觉-神经递质耦合更新
 MOTOR_CONTROL = "motor_control"          # 运动控制 (BG, PFC, Cerebellum)
 VOCALIZATION_CONTROL = "vocalization_control"  # 发音控制 (VocalCortex, ArticulatoryPlanner)
 VOCALIZATION_OUTPUT = "vocalization_output"    # 发音输出 (声学特征, 共振峰)
@@ -79,7 +80,7 @@ ALL_EVENTS = [
     PERSONALITY_UPDATE,
     EMOTION_PROCESS, EMOTION_UPDATED,
     COMPRESSION_DONE,
-    NEURAL_REGULATION, BRAIN_UPDATE, SENSORY_PROCESS,
+    NEURAL_REGULATION, BRAIN_UPDATE, SENSORY_PROCESS, SENSORY_NEURO_UPDATE,
     MOTOR_CONTROL, VOCALIZATION_CONTROL, VOCALIZATION_OUTPUT,
     MEMORY_ENCODE, PRUNING_UPDATE,
     OUTPUT_FILTER, LEARNING_TRIGGER,

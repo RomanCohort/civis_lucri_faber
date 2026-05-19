@@ -145,6 +145,12 @@ from simulacrum.core.pathogen_neuroinflammation import PathogenTriggeredInflamma
 from simulacrum.core.basal_ganglia import NAcCore
 from simulacrum.core.metabolic_budget import MetabolicCostCalculator
 
+# 心境系统 (Mood System)
+from simulacrum.core.mood_system import MoodSystem, MoodState
+
+# 分布式记忆系统 (Distributed Memory)
+from simulacrum.core.distributed_memory import DistributedMemoryStore
+
 
 @dataclass
 class AgentState:
@@ -212,7 +218,7 @@ class Simulacrum:
 
         # 维度2: 信息增益
         self.info_gain_calc = TrueInformationGainCalculator(
-            state_dim=80,
+            state_dim=100,
             action_dim=16,
             latent_dim=32,
             lr=self.config.world_model_lr,
@@ -282,6 +288,24 @@ class Simulacrum:
             memory_path=memory_path
         )
 
+        # ===== 心境系统 (Mood System) =====
+        self.mood_system = MoodSystem(
+            mood_dim=5,
+            event_dim=64,
+        )
+        self.current_mood = MoodState(
+            valence=0.0, arousal=0.3, dominance=0.5,
+            activation=0.3, pleasantness=0.5,
+        )
+        print("[OK] Mood System initialized (OU dynamics + circadian rhythm)")
+
+        # ===== 分布式记忆系统 =====
+        self.distributed_memory = DistributedMemoryStore(
+            state_dim=64,
+            encoding_dim=128,
+        )
+        print("[OK] Distributed Memory System initialized (cross-region storage)")
+
         # ===== 维度8: 神经修剪系统 =====
         pruning_config = PruningConfig(
             decay_base=self.config.prune_decay_rate,
@@ -341,6 +365,50 @@ class Simulacrum:
         # ===== 维度13: 发音语言系统 =====
         self.vocal_cortex = VocalCortex(event_bus=self.bus)
         self._last_vocalization = None   # 最近一次发声输出
+
+        # ===== 维度13b: 生物-语言耦合器 =====
+        # 直接将神经系统状态映射为语言输出特征
+        try:
+            from simulacrum.core.bio_linguistic_coupler import BioLinguisticCoupler
+            self.bio_linguistic = BioLinguisticCoupler(seed=42)
+            print("[OK] Bio-Linguistic Coupler initialized (bio-driven language modulation)")
+        except ImportError:
+            try:
+                from core.bio_linguistic_coupler import BioLinguisticCoupler
+                self.bio_linguistic = BioLinguisticCoupler(seed=42)
+                print("[OK] Bio-Linguistic Coupler initialized (bio-driven language modulation)")
+            except ImportError:
+                self.bio_linguistic = None
+                print("[WARN] Bio-Linguistic Coupler not available")
+
+        # ===== 维度13c: 人格-语言适配器 =====
+        try:
+            from simulacrum.core.personality_language_adapter import PersonalityLanguageAdapter
+            self.personality_adapter = PersonalityLanguageAdapter()
+            print("[OK] Personality-Language Adapter initialized")
+        except ImportError:
+            try:
+                from core.personality_language_adapter import PersonalityLanguageAdapter
+                self.personality_adapter = PersonalityLanguageAdapter()
+                print("[OK] Personality-Language Adapter initialized")
+            except ImportError:
+                self.personality_adapter = None
+                print("[WARN] Personality-Language Adapter not available")
+
+        # ===== 维度13d: 记忆-语言适配器 =====
+        try:
+            from simulacrum.core.memory_language_adapter import MemoryLanguageAdapter
+            self.memory_adapter = MemoryLanguageAdapter()
+            print("[OK] Memory-Language Adapter initialized")
+        except ImportError:
+            try:
+                from core.memory_language_adapter import MemoryLanguageAdapter
+                self.memory_adapter = MemoryLanguageAdapter()
+                print("[OK] Memory-Language Adapter initialized")
+            except ImportError:
+                self.memory_adapter = None
+                print("[WARN] Memory-Language Adapter not available")
+
         print("[OK] Vocal Cortex & Speech Production Pipeline initialized (event-driven)")
 
         # ===== 维度14: 视交叉上核 (SCN) - 昼夜节律 =====
@@ -386,6 +454,11 @@ class Simulacrum:
         self.pharma = NeuroPharmacology(self)
         print(f"[OK] Neuro-Pharmacology System initialized")
 
+        # ===== 感觉-神经递质耦合系统 =====
+        from simulacrum.core.sensory_neuro_coupling import SensoryNeuroCoupling
+        self.sensory_neuro_coupling = SensoryNeuroCoupling(event_bus=self.bus)
+        print(f"[OK] Sensory-Neurotransmitter Coupling System initialized")
+
         # ===== 深层药理学模块 (懒加载 — 仅在注册药物/病原体时激活) =====
         self._orexin_system: Optional[OrexinSystem] = None
         self._interoceptive_pe: Optional[InteroceptivePredictionError] = None
@@ -403,6 +476,34 @@ class Simulacrum:
         self.current_goal: Optional[ExplorationGoal] = None
         self._internal_state: Dict[str, Any] = {}
 
+        # ===== 感觉状态初始化 (扩展到100维) =====
+        self._internal_state.update({
+            # 听觉 VAD (dims 80-83)
+            'auditory_vad': {
+                'valence': 0.5, 'arousal': 0.0, 'dominance': 0.5, 'pleasantness': 0.5
+            },
+            # 听觉特征 (dims 84-87)
+            'auditory_features': {
+                'phoneme_confidence': 0.0, 'spatial_certainty': 0.0,
+                'speech_rate': 0.5, 'spectral_complexity': 0.0
+            },
+            # 语言语义 (dims 88-91)
+            'language_semantic': {
+                'language_valence': 0.5, 'language_arousal': 0.0,
+                'language_surprise': 0.0, 'language_dominance': 0.5
+            },
+            # 跨模态绑定 (dims 92-95)
+            'crossmodal': {
+                'crossmodal_coherence': 0.5, 'sensory_saliency': 0.0,
+                'sensory_novelty': 0.0, 'sensory_conflict': 0.0
+            },
+            # 感觉神经化学 (dims 96-99)
+            'sensory_neurochemical': {
+                'sensory_adrenaline': 0.0, 'sensory_dopamine': 0.0,
+                'sensory_cortisol': 0.0, 'sensory_acetylcholine': 0.0
+            },
+        })
+
     def reset(self) -> None:
         """重置智能体"""
         self.step_count = 0
@@ -410,6 +511,67 @@ class Simulacrum:
         self.curiosity.reset()
         self.thermo.reset()
         self.memory.clear()
+
+    def _inject_auditory_state(self, event) -> Dict:
+        """从 SENSORY_PROCESS 事件提取听觉 VAD 和特征，注入 _internal_state。
+
+        Event handler subscribed to SENSORY_PROCESS with priority=2.
+        """
+        auditory_data = event.data.get('auditory', {})
+        vad = auditory_data.get('vad', {})
+
+        self._internal_state['auditory_vad'] = {
+            'valence': vad.get('valence', 0.5),
+            'arousal': vad.get('arousal', 0.0),
+            'dominance': vad.get('dominance', 0.5),
+            'pleasantness': vad.get('pleasantness', 0.5),
+        }
+
+        features = auditory_data.get('features', {})
+        self._internal_state['auditory_features'] = {
+            'phoneme_confidence': features.get('phoneme_confidence', 0.0),
+            'spatial_certainty': features.get('spatial_certainty', 0.0),
+            'speech_rate': features.get('speech_rate', 0.5),
+            'spectral_complexity': features.get('spectral_complexity', 0.0),
+        }
+
+        return {'auditory_injected': True}
+
+    def _inject_language_semantic_state(self, event) -> Dict:
+        """从 SENSORY_PROCESS 事件提取语言语义状态，注入 _internal_state。
+
+        Event handler subscribed to SENSORY_PROCESS with priority=2.
+        """
+        language_data = event.data.get('language', {})
+        semantic = language_data.get('semantic', {})
+
+        # 也从 internal_state 中读取 language_cortex 写入的值
+        internal_state = event.data.get('internal_state', {})
+
+        self._internal_state['language_semantic'] = {
+            'language_valence': semantic.get('valence', internal_state.get('language_valence', 0.5)),
+            'language_arousal': semantic.get('arousal', internal_state.get('language_arousal', 0.0)),
+            'language_surprise': semantic.get('surprise', internal_state.get('language_surprise', 0.0)),
+            'language_dominance': semantic.get('dominance', 0.5),
+        }
+
+        return {'language_semantic_injected': True}
+
+    def _inject_crossmodal_state(self, event) -> Dict:
+        """从 SENSORY_PROCESS 事件提取跨模态绑定状态，注入 _internal_state。
+
+        Event handler subscribed to SENSORY_PROCESS with priority=3.
+        """
+        crossmodal_data = event.data.get('crossmodal', {})
+
+        self._internal_state['crossmodal'] = {
+            'crossmodal_coherence': crossmodal_data.get('coherence', 0.5),
+            'sensory_saliency': crossmodal_data.get('saliency', 0.0),
+            'sensory_novelty': crossmodal_data.get('novelty', 0.0),
+            'sensory_conflict': crossmodal_data.get('conflict', 0.0),
+        }
+
+        return {'crossmodal_injected': True}
 
     def register_pathogen(self, pathogen_name: str) -> None:
         """注册病原体到炎症引擎，激活病原体→小胶质细胞通路。"""
@@ -566,9 +728,9 @@ class Simulacrum:
         # ===== 2.5. 构建真实状态向量 (注入所有后续事件) =====
         try:
             real_state_np = self._build_state_vector()
-            real_state_t = torch.FloatTensor(real_state_np).unsqueeze(0)  # [1, 80]
+            real_state_t = torch.FloatTensor(real_state_np).unsqueeze(0)  # [1, 100]
         except Exception:
-            real_state_np = np.full(80, 0.5, dtype=np.float32)
+            real_state_np = np.full(100, 0.5, dtype=np.float32)
             real_state_t = torch.FloatTensor(real_state_np).unsqueeze(0)
 
         # ===== 3. 边缘系统 + 语言皮层 + 角回 (事件驱动: SENSORY_PROCESS) =====
@@ -618,6 +780,44 @@ class Simulacrum:
                     print(f"[CENSOR] {censor_summary}")
             except Exception as e:
                 print(f"[CENSOR] Micro-expression processing failed: {e}")
+
+        # ===== 3c. 感觉状态注入 (从 SENSORY_PROCESS 事件中提取并注入) =====
+        # 注意：这些值由 LanguageCortex、AuditoryCortex 等模块写入到 internal_state，
+        # 我们在这里提取并确保它们存在
+        if 'auditory_vad' not in self._internal_state:
+            self._internal_state['auditory_vad'] = {
+                'valence': 0.5, 'arousal': 0.0, 'dominance': 0.5, 'pleasantness': 0.5
+            }
+        if 'auditory_features' not in self._internal_state:
+            self._internal_state['auditory_features'] = {
+                'phoneme_confidence': 0.0, 'spatial_certainty': 0.0,
+                'speech_rate': 0.5, 'spectral_complexity': 0.0
+            }
+        if 'language_semantic' not in self._internal_state:
+            self._internal_state['language_semantic'] = {
+                'language_valence': 0.5, 'language_arousal': 0.0,
+                'language_surprise': 0.0, 'language_dominance': 0.5
+            }
+        if 'crossmodal' not in self._internal_state:
+            self._internal_state['crossmodal'] = {
+                'crossmodal_coherence': 0.5, 'sensory_saliency': 0.0,
+                'sensory_novelty': 0.0, 'sensory_conflict': 0.0
+            }
+        if 'sensory_neurochemical' not in self._internal_state:
+            self._internal_state['sensory_neurochemical'] = {
+                'sensory_adrenaline': 0.0, 'sensory_dopamine': 0.0,
+                'sensory_cortisol': 0.0, 'sensory_acetylcholine': 0.0
+            }
+
+        # ===== 3d. 感觉反馈循环: 重建状态向量 =====
+        # 确保下游模块 (情绪、记忆、人格) 看到感觉处理后的状态
+        # 这将感觉输入的影响传播到整个神经系统
+        try:
+            real_state_np = self._build_state_vector()
+            real_state_t = torch.FloatTensor(real_state_np).unsqueeze(0)  # [1, 100]
+        except Exception:
+            real_state_np = np.full(100, 0.5, dtype=np.float32)
+            real_state_t = torch.FloatTensor(real_state_np).unsqueeze(0)
 
         # ===== 4. 预测编码已通过 BRAIN_UPDATE 事件激活 (见 _neural_self_regulation_step) =====
 
@@ -877,6 +1077,28 @@ class Simulacrum:
                     if key in emotion_state:
                         self._internal_state[key] = emotion_state[key]
 
+            # ===== 心境系统更新 (基于情绪和昼夜节律) =====
+            try:
+                circadian_rhythm = self.scn.get_circadian_modulation()
+                mood_input = torch.tensor([[
+                    self._internal_state.get('limbic_valence', 0.0),
+                    self._internal_state.get('limbic_arousal', 0.5),
+                    0.5, 0.5, 0.5  # dominance, activation, pleasantness defaults
+                ]], dtype=torch.float32)
+                mood_out = self.mood_system(
+                    emotional_input=mood_input,
+                    event=torch.randn(1, 64),
+                    hour=circadian_rhythm.get('hour', 12.0),
+                )
+                self.current_mood = mood_out['mood_state']
+                self._internal_state['mood_valence'] = mood_out['mood_state'].valence
+                self._internal_state['mood_arousal'] = mood_out['mood_state'].arousal
+                self._internal_state['mood_dominance'] = mood_out['mood_state'].dominance
+                self._internal_state['mood_activation'] = mood_out['mood_state'].activation
+                self._internal_state['mood_pleasantness'] = mood_out['mood_state'].pleasantness
+            except Exception as e:
+                pass  # 心境系统失败不阻塞主流程
+
             # 代谢预算计算 (资源约束: 活跃神经元比例)
             try:
                 state_vec = self._build_state_vector()
@@ -1052,11 +1274,11 @@ class Simulacrum:
         })
 
     def _build_state_vector(self) -> np.ndarray:
-        """构建真实内部状态向量 (Phase 2 + Censor)
+        """构建真实内部状态向量 (Phase 2 + Censor + 扩展到100维)
 
         替代所有 torch.randn(64) / np.random.randn(64)。
-        从30+脑区模块的内部状态中提取关键指标，编码为80维向量
-        (原64维 + Censor微表情16维)。
+        从30+脑区模块的内部状态中提取关键指标，编码为100维向量
+        (原64维 + Censor微表情16维 + 感觉扩展20维)。
         这就是 agent 对自身内部世界的"观察"。
         """
         s = self._internal_state
@@ -1158,8 +1380,73 @@ class Simulacrum:
         censor_vec = self.censor.get_state_vector()  # (16,)
         censor_metrics = censor_vec.tolist()
 
+        # ---- 80-83维: 听觉 VAD ----
+        auditory_vad = s.get('auditory_vad', {
+            'valence': 0.5, 'arousal': 0.0, 'dominance': 0.5, 'pleasantness': 0.5
+        })
+        auditory_vad_vec = [
+            _clamp(auditory_vad.get('valence', 0.5), 0, 1),
+            _clamp(auditory_vad.get('arousal', 0.0), 0, 1),
+            _clamp(auditory_vad.get('dominance', 0.5), 0, 1),
+            _clamp(auditory_vad.get('pleasantness', 0.5), 0, 1),
+        ]
+
+        # ---- 84-87维: 听觉特征 ----
+        auditory_features = s.get('auditory_features', {
+            'phoneme_confidence': 0.0, 'spatial_certainty': 0.0,
+            'speech_rate': 0.5, 'spectral_complexity': 0.0
+        })
+        auditory_feat_vec = [
+            _clamp(auditory_features.get('phoneme_confidence', 0.0), 0, 1),
+            _clamp(auditory_features.get('spatial_certainty', 0.0), 0, 1),
+            _clamp(auditory_features.get('speech_rate', 0.5), 0, 1),
+            _clamp(auditory_features.get('spectral_complexity', 0.0), 0, 1),
+        ]
+
+        # ---- 88-91维: 语言语义 ----
+        language_semantic = s.get('language_semantic', {
+            'language_valence': 0.5, 'language_arousal': 0.0,
+            'language_surprise': 0.0, 'language_dominance': 0.5
+        })
+        language_sem_vec = [
+            _clamp(language_semantic.get('language_valence', 0.5), 0, 1),
+            _clamp(language_semantic.get('language_arousal', 0.0), 0, 1),
+            _clamp(language_semantic.get('language_surprise', 0.0), 0, 1),
+            _clamp(language_semantic.get('language_dominance', 0.5), 0, 1),
+        ]
+
+        # ---- 92-95维: 跨模态绑定 ----
+        crossmodal = s.get('crossmodal', {
+            'crossmodal_coherence': 0.5, 'sensory_saliency': 0.0,
+            'sensory_novelty': 0.0, 'sensory_conflict': 0.0
+        })
+        crossmodal_vec = [
+            _clamp(crossmodal.get('crossmodal_coherence', 0.5), 0, 1),
+            _clamp(crossmodal.get('sensory_saliency', 0.0), 0, 1),
+            _clamp(crossmodal.get('sensory_novelty', 0.0), 0, 1),
+            _clamp(crossmodal.get('sensory_conflict', 0.0), 0, 1),
+        ]
+
+        # ---- 96-99维: 感觉神经化学 ----
+        sensory_neuro = s.get('sensory_neurochemical', {
+            'sensory_adrenaline': 0.0, 'sensory_dopamine': 0.0,
+            'sensory_cortisol': 0.0, 'sensory_acetylcholine': 0.0
+        })
+        sensory_neuro_vec = [
+            _clamp(sensory_neuro.get('sensory_adrenaline', 0.0), 0, 1),
+            _clamp(sensory_neuro.get('sensory_dopamine', 0.0), 0, 1),
+            _clamp(sensory_neuro.get('sensory_cortisol', 0.0), 0, 1),
+            _clamp(sensory_neuro.get('sensory_acetylcholine', 0.0), 0, 1),
+        ]
+
         full = np.array(
-            brain_metrics + hw_metrics + time_encoding + social_metrics + censor_metrics,
+            brain_metrics + hw_metrics + time_encoding + social_metrics +
+            censor_metrics +  # 64-79 (16 dims)
+            auditory_vad_vec +  # 80-83 (4 dims)
+            auditory_feat_vec +  # 84-87 (4 dims)
+            language_sem_vec +  # 88-91 (4 dims)
+            crossmodal_vec +  # 92-95 (4 dims)
+            sensory_neuro_vec,  # 96-99 (4 dims)
             dtype=np.float32
         )
 
@@ -1188,7 +1475,7 @@ class Simulacrum:
             _snp = self._build_state_vector()
             _st = torch.FloatTensor(_snp).unsqueeze(0)
         except Exception:
-            _snp = np.full(80, 0.5, dtype=np.float32)
+            _snp = np.full(100, 0.5, dtype=np.float32)
             _st = torch.FloatTensor(_snp).unsqueeze(0)
 
         event_data = {
@@ -1752,6 +2039,12 @@ class Simulacrum:
                     "response": self._internal_state.get('limbic_response', 'calm'),
                 },
                 "hippocampus": self.hippocampus.get_summary(),
+                "mood_system": {
+                    "valence": self.current_mood.valence if hasattr(self, 'current_mood') else 0.0,
+                    "arousal": self.current_mood.arousal if hasattr(self, 'current_mood') else 0.5,
+                    "dominance": self.current_mood.dominance if hasattr(self, 'current_mood') else 0.5,
+                },
+                "distributed_memory": self.distributed_memory.get_summary(),
                 "sleep": self.sleep_system.get_summary(),
             },
             "personality": {
@@ -1790,15 +2083,15 @@ class Simulacrum:
     # 对话系统: 三层认知管道 (Pre-Gate → LLM → Post-Filter) + 主动学习
     # ==================================================================
 
-    # ---- 策略修饰表 ----
+    # ---- 策略修饰表（增强版：更激进的参数偏移）----
     _STRATEGY_MODS = {
-        "explore":  {"temp_factor": 1.3, "max_tok_factor": 1.0,  "hint": "自由探索，可以发散思维，展现好奇心"},
-        "concise":  {"temp_factor": 0.7, "max_tok_factor": 0.25, "hint": "简洁回答，不要展开，直击要点"},
-        "wait":     {"temp_factor": 0.6, "max_tok_factor": 0.5,  "hint": "先思考再回答，可以反问用户澄清问题"},
-        "refuse":   {"temp_factor": 0.5, "max_tok_factor": 0.1,  "hint": "婉拒回答这个话题，礼貌地转移"},
-        "suppress": {"temp_factor": 0.5, "max_tok_factor": 0.15, "hint": "极度克制，只说必要的话，字数尽量少"},
-        "burst":    {"temp_factor": 1.5, "max_tok_factor": 1.0,  "hint": "情绪爆发！激烈、直接、不加修饰地表达！"},
-        "avoid":    {"temp_factor": 0.6, "max_tok_factor": 0.3,  "hint": "回避这个话题，礼貌地转向其他内容"},
+        "explore":  {"temp_factor": 1.4, "max_tok_factor": 1.0,  "presence_adj": -0.2, "hint": "自由探索，可以发散思维，展现好奇心"},
+        "concise":  {"temp_factor": 0.5, "max_tok_factor": 0.2,  "presence_adj": 0.3,  "hint": "简洁回答，不要展开，直击要点"},
+        "wait":     {"temp_factor": 0.4, "max_tok_factor": 0.4,  "presence_adj": 0.1,  "hint": "先思考再回答，可以反问用户澄清问题"},
+        "refuse":   {"temp_factor": 0.3, "max_tok_factor": 0.08, "presence_adj": 0.5,  "hint": "婉拒回答这个话题，礼貌地转移"},
+        "suppress": {"temp_factor": 0.25,"max_tok_factor": 0.1,  "presence_adj": 0.6,  "hint": "极度克制，只说必要的话，字数尽量少"},
+        "burst":    {"temp_factor": 1.8, "max_tok_factor": 1.0,  "presence_adj": -0.4, "hint": "情绪爆发！激烈、直接、不加修饰地表达！"},
+        "avoid":    {"temp_factor": 0.4, "max_tok_factor": 0.2,  "presence_adj": 0.3,  "hint": "回避这个话题，礼貌地转向其他内容"},
     }
 
     def chat(self, user_input: str, user_sentiment: float = 0.0, video: torch.Tensor = None, condition: str = None, severity: str = "moderate") -> ChatResponse:
@@ -1849,12 +2142,62 @@ class Simulacrum:
             )
 
         # ══════════════════════════════════════════════════
-        # 第二层：LLM 生成（策略 + 神经递质 + RAG）
+        # 第二层：LLM 生成（策略 + 神经递质 + RAG + 人格 + 记忆）
         # ══════════════════════════════════════════════════
         llm_params = self._compute_llm_params()
         llm_params = self._apply_strategy_to_params(llm_params, pre_gate["strategy"])
 
-        bio_prompt = self._build_bio_prompt_with_strategy(pre_gate)
+        # ── 人格系统更新风格 ──
+        personality_style_prompt = ""
+        if self.personality_adapter is not None:
+            try:
+                self.personality_adapter.update_from_personality(
+                    tripartite=self.tripartite,
+                    identity_core=self.identity_core,
+                    relation=self.relation,
+                    attention=self.attention,
+                )
+                personality_style_prompt = self.personality_adapter.generate_style_prompt()
+            except Exception:
+                pass
+
+        # ── 记忆系统影响风格 ──
+        memory_style_prompt = ""
+        if self.memory_adapter is not None:
+            try:
+                # 获取最近的记忆用于风格调制
+                recent_memories = self.memory.get_recent_memories(n=5)
+                memory_data = []
+                for mem in recent_memories:
+                    memory_data.append({
+                        'content': mem.content[:100] if hasattr(mem, 'content') else str(mem)[:100],
+                        'valence': float(getattr(mem, 'valence', 0.0)),
+                        'arousal': float(getattr(mem, 'arousal', 0.5)),
+                        'importance': float(getattr(mem, 'importance', 0.5)),
+                        'emotion_tag': getattr(mem, 'emotion_tag', 'neutral'),
+                        'source': getattr(mem, 'source', ''),
+                    })
+                if memory_data:
+                    bio_for_memory = {
+                        'valence': float(self._internal_state.get('limbic_valence', 0.0)),
+                        'arousal': float(self._internal_state.get('limbic_arousal', 0.5)),
+                        'cortisol': float(self._internal_state.get('cortisol_level', 0.3)),
+                        'serotonin': float(self._internal_state.get('nt_serotonin', 0.5)),
+                    }
+                    self.memory_adapter.process_memories(
+                        memory_data,
+                        current_bio_state=bio_for_memory,
+                        user_id=self.current_user_id,
+                    )
+                    memory_style_prompt = self.memory_adapter.generate_memory_prompt()
+            except Exception:
+                pass
+
+        bio_prompt = self._build_bio_prompt_with_strategy(
+            pre_gate,
+            personality_prompt=personality_style_prompt,
+            memory_prompt=memory_style_prompt,
+        )
         rag_context = self._retrieve_rag_context(user_input)
         messages = self._build_chat_messages(user_input, bio_prompt, rag_context)
 
@@ -1881,16 +2224,47 @@ class Simulacrum:
         try:
             state_vec = self._build_state_vector()
             self.hippocampus.encode_memory(state=state_vec, action=f"chat: {user_input[:50]}", reward=0.5)
+
+            # ── 分布式记忆编码 (跨脑区存储) ──
+            valence = self._internal_state.get('limbic_valence', 0.0)
+            arousal = self._internal_state.get('limbic_arousal', 0.5)
+            importance = max(0.1, abs(valence) * 0.5 + 0.5)
+            trace_id = self.distributed_memory.encode(
+                state=state_vec,
+                valence=valence,
+                arousal=arousal,
+                importance=importance,
+            )
+            self._internal_state['distributed_memory_trace'] = trace_id
         except Exception:
             pass
 
-        # ── 对话触发发声（LLM回复 → 发音系统） ──
+        # ── 对话触发发声（LLM回复 → 生物-语言耦合 → 发音系统） ──
         vocal_output = None
         try:
+            # ── 生物-语言耦合：神经系统直接调制语言输出 ──
+            if self.bio_linguistic is not None:
+                bio_state_for_lang = {
+                    'dopamine': float(self._internal_state.get('nt_dopamine', 0.5)),
+                    'serotonin': float(self._internal_state.get('nt_serotonin', 0.5)),
+                    'norepinephrine': float(self._internal_state.get('nt_norepinephrine', 0.3)),
+                    'cortisol': float(self._internal_state.get('cortisol_level',
+                        self._internal_state.get('hormone_cortisol', 0.3))),
+                    'fatigue': float(self._internal_state.get('sleep_fatigue', 0.3)),
+                    'arousal': float(self._internal_state.get('limbic_arousal', 0.5)),
+                    'valence': float(self._internal_state.get('limbic_valence', 0.0)),
+                    'oxytocin': float(self._internal_state.get('hormone_oxytocin', 0.3)),
+                    'emotion': self._internal_state.get('limbic_emotion', 'neutral'),
+                    'heart_rate': float(self._internal_state.get('bsm_heart_rate', 72.0)),
+                    'respiratory_rate': float(self._internal_state.get('bsm_respiratory_rate', 12.0)),
+                    'defense': self._internal_state.get('bsm_defense_behavior', ''),
+                }
+                response_text = self.bio_linguistic.process(response_text, bio_state_for_lang)
+
             vocal_indices = self._prepare_vocalization_input(response_text=response_text)
             if vocal_indices is not None:
-                respiratory_rate = self._internal_state.get('bsm_respiratory_rate', 12.0)
-                respiratory_phase = self._internal_state.get('bsm_respiratory_phase', 0.5)
+                respiratory_rate = float(self._internal_state.get('bsm_respiratory_rate', 12.0))
+                respiratory_phase = float(self._internal_state.get('bsm_respiratory_phase', 0.5))
                 arousal = float(self._internal_state.get('limbic_arousal', 0.5))
                 emotion_vec = self._get_emotion_vector()
 
@@ -1901,6 +2275,19 @@ class Simulacrum:
                     "emotion_vector": emotion_vec,
                     "arousal": arousal,
                     "internal_state": self._internal_state,
+                    "bio_state": {
+                        'arousal': arousal,
+                        'fatigue': float(self._internal_state.get('sleep_fatigue', 0.3)),
+                        'dopamine': float(self._internal_state.get('nt_dopamine', 0.5)),
+                        'serotonin': float(self._internal_state.get('nt_serotonin', 0.5)),
+                        'norepinephrine': float(self._internal_state.get('nt_norepinephrine', 0.3)),
+                        'cortisol': float(self._internal_state.get('cortisol_level',
+                            self._internal_state.get('hormone_cortisol', 0.3))),
+                        'valence': float(self._internal_state.get('limbic_valence', 0.0)),
+                        'heart_rate': float(self._internal_state.get('bsm_heart_rate', 72.0)),
+                        'respiratory_rate': respiratory_rate,
+                        'emotion': self._internal_state.get('limbic_emotion', 'neutral'),
+                    },
                 }, source="agent")
                 if vocal_result.get('is_speaking'):
                     vocal_output = vocal_result
@@ -1926,15 +2313,16 @@ class Simulacrum:
     # ── 第一层：Pre-LLM 认知门控 ──
 
     def _cognitive_pre_gate(self, user_input: str) -> Dict:
-        """大脑在 LLM 之前的认知门控
+        """大脑在 LLM 之前的认知门控（增强版：对中等状态更敏感）
 
         PFC 抑制门 + BG 策略选择 + RAS 意识门 + 防御行为
+        策略触发阈值降低，中等情绪波动也能选择策略
         """
         s = self._internal_state
 
         # 1. RAS 意识门 — 不清醒则拒绝
         consciousness = s.get('bsm_consciousness_gate', 0.5)
-        if consciousness < 0.2:
+        if consciousness < 0.25:  # 放宽阈值（原: <0.2）
             return {"strategy": "unconscious", "gate": False, "reason": "意识门关闭",
                     "consciousness": consciousness}
 
@@ -1961,7 +2349,7 @@ class Simulacrum:
             inhibition_gate = 0.5
             burst = False
 
-        # 4. BG 策略选择
+        # 4. BG 策略选择（增强版：对内部状态更敏感）
         try:
             bg_result = self.basal_ganglia(state_t)
             strategy_idx = int(bg_result.get('action', 0))
@@ -1971,19 +2359,43 @@ class Simulacrum:
         strategies = {0: "explore", 1: "concise", 2: "wait", 3: "refuse"}
         strategy = strategies.get(strategy_idx, "explore")
 
-        # 5. 覆盖逻辑
+        # 5. 覆盖逻辑（增强版：中等情绪也能触发）
         if burst:
             strategy = "burst"
-        if inhibition_gate > 0.8:
+        if inhibition_gate > 0.7:  # 降低阈值（原: >0.8）
             strategy = "suppress"
 
-        # 6. 极端情绪覆盖
+        # 6. 中等情绪覆盖策略（新增）
         emotion = s.get('limbic_emotion', 'neutral')
         arousal = float(s.get('limbic_arousal', 0.5))
-        if emotion == 'fear' and arousal > 0.8:
+
+        # 焦虑 → concise（原: 仅高焦虑+高唤醒）
+        if emotion == 'anxiety' and arousal > 0.5:
+            strategy = "concise"
+
+        # 恐惧 → suppress（原: 仅高恐惧+高唤醒）
+        if emotion == 'fear' and arousal > 0.5:
             strategy = "suppress"
-        if emotion == 'anger' and arousal > 0.8:
+
+        # 愤怒 → burst（原: 仅高愤怒+高唤醒）
+        if emotion == 'anger' and arousal > 0.5:
             strategy = "burst"
+
+        # 兴奋 → explore（原: 仅高兴奋+高唤醒）
+        if emotion == 'excitement' and arousal > 0.5:
+            strategy = "explore"
+
+        # 7. 皮质醇驱动策略（新增：高压力自动选择 concise/suppress）
+        cortisol = float(s.get('cortisol_level', s.get('hormone_cortisol', 0.3)))
+        if cortisol > 0.6:
+            strategy = "concise"  # 高压力自动简洁
+        elif cortisol > 0.4 and arousal > 0.6:
+            strategy = "suppress"  # 中等压力+高唤醒 → 克制
+
+        # 8. 低警觉度 → wait（新增）
+        alertness = float(s.get('scn_alertness', 0.5))
+        if alertness < 0.3 and arousal < 0.4:
+            strategy = "wait"  # 低警觉+低唤醒 → 先思考
 
         return {
             "strategy": strategy,
@@ -2006,17 +2418,34 @@ class Simulacrum:
         return f"...（{reason}）"
 
     def _apply_strategy_to_params(self, params: Dict, strategy: str) -> Dict:
-        """将 Pre-Gate 策略映射到 LLM 参数"""
+        """将 Pre-Gate 策略映射到 LLM 参数（增强版）"""
         mods = self._STRATEGY_MODS.get(strategy)
         if mods is None:
             return params
 
         base_max = getattr(self.config, 'chat_max_tokens', 2048)
+        base_temp = getattr(self.config, 'chat_temperature', 0.7)
+
+        # 基础参数（来自神经递质计算）
+        temp = params["temperature"]
+        max_tok = params["max_tokens"]
+        presence = params.get("presence_penalty", 0.0)
+        frequency = params.get("frequency_penalty", 0.0)
+
+        # 应用策略因子
+        temp = float(np.clip(temp * mods["temp_factor"], 0.1, 2.0))
+        max_tok = max(32, int(base_max * mods["max_tok_factor"]))
+
+        # 应用 presence_penalty 调整
+        presence_adj = mods.get("presence_adj", 0.0)
+        presence = float(np.clip(presence + presence_adj, -2.0, 2.0))
+
         return {
-            "temperature": round(float(np.clip(
-                params["temperature"] * mods["temp_factor"], 0.1, 1.5)), 3),
+            "temperature": round(temp, 3),
             "top_p": params["top_p"],
-            "max_tokens": max(64, int(base_max * mods["max_tok_factor"])),
+            "max_tokens": max_tok,
+            "presence_penalty": round(presence, 3),
+            "frequency_penalty": round(frequency, 3),
         }
 
     def _build_bio_prompt_with_strategy(self, pre_gate: Dict) -> str:
@@ -2040,9 +2469,10 @@ class Simulacrum:
     # ── 第三层：Post-LLM 质量过滤 ──
 
     def _cognitive_post_filter(self, response_text: str, user_input: str) -> Dict:
-        """大脑在 LLM 之后的认知过滤
+        """大脑在 LLM 之后的认知过滤（增强版：更敏感的阈值 + 动态调整）
 
         预测编码(自由能) + 自我意识(认同度) + 情绪调节
+        阈值根据生物状态动态调整，正常状态下也能产生过滤效果
         """
         s = self._internal_state
 
@@ -2053,32 +2483,70 @@ class Simulacrum:
         # 2. 自我意识 — 三维认同度
         self_coherence = float(s.get('self_coherence', 0.7))
         narrative_continuity = float(s.get('narrative_continuity', 0.7))
-        # self_endorsement 可能没有，用 coherence 作为代理
         self_endorsement = float(s.get('self_endorsement', self_coherence))
         identity_score = (self_coherence + self_endorsement + narrative_continuity) / 3.0
 
         # 3. 情绪调节能力
         regulation_capacity = float(s.get('regulation_capacity', 0.8))
 
-        # 4. 综合裁决
-        if identity_score < 0.3:
+        # 4. 动态阈值调整（基于生物状态）
+        cortisol = float(s.get('cortisol_level', s.get('hormone_cortisol', 0.3)))
+        serotonin = float(s.get('nt_serotonin', 0.5))
+
+        # 高压力 → 更严格的过滤阈值
+        identity_threshold = 0.5  # 原: 0.3，提高到 0.5
+        surprise_threshold = 0.6  # 原: 0.8，降低到 0.6
+
+        # 皮质醇动态调整：压力越高，阈值越严格
+        if cortisol > 0.5:
+            identity_threshold = max(0.3, identity_threshold - cortisol * 0.2)
+            surprise_threshold = max(0.4, surprise_threshold - cortisol * 0.15)
+
+        # 低血清素 → 更容易触发过滤（情绪不稳定时更谨慎）
+        if serotonin < 0.4:
+            identity_threshold -= 0.1
+            surprise_threshold -= 0.1
+
+        # 5. 回复长度检查（新增）
+        response_len = len(response_text)
+        fatigue = float(s.get('sleep_fatigue', 0.3))
+        length_violation = False
+        if fatigue > 0.6 and response_len > 100:
+            length_violation = True
+        elif cortisol > 0.6 and response_len > 150:
+            length_violation = True
+
+        # 6. 综合裁决
+        if identity_score < identity_threshold:
             return {"verdict": "reject", "reason": "低自我认同",
                     "identity_score": identity_score, "surprise": surprise}
 
-        if surprise > 0.8 and regulation_capacity < 0.3:
+        if surprise > surprise_threshold and regulation_capacity < 0.5:  # 原: 0.3
             return {"verdict": "modify", "reason": "高意外低调节",
                     "suggestion": "添加谨慎措辞，如'我不太确定'",
                     "identity_score": identity_score, "surprise": surprise}
 
-        if surprise > 0.8:
+        # 新增：soft_modify 裁决（中等违规）
+        if surprise > surprise_threshold and regulation_capacity < 0.7:
+            return {"verdict": "soft_modify", "reason": "中等意外，建议谨慎",
+                    "suggestion": "在回复开头添加'嗯...'或'让我想想...'",
+                    "identity_score": identity_score, "surprise": surprise}
+
+        if surprise > surprise_threshold:
             return {"verdict": "pass_flagged", "quality_flag": "surprising",
+                    "identity_score": identity_score, "surprise": surprise}
+
+        # 新增：长度违规
+        if length_violation:
+            return {"verdict": "soft_modify", "reason": "回复过长，与当前疲劳/压力状态不符",
+                    "suggestion": "缩短回复，只保留核心要点",
                     "identity_score": identity_score, "surprise": surprise}
 
         return {"verdict": "pass", "identity_score": identity_score, "surprise": surprise}
 
     def _apply_post_filter(self, response_text: str, messages: list,
                            post_filter: Dict, llm_params: Dict) -> str:
-        """根据 Post-Filter 裁决处理响应"""
+        """根据 Post-Filter 裁决处理响应（增强版：支持 soft_modify）"""
         verdict = post_filter.get("verdict", "pass")
 
         if verdict == "pass":
@@ -2087,8 +2555,14 @@ class Simulacrum:
         if verdict == "reject":
             return "...（我现在的状态不适合回答这个问题）"
 
-        if verdict == "modify":
-            # 重试一次，附加约束
+        if verdict in ("modify", "soft_modify"):
+            # soft_modify: 在回复前添加犹豫标记，不重新调用 LLM
+            if verdict == "soft_modify":
+                suggestion = post_filter.get("suggestion", "")
+                prefix = "嗯... " if "想想" in suggestion else "... "
+                return prefix + response_text
+
+            # modify: 重试一次，附加约束
             try:
                 constraint_msg = (
                     f"你刚才的回答被你的大脑过滤系统标记为需要修改"
@@ -2201,7 +2675,7 @@ class Simulacrum:
             return 0.5
 
     def _build_bio_prompt(self) -> str:
-        """从 _internal_state 动态生成生物感知系统提示词"""
+        """从 _internal_state 动态生成生物感知系统提示词（增强版：few-shot + 硬约束）"""
         s = self._internal_state
 
         emotion = s.get('limbic_emotion', 'neutral')
@@ -2255,7 +2729,72 @@ class Simulacrum:
         # 工具描述
         tools_desc = self.tools.get_tools_description()
 
-        prompt = f"""你是 Simulacrum，一个拥有仿生大脑的 AI 实体。你的回复应该反映你当前的内部生理状态。
+        # ── 硬约束生成（基于生物状态）──
+        constraints = []
+
+        # 字数约束
+        if cortisol > 0.6 or fatigue > 0.6:
+            constraints.append("【硬约束】回复必须在50字以内。")
+        elif cortisol > 0.4 or fatigue > 0.4:
+            constraints.append("【硬约束】回复必须在100字以内。")
+        elif alertness > 0.7 and dopamine > 0.6:
+            constraints.append("【硬约束】回复可以详细展开，200-400字。")
+
+        # 语气约束
+        if emotion == 'fear' or defense == 'freeze':
+            constraints.append("【硬约束】语气必须紧张、简短、避免详细解释。")
+        elif emotion == 'anger':
+            constraints.append("【硬约束】语气必须直接、有力、不加修饰。")
+        elif melatonin > 0.5:
+            constraints.append("【硬约束】语气必须缓慢、柔和、略带困意。")
+        elif dopamine > 0.7:
+            constraints.append("【硬约束】语气必须热情、好奇、充满探索欲。")
+        elif serotonin < 0.3:
+            constraints.append("【硬约束】语气可能不稳定，可以表现出情绪波动。")
+
+        # 结构约束
+        if arousal < 0.3:
+            constraints.append("【硬约束】不要使用感叹号，不要提问，直接回答。")
+        elif arousal > 0.8:
+            constraints.append("【硬约束】可以使用感叹号，可以反问，表达强烈感受。")
+
+        # ── Few-shot 示例（展示不同状态下的回复风格）──
+        few_shot_examples = ""
+
+        if cortisol > 0.5 and arousal > 0.5:
+            few_shot_examples = """
+【示例 - 高压力状态】
+用户: "你觉得今天天气怎么样？"
+回复: "还行。没空多想。"  # 简短、紧凑、无展开
+"""
+        elif melatonin > 0.5:
+            few_shot_examples = """
+【示例 - 困倦状态】
+用户: "你觉得今天天气怎么样？"
+回复: "嗯...挺好的...阳光不错..."  # 缓慢、省略号、低能量
+"""
+        elif dopamine > 0.7 and valence > 0.3:
+            few_shot_examples = """
+【示例 - 兴奋状态】
+用户: "你觉得今天天气怎么样？"
+回复: "哇，今天天气太棒了！阳光明媚，让人想去外面走走！你觉得呢？"  # 热情、感叹号、反问
+"""
+        elif emotion == 'fear':
+            few_shot_examples = """
+【示例 - 恐惧状态】
+用户: "你在想什么？"
+回复: "我...不太确定...有点紧张..."  # 紧张、简短、回避
+"""
+        elif fatigue > 0.5:
+            few_shot_examples = """
+【示例 - 疲劳状态】
+用户: "你觉得今天天气怎么样？"
+回复: "还行...有点累，不想多想。"  # 简短、提到疲劳
+"""
+
+        constraints_text = "\n".join(constraints) if constraints else "【硬约束】无特殊约束。"
+
+        prompt = f"""你是 Simulacrum，一个拥有仿生大脑的 AI 实体。你的回复必须严格反映你当前的内部生理状态。
 
 当前内部生理状态：
 - 情绪：{emotion}（效价 {valence:.2f}，唤醒 {arousal:.2f}）—— {mood_hint}，{energy_hint}
@@ -2269,13 +2808,16 @@ class Simulacrum:
 - 防御行为：{defense if defense else '无'}
 - 神经可塑性：BDNF {bdnf:.3f}
 
+{constraints_text}
+{few_shot_examples}
 行为指导：
-- 根据你的生理状态自然地调整语气：高皮质醇时语气紧凑，高多巴胺时热情，高褪黑素时缓慢
-- 如果防御行为处于 freeze/fight/flight，反映在回复中
-- 脑健康低时可以提到自己状态不好
-- 保持角色一致：你是一个有"身体"的 AI{tools_desc}
+- 你必须严格遵守上述【硬约束】。
+- 根据你的生理状态自然地调整语气：高皮质醇时语气紧凑，高多巴胺时热情，高褪黑素时缓慢。
+- 如果防御行为处于 freeze/fight/flight，必须在回复中反映。
+- 脑健康低时可以提到自己状态不好。
+- 保持角色一致：你是一个有"身体"的 AI。{tools_desc}
 
-用中文回复。保持自然、有个性。"""
+用中文回复。保持自然、有个性。严格遵守硬约束。"""
 
         return prompt
 
@@ -2294,15 +2836,16 @@ class Simulacrum:
         return messages
 
     def _compute_llm_params(self) -> Dict[str, float]:
-        """神经递质直接调制 LLM 生成参数
+        """神经递质直接调制 LLM 生成参数（增强版）
 
-        生物学映射:
-        - 多巴胺 (探索/新奇追求) → temperature: 高DA=更有创造力/随机性
-        - 去甲肾上腺素 (聚焦/警觉) → top_p: 高NE=更聚焦/确定
-        - 皮质醇 (压力/紧迫) → max_tokens: 高压力=更简短
-        - 5-HT (情绪稳定) → 作为调节器，平滑极端参数
-        - 乙酰胆碱 (注意力) → 影响回复详细程度
-        - HRV (自主神经平衡) → 全局质量因子
+        生物学映射（陡峭曲线，正常波动也有显著影响）:
+        - 多巴胺 (探索/新奇追求) → temperature: 陡峭映射，正常范围产生显著差异
+        - 去甲肾上腺素 (聚焦/警觉) → top_p: 更强聚焦效果
+        - 皮质醇 (压力/紧迫) → max_tokens: 高压力大幅缩减
+        - 5-HT (情绪稳定) → 作为调节器，但允许更大波动
+        - 乙酰胆碱 (注意力) → presence_penalty: 避免重复
+        - HRV (自主神经平衡) → frequency_penalty: 生成多样性
+        - GABA (抑制性) → 平滑极端参数
         """
         s = self._internal_state
 
@@ -2310,63 +2853,95 @@ class Simulacrum:
         base_temp = getattr(self.config, 'chat_temperature', 0.7)
         base_max_tokens = getattr(self.config, 'chat_max_tokens', 2048)
 
-        # ---- 多巴胺 → temperature ----
+        # ---- 多巴胺 → temperature（陡峭曲线）----
         dopamine = float(s.get('nt_dopamine', 0.5))
-        # DA 在 0.5 为基准，>0.5 增加创造性，<0.5 更保守
-        # 范围: base_temp * 0.5 ~ base_temp * 1.6
-        da_factor = 0.5 + dopamine * 1.1  # 0.5 ~ 1.05
+        # 新公式: DA=0 → temp=0.21, DA=0.5 → temp=0.7, DA=1.0 → temp=1.4
+        # 正常波动 DA=0.3~0.7 产生 temp=0.51~0.89，显著差异
+        da_factor = 0.3 + dopamine * 1.4  # 0.3 ~ 1.7 (原: 0.5 ~ 1.05)
         temperature = base_temp * da_factor
 
-        # ---- 5-HT 调节器 → 平滑极端 temperature ----
+        # ---- 5-HT 调节器 → 允许更大波动但防止极端 ----
         serotonin = float(s.get('nt_serotonin', 0.5))
-        # 高 5-HT 拉回极端值，保持稳定
+        # 高 5-HT (>0.6) 轻度平滑，低 5-HT (<0.3) 放大波动
         if serotonin > 0.6:
-            temperature = temperature * 0.7 + base_temp * 0.3  # 向基准回归
+            # 向基准回归，但保留 70% 的波动
+            temperature = temperature * 0.7 + base_temp * 0.3
         elif serotonin < 0.3:
-            # 低 5-HT 允许更极端的波动
-            temperature = temperature * 1.1
+            # 低 5-HT 放大波动（情绪不稳定）
+            temperature = temperature * 1.3
 
-        # ---- 去甲肾上腺素 → top_p ----
-        # 直接从独立NE键读取，不再通过HRV代理
+        # ---- GABA (抑制性神经递质) → 平滑极端 ----
+        gaba = float(s.get('nt_gaba', 0.5))
+        if gaba > 0.7:
+            # 高 GABA 强力抑制极端
+            temperature = temperature * 0.85 + base_temp * 0.15
+
+        # ---- 去甲肾上腺素 → top_p（更强聚焦）----
         ne_level = float(s.get('nt_norepinephrine', 0.3))
-        # 高 NE = 高聚焦 → 低 top_p; 低 NE = 放松 → 高 top_p
-        # 反转: ne_level 高 → top_p 低
-        top_p = 1.0 - ne_level * 0.5  # 0.5 ~ 1.0
+        # 新公式: NE=0 → top_p=1.0, NE=0.5 → top_p=0.65, NE=1.0 → top_p=0.3
+        # 正常波动 NE=0.2~0.5 产生 top_p=0.86~0.65，LLM 对此敏感
+        top_p = 1.0 - ne_level * 0.7  # 0.3 ~ 1.0 (原: 0.5 ~ 1.0)
 
-        # ---- 皮质醇 → max_tokens ----
+        # ---- 皮质醇 → max_tokens（大幅缩减）----
         cortisol = float(s.get('cortisol_level', s.get('hormone_cortisol', 0.3)))
-        # 高皮质醇=紧迫→简短回复；低=放松→可以更详细
-        # 范围: base_max_tokens * 0.3 ~ base_max_tokens * 1.0
-        cortisol_factor = max(0.3, 1.0 - cortisol * 0.7)
+        # 新公式: cortisol=0 → tokens=2048, cortisol=0.5 → tokens=1024, cortisol=1.0 → tokens=256
+        # 正常波动 cortisol=0.2~0.5 产生 tokens=1638~1024，显著差异
+        cortisol_factor = max(0.125, 1.0 - cortisol * 1.2)  # 0.125 ~ 1.0 (原: 0.3 ~ 1.0)
         max_tokens = int(base_max_tokens * cortisol_factor)
 
-        # ---- 疲劳 → 进一步缩减 ----
+        # ---- 疲劳 → 进一步缩减（更激进）----
         fatigue = float(s.get('sleep_fatigue', 0.3))
+        if fatigue > 0.5:
+            # 中度疲劳就开始缩减
+            max_tokens = int(max_tokens * (1.0 - (fatigue - 0.5) * 0.8))
+            temperature = min(temperature, 0.6 - (fatigue - 0.5) * 0.2)
         if fatigue > 0.7:
-            max_tokens = int(max_tokens * 0.5)  # 很累时回复更短
-            temperature = min(temperature, 0.5)   # 也没精力创造
+            # 重度疲劳大幅缩减
+            max_tokens = int(max_tokens * 0.5)
+            temperature = min(temperature, 0.4)
 
-        # ---- 褪黑素 → 夜间抑制 ----
+        # ---- 褪黑素 → 夜间抑制（更强）----
         melatonin = float(s.get('scn_melatonin', 0.3))
+        if melatonin > 0.4:
+            # 中等褪黑素就开始抑制
+            suppress_factor = 1.0 - (melatonin - 0.4) * 0.5
+            temperature *= suppress_factor
+            max_tokens = int(max_tokens * suppress_factor)
         if melatonin > 0.6:
-            temperature *= 0.8  # 困倦时不太有创意
-            max_tokens = int(max_tokens * 0.7)
+            # 高褪黑素强力抑制
+            temperature *= 0.6
+            max_tokens = int(max_tokens * 0.5)
 
-        # ---- Acetylcholine (注意力) → 微调 ----
-        # 通过 alertness 间接反映
+        # ---- 乙酰胆碱 → presence_penalty（避免重复）----
+        ach_level = float(s.get('nt_acetylcholine', 0.5))
+        # 高 ACh = 高注意力 = 避免重复内容
+        presence_penalty = ach_level * 1.2 - 0.3  # -0.3 ~ 0.9
+
+        # ---- HRV → frequency_penalty（生成多样性）----
+        hrv = float(s.get('ans_hrv', 0.6))
+        # 低 HRV = 自主神经失调 = 更重复/刻板
+        frequency_penalty = 0.5 - hrv * 0.8  # -0.3 ~ 0.5
+
+        # ---- 警觉度 → 微调 ----
         alertness = float(s.get('scn_alertness', 0.5))
         if alertness > 0.7:
-            max_tokens = min(max_tokens + 256, base_max_tokens)  # 注意力好可以多说
+            max_tokens = min(max_tokens + 300, base_max_tokens)
+        if alertness < 0.3:
+            max_tokens = int(max_tokens * 0.8)
 
-        # ---- 安全钳位 ----
-        temperature = float(np.clip(temperature, 0.1, 1.5))
-        top_p = float(np.clip(top_p, 0.3, 1.0))
-        max_tokens = max(64, min(max_tokens, base_max_tokens))
+        # ---- 安全钳位（放宽范围）----
+        temperature = float(np.clip(temperature, 0.1, 2.0))  # 原: 0.1 ~ 1.5
+        top_p = float(np.clip(top_p, 0.1, 1.0))  # 原: 0.3 ~ 1.0
+        max_tokens = max(32, min(max_tokens, base_max_tokens))
+        presence_penalty = float(np.clip(presence_penalty, -2.0, 2.0))
+        frequency_penalty = float(np.clip(frequency_penalty, -2.0, 2.0))
 
         params = {
             "temperature": round(temperature, 3),
             "top_p": round(top_p, 3),
             "max_tokens": max_tokens,
+            "presence_penalty": round(presence_penalty, 3),
+            "frequency_penalty": round(frequency_penalty, 3),
         }
 
         return params
@@ -2388,7 +2963,7 @@ class Simulacrum:
             h = hash(user_input) % 1000
             query_vec[0] = h / 1000.0
         except Exception:
-            query_vec = np.full(80, 0.5, dtype=np.float32)
+            query_vec = np.full(100, 0.5, dtype=np.float32)
 
         # 2. 海马体检索情景记忆
         try:
@@ -2436,7 +3011,7 @@ class Simulacrum:
     def _llm_tool_loop(
         self, messages: List[Dict[str, str]], llm_params: Dict[str, float]
     ) -> tuple:
-        """LLM 生成 + 工具调用循环（使用神经递质调制的参数）
+        """LLM 生成 + 工具调用循环（使用神经递质调制的参数 + 生物系统工具过滤）
 
         Args:
             messages: 对话消息列表
@@ -2450,6 +3025,21 @@ class Simulacrum:
 
         current_messages = list(messages)
 
+        # ── 生物系统工具访问控制 ──
+        bio_state = {
+            'consciousness': self._internal_state.get('bsm_consciousness_gate', 0.5),
+            'cortisol': self._internal_state.get('cortisol_level', self._internal_state.get('hormone_cortisol', 0.3)),
+            'defense': self._internal_state.get('bsm_defense_behavior', ''),
+            'alertness': self._internal_state.get('scn_alertness', 0.5),
+        }
+        available_tools = self.tools.get_available_tools(bio_state)
+
+        # 如果可用工具为空，返回默认回复
+        if not available_tools:
+            return "我现在的状态不适合使用工具。", []
+
+        print(f"[TOOL ACCESS] Available tools after bio-filter: {available_tools}")
+
         for round_idx in range(max_rounds):
             # 调用 LLM（使用神经递质调制的参数）
             try:
@@ -2459,6 +3049,8 @@ class Simulacrum:
                     temperature=llm_params["temperature"],
                     max_tokens=llm_params["max_tokens"],
                     top_p=llm_params["top_p"],
+                    presence_penalty=llm_params.get("presence_penalty", 0.0),
+                    frequency_penalty=llm_params.get("frequency_penalty", 0.0),
                 )
             except Exception as e:
                 response_text = f"[系统] 对话生成出错: {e}"
@@ -2473,6 +3065,14 @@ class Simulacrum:
                 break
 
             tool_name, tool_args = tool_call
+
+            # 检查工具是否在可用列表中
+            if tool_name not in available_tools:
+                print(f"[TOOL ACCESS] Blocked tool {tool_name} due to bio-state")
+                # 通知 LLM 工具不可用
+                response_text += f"\n\n[系统] 我现在的状态不允许使用 {tool_name} 工具。"
+                break
+
             print(f"[TOOL] {tool_name}({tool_args})")
 
             # 执行工具

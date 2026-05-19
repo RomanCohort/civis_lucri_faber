@@ -77,8 +77,20 @@ class APIClient:
         temperature: float = 0.7,
         max_tokens: int = 2048,
         top_p: float = 1.0,
+        presence_penalty: float = 0.0,
+        frequency_penalty: float = 0.0,
     ) -> str:
-        """发送对话请求，自动选择通道"""
+        """发送对话请求，自动选择通道
+
+        Args:
+            messages: 对话消息列表
+            system_prompt: 系统提示词
+            temperature: 温度参数
+            max_tokens: 最大token数
+            top_p: top_p 采样参数
+            presence_penalty: 存在惩罚（避免重复内容）
+            frequency_penalty: 频率惩罚（降低重复率）
+        """
 
         provider = self._resolve_provider()
 
@@ -94,7 +106,7 @@ class APIClient:
         if provider in ("mock",):
             return handler(messages)
 
-        result = handler(messages, system_prompt, temperature, max_tokens, top_p)
+        result = handler(messages, system_prompt, temperature, max_tokens, top_p, presence_penalty, frequency_penalty)
         if result is None:
             return self._mock_response(messages)
         return result
@@ -106,6 +118,8 @@ class APIClient:
         temperature: float,
         max_tokens: int,
         top_p: float = 1.0,
+        presence_penalty: float = 0.0,
+        frequency_penalty: float = 0.0,
     ) -> Optional[str]:
         """OpenAI API 调用"""
         try:
@@ -129,6 +143,8 @@ class APIClient:
                 temperature=temperature,
                 max_tokens=max_tokens,
                 top_p=top_p,
+                presence_penalty=presence_penalty,
+                frequency_penalty=frequency_penalty,
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -142,6 +158,8 @@ class APIClient:
         temperature: float,
         max_tokens: int,
         top_p: float = 1.0,
+        presence_penalty: float = 0.0,
+        frequency_penalty: float = 0.0,
     ) -> Optional[str]:
         """Anthropic Claude API 调用"""
         try:
@@ -184,6 +202,8 @@ class APIClient:
         temperature: float,
         max_tokens: int,
         top_p: float = 1.0,
+        presence_penalty: float = 0.0,
+        frequency_penalty: float = 0.0,
     ) -> Optional[str]:
         """DeepSeek API 调用（兼容 OpenAI SDK，切换 base_url）"""
         try:
@@ -210,6 +230,8 @@ class APIClient:
                 temperature=temperature,
                 max_tokens=max_tokens,
                 top_p=top_p,
+                presence_penalty=presence_penalty,
+                frequency_penalty=frequency_penalty,
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -223,6 +245,8 @@ class APIClient:
         temperature: float,
         max_tokens: int,
         top_p: float = 1.0,
+        presence_penalty: float = 0.0,
+        frequency_penalty: float = 0.0,
     ) -> Optional[str]:
         """Ollama 本地模型调用"""
         try:
@@ -240,6 +264,8 @@ class APIClient:
                     "temperature": temperature,
                     "num_predict": max_tokens,
                     "top_p": top_p,
+                    "presence_penalty": presence_penalty,
+                    "frequency_penalty": frequency_penalty,
                 }
             }).encode("utf-8")
 

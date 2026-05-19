@@ -477,7 +477,7 @@ class MoodSystem(nn.Module):
             event_impact = event_out['mood_impact']
 
         # 4. 昼夜节律
-        circadian_out = self.circadian(self.current_hour, external_cortisol=external_cortisol)
+        circadian_out = self.circadian(self.current_hour, external_cortisol=None)
         circadian_mod = torch.tensor([
             circadian_out['valence_modulation'],
             circadian_out['arousal_modulation'],

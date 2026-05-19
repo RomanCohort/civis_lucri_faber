@@ -7,11 +7,13 @@
 3. 冲动抑制 — 审核来自其他脑区的冲动信号，门控放行或抑制
 4. 长期规划 — 目标层级树 + 前瞻模拟 + 时间折扣
 5. 工作记忆 — 7-slot Miller limit + 注意力门控写入
+6. Attractor工作记忆 — 连续吸引子网络维持稳定表征 (新增)
 
 参考:
   - Miller & Cohen (2001) - PFC as an integrative hub
   - Casey et al. (2008) - Adolescent brain development & impulse control
   - Bechara et al. (1994) - Somatic marker hypothesis (Iowa gambling task)
+  - Compte et al. (2000) - Attractor dynamics in PFC working memory
 """
 
 import torch
@@ -434,6 +436,225 @@ class WorkingMemory(nn.Module):
         return int((self.occupancy > 0.5).sum().item())
 
 
+# ══════════════════════════════════════════════════════
+# Attractor工作记忆 (新增)
+# 参考: Compte et al. (2000) - Continuous attractor networks in PFC
+# ══════════════════════════════════════════════════════
+
+class AttractorWorkingMemory(nn.Module):
+    """连续吸引子工作记忆网络
+
+    PFC工作记忆的生物学基础:
+    - 持续放电 (persistent firing) 维持信息
+    - 连续吸引子网络 (CANN) 实现稳定表征
+    - 多巴胺D1受体调控记忆稳定性
+
+    核心机制:
+    1. 输入驱动吸引子状态
+    2. 循环连接维持持久活动
+    3. 噪声导致漂移 (多巴胺调控漂移率)
+    4. 多个吸引子可以同时活跃 (多项目工作记忆)
+
+    参考:
+    - Compte et al. (2000): Synaptic mechanisms and network dynamics
+    - Durstewitz et al. (2000): DA-D1 modulation of PFC attractors
+    """
+
+    def __init__(
+        self,
+        n_units: int = 64,
+        n_attractors: int = 7,
+        recurrent_strength: float = 1.5,
+        decay_rate: float = 0.95,
+        noise_scale: float = 0.02,
+    ):
+        super().__init__()
+        self.n_units = n_units
+        self.n_attractors = n_attractors
+        self.recurrent_strength = recurrent_strength
+        self.decay_rate = decay_rate
+        self.noise_scale = noise_scale
+
+        # 持续活动状态
+        self.register_buffer('persistent_activity', torch.zeros(n_attractors, n_units))
+
+        # 吸引子中心 (可学习)
+        self.attractor_centers = nn.Parameter(
+            torch.randn(n_attractors, n_units) * 0.1
+        )
+
+        # 循环连接权重 (吸引子内)
+        self.recurrent_weight = nn.Parameter(
+            torch.eye(n_units) * recurrent_strength
+        )
+
+        # 门控信号 (哪些吸引子活跃)
+        self.register_buffer('gate', torch.zeros(n_attractors))
+
+        # 多巴胺调制参数
+        self.da_modulation = 1.0  # D1受体调制
+
+        # 写入指针
+        self.write_ptr = 0
+
+    def write(
+        self,
+        x: torch.Tensor,
+        importance: float = 1.0,
+    ) -> int:
+        """写入新项目到工作记忆
+
+        Args:
+            x: 输入表征 [n_units]
+            importance: 重要性权重
+
+        Returns:
+            slot_idx: 写入的吸引子索引
+        """
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
+
+        idx = self.write_ptr % self.n_attractors
+
+        # 初始化吸引子中心到输入位置
+        self.attractor_centers.data[idx] = x.squeeze(0).detach()
+
+        # 初始化持续活动
+        self.persistent_activity[idx] = x.squeeze(0).detach() * importance
+
+        # 开启门控
+        self.gate[idx] = importance
+
+        self.write_ptr += 1
+        return idx
+
+    def maintain(self, dopamine_level: float = 0.5) -> Dict:
+        """维持工作记忆 (一步更新)
+
+        吸引子动力学:
+        1. 循环连接驱动: W @ activity
+        2. 衰减: activity *= decay
+        3. 噪声漂移: activity += noise
+        4. 多巴胺调制: D1增强循环, D1降低噪声
+
+        Args:
+            dopamine_level: 多巴胺水平 [0, 1]
+
+        Returns:
+            maintenance_info: 维持信息
+        """
+        # 多巴胺D1调制:
+        # 高DA → 强循环连接 → 稳定记忆 (低漂移)
+        # 低DA → 弱循环连接 → 记忆漂移/丢失
+        da_factor = 0.5 + dopamine_level  # [0.5, 1.5]
+
+        # 噪声缩放: 低DA → 高噪声 (记忆不稳定)
+        effective_noise = self.noise_scale * (2.0 - dopamine_level)
+
+        drifts = []
+        for i in range(self.n_attractors):
+            if self.gate[i] < 0.1:
+                continue
+
+            activity = self.persistent_activity[i]
+
+            # 1. 循环连接驱动 (向吸引子中心收缩)
+            center = self.attractor_centers[i]
+            recurrent_drive = self.recurrent_weight @ (center - activity) * 0.1 * da_factor
+
+            # 2. 衰减
+            decayed = activity * self.decay_rate
+
+            # 3. 更新
+            new_activity = decayed + recurrent_drive
+
+            # 4. 噪声漂移
+            noise = torch.randn_like(activity) * effective_noise
+            new_activity = new_activity + noise
+
+            # 记录漂移量
+            drift = (new_activity - activity).norm().item()
+            drifts.append(drift)
+
+            # 更新状态
+            self.persistent_activity[i] = new_activity
+
+            # 如果活动太弱，关闭门控
+            if new_activity.norm() < 0.01:
+                self.gate[i] = 0.0
+
+        return {
+            'active_attractors': int((self.gate > 0.1).sum().item()),
+            'avg_drift': np.mean(drifts) if drifts else 0.0,
+            'da_factor': da_factor,
+            'effective_noise': effective_noise,
+        }
+
+    def read(
+        self,
+        query: torch.Tensor,
+        top_k: int = 3,
+    ) -> torch.Tensor:
+        """从工作记忆读取
+
+        基于与查询的相似度，加权读取最相关的吸引子
+
+        Args:
+            query: 查询向量 [n_units]
+            top_k: 读取前k个最相关的
+
+        Returns:
+            retrieved: 读取的内容 [n_units]
+        """
+        if query.dim() == 1:
+            query = query.unsqueeze(0)
+
+        # 计算与各活跃吸引子的相似度
+        similarities = []
+        for i in range(self.n_attractors):
+            if self.gate[i] < 0.1:
+                similarities.append(-float('inf'))
+            else:
+                sim = F.cosine_similarity(
+                    query, self.persistent_activity[i].unsqueeze(0)
+                ).item()
+                similarities.append(sim)
+
+        # 选择top-k
+        sim_tensor = torch.tensor(similarities)
+        topk_values, topk_indices = sim_tensor.topk(min(top_k, len(similarities)))
+
+        # 加权求和
+        weights = F.softmax(topk_values * 5.0, dim=0)  # 温度缩放
+        retrieved = torch.zeros(self.n_units)
+        for j, idx in enumerate(topk_indices):
+            if similarities[idx.item()] > -float('inf'):
+                retrieved += weights[j] * self.persistent_activity[idx.item()]
+
+        return retrieved
+
+    def clear(self):
+        """清空工作记忆"""
+        self.persistent_activity.zero_()
+        self.gate.zero_()
+        self.write_ptr = 0
+
+    @property
+    def active_count(self) -> int:
+        return int((self.gate > 0.1).sum().item())
+
+    def get_summary(self) -> Dict:
+        """获取吸引子工作记忆摘要"""
+        active = self.gate > 0.1
+        activity_norms = self.persistent_activity.norm(dim=1)
+        return {
+            'active_attractors': self.active_count,
+            'total_attractors': self.n_attractors,
+            'avg_activity_norm': activity_norms[active].mean().item() if active.any() else 0.0,
+            'da_modulation': self.da_modulation,
+        }
+
+
 # ============ 主类：前额叶皮质 ============
 
 class PrefrontalCortex(nn.Module):
@@ -483,6 +704,12 @@ class PrefrontalCortex(nn.Module):
         self.impulse_ctrl = ImpulseController(input_dim, hidden_dim // 2)
         self.planner = LongTermPlanner(input_dim, hidden_dim // 2)
         self.working_memory = WorkingMemory(input_dim, wm_slots)
+
+        # Attractor工作记忆 (新增)
+        self.attractor_wm = AttractorWorkingMemory(
+            n_units=input_dim,
+            n_attractors=wm_slots,
+        )
 
         # 决策网络（最终行动选择）
         self.decision_net = nn.Sequential(
@@ -576,31 +803,38 @@ class PrefrontalCortex(nn.Module):
         self.maturation.advance()
         maturity = self.maturation.maturity
 
-        # 1. 工作记忆读取 + 状态融合
+        # 1. Attractor工作记忆维持
+        wm_maintenance = self.attractor_wm.maintain(dopamine_level)
+
+        # 2. 工作记忆读取 + 状态融合
         wm_context = self.working_memory.read(state)
         if wm_context.dim() == 1:
             wm_context = wm_context.unsqueeze(0)
         blended = torch.cat([state, wm_context], dim=-1)
         effective_input = torch.sigmoid(self.context_blend(blended))
 
-        # 2. 成本收益分析
+        # 3. 成本收益分析
         cb_results = self.cost_benefit.evaluate(state, maturity, candidates)
 
-        # 3. 冲动抑制
+        # 4. 冲动抑制
         inhibition_result = self.impulse_ctrl.gate(state, maturity, impulse_signals)
 
-        # 4. 长期规划
+        # 5. 长期规划
         plan_result = self.planner.plan(state, maturity, self.num_actions)
 
-        # 5. 决策
+        # 6. 决策
         action_logits = self.decision_net(effective_input)
         action = action_logits.argmax(dim=-1)
 
-        # 6. 价值评估
+        # 7. 价值评估
         value = self.value_net(effective_input).squeeze(-1)
 
-        # 7. 工作记忆写入
+        # 8. 工作记忆写入
         self.working_memory.write(state)
+
+        # 9. Attractor工作记忆写入
+        importance = self.decision_net(effective_input).squeeze().abs().item()
+        self.attractor_wm.write(state, importance)
 
         return {
             'action': action,
@@ -614,6 +848,7 @@ class PrefrontalCortex(nn.Module):
             'maturity': maturity,
             'planning_depth': plan_result['depth'],
             'effective_input': effective_input,
+            'attractor_wm_stats': wm_maintenance,
         }
 
     def get_decision_explanation(self, action_id: int) -> str:

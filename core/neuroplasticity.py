@@ -263,6 +263,41 @@ class NMDADependentPlasticity:
         self.nmda_activation *= 0.9
 
 
+class Synapse:
+    """突触连接"""
+
+    def __init__(
+        self,
+        pre_neuron_id: int,
+        post_neuron_id: int,
+        initial_weight: float = 1.0,
+    ):
+        self.pre_neuron_id = pre_neuron_id
+        self.post_neuron_id = post_neuron_id
+        self.weight = initial_weight
+        self.last_activation = 0.0
+        self.activation_count = 0
+
+    def activate(self, signal: float) -> float:
+        """激活突触"""
+        self.last_activation = signal * self.weight
+        self.activation_count += 1
+        return self.last_activation
+
+    def strengthen(self, amount: float = 0.1) -> None:
+        """强化突触 - Hebbian学习 (一起放电的连接更强)"""
+        self.weight = min(2.0, self.weight + amount)
+
+    def weaken(self, amount: float = 0.05) -> None:
+        """弱化突触 - 长时间不激活则减弱"""
+        if self.activation_count == 0:
+            self.weight = max(0.1, self.weight - amount)
+
+    def should_prune(self, threshold: float = 0.2) -> bool:
+        """判断是否应该修剪"""
+        return self.weight < threshold
+
+
 class SynapticScaling:
     """突触缩放 - 稳态可塑性
 
@@ -276,9 +311,9 @@ class SynapticScaling:
     def __init__(
         self,
         target_strength: float = 0.5,  # 目标总强度
-        scaling_rate: 0.01,             # 缩放速率
         min_scale: float = 0.8,         # 最小缩放因子
         max_scale: float = 1.2,         # 最大缩放因子
+        scaling_rate: float = 0.01,    # 缩放速率
     ):
         self.target_strength = target_strength
         self.scaling_rate = scaling_rate
@@ -327,41 +362,6 @@ class SynapticScaling:
             )
 
         return scale_factor
-
-
-class Synapse:
-    """突触连接"""
-
-    def __init__(
-        self,
-        pre_neuron_id: int,
-        post_neuron_id: int,
-        initial_weight: float = 1.0,
-    ):
-        self.pre_neuron_id = pre_neuron_id
-        self.post_neuron_id = post_neuron_id
-        self.weight = initial_weight
-        self.last_activation = 0.0
-        self.activation_count = 0
-
-    def activate(self, signal: float) -> float:
-        """激活突触"""
-        self.last_activation = signal * self.weight
-        self.activation_count += 1
-        return self.last_activation
-
-    def strengthen(self, amount: float = 0.1) -> None:
-        """强化突触 - Hebbian学习 (一起放电的连接更强)"""
-        self.weight = min(2.0, self.weight + amount)
-
-    def weaken(self, amount: float = 0.05) -> None:
-        """弱化突触 - 长时间不激活则减弱"""
-        if self.activation_count == 0:
-            self.weight = max(0.1, self.weight - amount)
-
-    def should_prune(self, threshold: float = 0.2) -> bool:
-        """判断是否应该修剪"""
-        return self.weight < threshold
 
 
 class NeuroplasticitySystem:

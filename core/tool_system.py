@@ -115,6 +115,69 @@ class ToolSystem:
         """获取工具调用历史"""
         return list(self._call_log)
 
+    def get_available_tools(self, bio_state: Dict) -> List[str]:
+        """根据生物状态过滤可用工具
+
+        Args:
+            bio_state: 包含 bio_state 的字典，如 {'cortisol': 0.8, 'consciousness': 0.3, 'defense': 'freeze'}
+
+        Returns:
+            可用工具名称列表
+        """
+        available = []
+
+        # 1. 意识门控：低意识限制工具
+        consciousness = bio_state.get('consciousness', 0.5)
+        if consciousness < 0.3:
+            # 低意识：只允许基本工具
+            for name in self._tools:
+                if name in ['get_time', 'memory_recall', 'memory_store']:
+                    available.append(name)
+            return available
+
+        # 2. 防御行为：冻结时禁用外部工具
+        defense = bio_state.get('defense', '')
+        if defense == 'freeze':
+            # 冻结：只允许最基本工具
+            for name in self._tools:
+                if name in ['get_time', 'memory_recall']:
+                    available.append(name)
+            return available
+
+        # 3. 高压力（皮质醇>0.7）：禁用探索性工具
+        cortisol = bio_state.get('cortisol', 0.3)
+        if cortisol > 0.7:
+            # 高压力：禁用搜索、网络等探索工具
+            for name, tool in self._tools.items():
+                if tool.requires_auth:
+                    # 外部工具需要授权，高压力下禁用
+                    continue
+                if name not in ['get_time', 'memory_recall', 'memory_store']:
+                    available.append(name)
+            return available
+
+        # 4. 中等压力（皮质醇>0.4）：限制部分工具
+        if cortisol > 0.4:
+            # 中等压力：禁用高风险工具
+            for name, tool in self._tools.items():
+                if tool.requires_auth:
+                    continue
+                if name not in ['get_time', 'memory_recall', 'memory_store', 'memory_store']:
+                    available.append(name)
+            return available
+
+        # 5. 低警觉度（警觉度<0.3）：限制工具使用频率
+        alertness = bio_state.get('alertness', 0.5)
+        if alertness < 0.3:
+            # 低警觉：只允许基本工具
+            for name in self._tools:
+                if name in ['get_time', 'memory_recall', 'memory_store']:
+                    available.append(name)
+            return available
+
+        # 6. 正常状态：允许所有工具
+        return list(self._tools.keys())
+
 
 # ====================================================================
 # 默认工具实现

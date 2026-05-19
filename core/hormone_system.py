@@ -98,6 +98,36 @@ class HormoneSystem:
                 priority=2,
                 name="hormones",
             )
+            event_bus.subscribe(
+                "sensory_neuro_update",
+                self._handle_sensory_neuro_update,
+                priority=3,
+                name="hormones_sensory",
+            )
+
+    def _handle_sensory_neuro_update(self, event) -> Dict:
+        """处理感觉-神经递质耦合事件。
+
+        从感觉驱动的神经化学释放更新激素水平。
+        """
+        sensory_neuro = event.data.get('sensory_neurochemical', {})
+
+        # 感觉驱动的肾上腺素 → 激素肾上腺素系统
+        sensory_adrenaline = sensory_neuro.get('sensory_adrenaline', 0.0)
+        if sensory_adrenaline > 0.1:
+            # 触发激素肾上腺素激增
+            current_adrenaline = self.levels.adrenaline
+            # 快上升 (SAM 直接激活)
+            self.levels.adrenaline = min(1.0, current_adrenaline + sensory_adrenaline * 0.2)
+
+        # 感觉驱动的皮质醇 → 激素皮质醇系统
+        sensory_cortisol = sensory_neuro.get('sensory_cortisol', 0.0)
+        if sensory_cortisol > 0.1:
+            # 触发激素皮质醇增加 (HPA 轴激活)
+            current_cortisol = self.levels.cortisol
+            self.levels.cortisol = min(1.0, current_cortisol + sensory_cortisol * 0.15)
+
+        return {}
 
     # ── Event Handler ─────────────────────────────────────
 

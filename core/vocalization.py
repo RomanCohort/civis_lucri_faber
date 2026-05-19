@@ -730,6 +730,112 @@ class VocalCortex(nn.Module):
             nn.Sigmoid(),
         )
 
+    def _compute_bio_driven_prosody(self, bio_state: Dict) -> Dict:
+        """
+        根据生物状态计算韵律参数
+
+        直接将神经系统状态映射为声学韵律参数。
+        这是生物-语言耦合的核心方法。
+
+        Args:
+            bio_state: 生物状态字典
+
+        Returns:
+            韵律参数字典
+        """
+        import numpy as np
+
+        arousal = float(bio_state.get('arousal', bio_state.get('limbic_arousal', 0.5)))
+        fatigue = float(bio_state.get('fatigue', bio_state.get('sleep_fatigue', 0.3)))
+        dopamine = float(bio_state.get('dopamine', bio_state.get('nt_dopamine', 0.5)))
+        norepinephrine = float(bio_state.get('norepinephrine', bio_state.get('nt_norepinephrine', 0.3)))
+        cortisol = float(bio_state.get('cortisol', bio_state.get('cortisol_level', 0.3)))
+        serotonin = float(bio_state.get('serotonin', bio_state.get('nt_serotonin', 0.5)))
+        valence = float(bio_state.get('valence', bio_state.get('limbic_valence', 0.0)))
+        heart_rate = float(bio_state.get('heart_rate', bio_state.get('bsm_heart_rate', 72.0)))
+        respiratory_rate = float(bio_state.get('respiratory_rate', bio_state.get('bsm_respiratory_rate', 12.0)))
+        emotion = bio_state.get('emotion', bio_state.get('limbic_emotion', 'neutral'))
+
+        # ── 语速：唤醒度高快，疲劳时慢 ──
+        speech_rate = 0.7 + arousal * 0.6 - fatigue * 0.4
+        speech_rate = float(np.clip(speech_rate, 0.4, 2.0))
+
+        # ── 基频（Hz）：去甲肾上腺素+唤醒度决定音调 ──
+        pitch_baseline = 120 + arousal * 80 + norepinephrine * 40 - fatigue * 30
+        # 情绪特殊调整
+        if emotion == 'fear':
+            pitch_baseline += 20  # 恐惧时音调升高
+        elif emotion == 'sadness':
+            pitch_baseline -= 15  # 悲伤时音调降低
+        elif emotion == 'anger':
+            pitch_baseline += 30  # 愤怒时音调显著升高
+        elif emotion == 'joy':
+            pitch_baseline += 15
+        pitch_baseline = float(np.clip(pitch_baseline, 80, 280))
+
+        # ── 音高范围（表达性，semitones）──
+        pitch_range = 3 + abs(valence) * 10 + arousal * 7 - fatigue * 5
+        pitch_range = float(np.clip(pitch_range, 0, 25))
+
+        # ── 停顿频率：疲劳/低唤醒时更多停顿 ──
+        pause_frequency = fatigue * 0.4 + (1 - arousal) * 0.3 + serotonin * 0.1
+        pause_frequency = float(np.clip(pause_frequency, 0, 1))
+
+        # ── 停顿时长：低唤醒时更长 ──
+        pause_duration = 0.3 + (1 - arousal) * 0.5 + fatigue * 0.3
+        pause_duration = float(np.clip(pause_duration, 0.1, 2.5))
+
+        # ── 响度 ──
+        volume = 0.4 + arousal * 0.3 + dopamine * 0.2 - fatigue * 0.3
+        if emotion == 'anger':
+            volume = min(1.0, volume + 0.2)  # 愤怒时更响
+        volume = float(np.clip(volume, 0.1, 1.0))
+
+        # ── 嗓音类型 ──
+        if fatigue > 0.7 or arousal < 0.2:
+            voice_register = 'fry'  # 气泡音（极度疲劳）
+        elif (arousal > 0.7 and valence > 0.3) or emotion == 'joy':
+            voice_register = 'breathy'  # 气声（兴奋/开心）
+        elif emotion == 'anger' and arousal > 0.7:
+            voice_register = 'pressed'  # 挤喉音（愤怒激动）
+        else:
+            voice_register = 'modal'  # 正常
+
+        # ── 发音清晰度：皮质醇高/疲劳时降低 ──
+        articulation_clarity = 1.0 - cortisol * 0.3 - fatigue * 0.4 - norepinephrine * 0.2
+        if emotion == 'fear':
+            articulation_clarity *= 0.8  # 恐惧时发音模糊
+        articulation_clarity = float(np.clip(articulation_clarity, 0.3, 1.0))
+
+        # ── 微抖动（紧张时）──
+        jitter = 0.005 + cortisol * 0.02 + arousal * 0.01
+        if emotion == 'fear':
+            jitter += 0.015  # 恐惧时更多抖动
+        jitter = float(np.clip(jitter, 0.0, 0.06))
+
+        # ── 呼吸气声（喘气程度）──
+        breathiness = 0.1
+        if fatigue > 0.6:
+            breathiness += (fatigue - 0.6) * 0.5
+        if respiratory_rate > 16:
+            breathiness += 0.2
+        if voice_register == 'breathy':
+            breathiness = max(breathiness, 0.4)
+        breathiness = float(np.clip(breathiness, 0.0, 0.8))
+
+        return {
+            'speech_rate': speech_rate,
+            'pitch_baseline': pitch_baseline,
+            'pitch_range': pitch_range,
+            'pause_frequency': pause_frequency,
+            'pause_duration': pause_duration,
+            'volume': volume,
+            'voice_register': voice_register,
+            'articulation_clarity': articulation_clarity,
+            'jitter': jitter,
+            'breathiness': breathiness,
+        }
+
         # 语音运动学习（通过听觉反馈的误差修正）
         self.error_learner = nn.Sequential(
             nn.Linear(acoustic_dim * 2, 64),
@@ -760,6 +866,7 @@ class VocalCortex(nn.Module):
         """Event-driven handler for VOCALIZATION_CONTROL events.
 
         从事件中提取音素序列、呼吸、情绪参数，执行发声管线。
+        支持完整的生物状态驱动韵律调制。
         """
         state = event.data
         phoneme_indices = state.get("phoneme_indices")
@@ -770,6 +877,12 @@ class VocalCortex(nn.Module):
         respiratory_phase = state.get("respiratory_phase", 0.5)
         arousal = state.get("arousal", 0.5)
         emotion_vector = state.get("emotion_vector")
+
+        # ── 生物状态驱动的韵律参数 ──
+        # 从事件中提取完整生物状态（如果提供）
+        bio_state = state.get("bio_state", {})
+        quality_filter = state.get("quality_filter", {})
+        vocalization_params = state.get("vocalization", None)
 
         result = self.forward(
             phoneme_indices=phoneme_indices,
@@ -796,9 +909,10 @@ class VocalCortex(nn.Module):
         auditory_feedback: Optional[torch.Tensor] = None,
         arousal: float = 0.5,
         dt: float = 0.01,
+        bio_state: Optional[Dict] = None,
     ) -> Dict:
         """
-        处理发声请求
+        处理发声请求（生物状态驱动版）
 
         优先级：
         1. 直接提供音素序列 → 直接使用
@@ -814,6 +928,9 @@ class VocalCortex(nn.Module):
             auditory_feedback: [B, 64] 听觉反馈
             arousal: 唤醒水平
             dt: 时间步长
+            bio_state: 完整生物状态字典（用于生物驱动韵律）
+                     支持字段：dopamine, serotonin, norepinephrine, cortisol,
+                     fatigue, valence, heart_rate, respiratory_rate, emotion
         """
         B = 1
         if phoneme_indices is not None:
@@ -831,7 +948,13 @@ class VocalCortex(nn.Module):
         if phoneme_indices is None:
             return {'is_speaking': False, 'acoustic_features': None}
 
-        # 情绪调制
+        # ── 生物状态驱动的韵律参数 ──
+        if bio_state is not None:
+            bio_prosody = self._compute_bio_driven_prosody(bio_state)
+        else:
+            bio_prosody = None
+
+        # 情绪调制（基础层）
         tempo_scale, pitch_scale, intensity_scale, roughness = 1.0, 1.0, 1.0, 0.0
         if emotion_vector is not None:
             if emotion_vector.dim() == 1:
@@ -841,6 +964,23 @@ class VocalCortex(nn.Module):
             pitch_scale = mod_params[0, 1].item()
             intensity_scale = mod_params[0, 2].item()
             roughness = mod_params[0, 3].item()
+
+        # ── 生物状态覆盖情绪参数（生物状态优先级更高）──
+        if bio_prosody is not None:
+            # 语速：生物状态决定基础值，情绪调制作为微调
+            bio_tempo = bio_prosody['speech_rate'] / 1.0  # 归一化到 0.4-2.0 范围
+            tempo_scale = tempo_scale * (0.5 + bio_tempo * 0.5)
+
+            # 音高：生物状态决定基频，情绪调制决定范围
+            bio_pitch = bio_prosody['pitch_baseline'] / 180.0  # 归一化
+            pitch_scale = pitch_scale * (0.7 + bio_pitch * 0.3)
+
+            # 强度：生物状态主导
+            intensity_scale = bio_prosody['volume']
+            roughness = bio_prosody['jitter'] * 10
+
+            # 更新唤醒水平
+            arousal = bio_prosody.get('speech_rate', arousal)
 
         # 有效唤醒（情绪调制后的）
         effective_arousal = arousal * intensity_scale
