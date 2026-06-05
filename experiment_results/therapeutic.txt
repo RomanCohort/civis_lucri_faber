@@ -1,0 +1,8 @@
+Experiment: therapeutic
+Return code: 2
+Elapsed: 0.1s
+============================================================
+
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\demo_therapeutic_experiment.py': [Errno 2] No such file or directory

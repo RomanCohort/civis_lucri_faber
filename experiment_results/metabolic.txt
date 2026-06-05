@@ -1,0 +1,8 @@
+Experiment: metabolic
+Return code: 2
+Elapsed: 0.2s
+============================================================
+
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_metabolic_sparsity.py': [Errno 2] No such file or directory

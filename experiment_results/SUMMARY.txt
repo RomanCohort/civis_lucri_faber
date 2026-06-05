@@ -1,0 +1,114 @@
+CLF 计算精神病学实验汇总报告
+运行时间: 2026-05-20 11:25:01
+总耗时: 1.1s
+============================================================
+
+## adhd [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_7_adhd_flicker.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## autism [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_9_autism_spectrum_v2.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## d2 [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_10_d2_occupancy_v2.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## dream [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_8_digital_dreaming_v2.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## drug [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_drug_decision.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## epigenetic [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_epigenetic_consolidation.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## glymphatic [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_6_glymphatic_timing.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## hpa [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_hpa_cognitive_rigidity_v2.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## metabolic [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_metabolic_sparsity.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## overdose [FAILED(rc=1)] (0.2s)
+
+--- STDERR ---
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from core.sertraline_overdose_experiment import run_experiment; run_experiment()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'core'
+
+------------------------------------------------------------
+
+## social [FAILED(rc=2)] (0.1s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_social_decay.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## stockholm [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_stockholm_pressure_v2.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## stress [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_stress_anhedonia_v2.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## therapeutic [FAILED(rc=2)] (0.1s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\demo_therapeutic_experiment.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+
+## thermo [FAILED(rc=2)] (0.2s)
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_thermodynamic_collapse.py': [Errno 2] No such file or directory
+
+------------------------------------------------------------
+

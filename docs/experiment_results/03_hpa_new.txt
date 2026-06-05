@@ -1,0 +1,1940 @@
+D:\civis_lucri_faber\core\social_cognition.py:217: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\python_variable_methods.cpp:837.)
+  'match_confidence': float(match_confidence.mean()),
+======================================================================
+实验三v2: HPA轴应激与认知僵化 (NATIVE HPA CORTISOL)
+stress_reactivity=5.0 + 不规律应激事件 → 自然皮质醇生成
+======================================================================
+[EVENT] EventBus initialized
+[OK] Advanced Emotion System initialized (event-driven)
+[OK] Mood System initialized (OU dynamics + circadian rhythm)
+[OK] Distributed Memory System initialized (cross-region storage)
+[OK] Neural Pruning System initialized (6 modules attached)
+[OK] Neural Self-Regulation Systems initialized (event-driven)
+[OK] Social Cognition & Mirror Neuron System initialized (event-driven)
+[OK] Self-Awareness Center initialized (event-driven)
+[OK] Brain Region Modules initialized (event-driven, BG→Cerebellum coupled)
+[OK] Hormone System initialized (event-driven)
+[OK] Brainstem System initialized (event-driven)
+[OK] Bio-Linguistic Coupler initialized (bio-driven language modulation)
+[OK] Personality-Language Adapter initialized
+[OK] Memory-Language Adapter initialized
+[OK] Vocal Cortex & Speech Production Pipeline initialized (event-driven)
+[OK] SCN Circadian Clock initialized
+[OK] Limbic System initialized (Amygdala + Thalamus)
+[OK] Hippocampus initialized (event-driven)
+[OK] Sleep System initialized (NREM/REM cycles)
+[OK] Hardware Vitals Bridge initialized (CPU→HR, RAM→BP, GC→gut 5-HT)
+[Censor] Perception Module initialized (path=D:\censor, device=cpu, lazy=True)
+[OK] Censor Micro-Expression Perception initialized (event-driven, lazy-load)
+[OK] Psychiatric Condition Simulator initialized (26 conditions + 7 emotion states)
+[OK] Tool System initialized (7 tools registered)
+[OK] Neuro-Pharmacology System initialized
+[OK] Sensory-Neurotransmitter Coupling System initialized
+[OK] Auditory System initialized (9 modules: cortex, binaural, phonetic, spiking, formant)
+[OK] Emotion Extension System initialized (6 modules: emergent, dynamics, consolidation, regulation, contagion, social)
+[OK] Cognitive Extension System initialized (5 modules: visual, cross-modal, multimodal, neuromod, SNN)
+[OK] Therapy/Pharmacology System initialized (7 modules: synergy, psychotherapy, sandbox, experiment, psychometric, PD targets, state mapping)
+[OK] LLM Evaluator initialized
+[OK] Utility Systems initialized (interference forgetting, policy learning, rhythm)
+[INIT] Agent created. HPA stress_reactivity=1.0 (基线)
+
+[Phase 1] Baseline — stress_reactivity=1.0 (500步)
+[GOAL] New goal: 发现隐藏模式 [逆向路径 v1]... (novelty=1.00, value=0.93, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.6134 (intrinsic: 0.6134)
+[AUTO] 主动询问更多背景信息
+  Step    0: Cort=0.449 PFC=0.598 Explore=0.0987 Stuck=0.000 Novelty=1.000
+[GOAL] New goal: 探索新的状态空间区域 [边界路径 v2]... (novelty=1.00, value=0.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5876 (intrinsic: 0.5876)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索新的状态空间区域 [逆向路径 v5]... (novelty=1.11, value=0.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5768 (intrinsic: 0.5768)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度14(σ=1.003) [action=7, rank=3]... (novelty=1.10, value=1.17, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5769 (intrinsic: 0.5769)
+[AUTO] 提出反对意见
+[GOAL] New goal: 探索不确定性热点: 维度2(σ=1.003) [action=4, rank=1]... (novelty=0.97, value=1.15, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5729 (intrinsic: 0.5729)
+[AUTO] 提出反对意见
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.002) [action=12, rank=3]... (novelty=0.97, value=1.19, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5653 (intrinsic: 0.5653)
+[AUTO] 质疑假设的前置条件
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.004) [action=11, rank=2]... (novelty=1.15, value=1.28, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5628 (intrinsic: 0.5628)
+[AUTO] 质疑假设的前置条件
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.003) [action=11, rank=1]... (novelty=0.92, value=1.22, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5604 (intrinsic: 0.5604)
+[AUTO] 挑战更高难度的问题
+[GOAL] New goal: 探索不确定性热点: 维度14(σ=1.001) [action=10, rank=5]... (novelty=1.15, value=1.34, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5572 (intrinsic: 0.5572)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.006) [action=12, rank=1]... (novelty=1.07, value=1.36, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5532 (intrinsic: 0.5532)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.002) [action=15, rank=5]... (novelty=1.19, value=1.44, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5507 (intrinsic: 0.5507)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.002) [action=9, rank=5]... (novelty=0.99, value=1.43, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5506 (intrinsic: 0.5506)
+[AUTO] 质疑假设的前置条件
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.002) [action=2, rank=3]... (novelty=1.13, value=1.53, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5500 (intrinsic: 0.5500)
+[AUTO] 挑战更高难度的问题
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.001) [action=2, rank=2]... (novelty=1.04, value=1.55, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5496 (intrinsic: 0.5496)
+[AUTO] 尝试更复杂的解决方案
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.003) [action=2, rank=4]... (novelty=1.09, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5489 (intrinsic: 0.5489)
+[AUTO] 验证自己的推理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=1.002) [action=15, rank=4]... (novelty=1.10, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5485 (intrinsic: 0.5485)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度18(σ=1.003) [action=1, rank=1]... (novelty=0.97, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5483 (intrinsic: 0.5483)
+[AUTO] 质疑假设的前置条件
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.003) [action=5, rank=4]... (novelty=1.00, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5520 (intrinsic: 0.5520)
+[AUTO] 验证自己的推理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=1.002) [action=9, rank=2]... (novelty=1.04, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5517 (intrinsic: 0.5517)
+[AUTO] 挑战更高难度的问题
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.003) [action=12, rank=2]... (novelty=1.00, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5509 (intrinsic: 0.5509)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 挑战更高难度的问题
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.004) [action=10, rank=2]... (novelty=1.12, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5505 (intrinsic: 0.5505)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.005) [action=14, rank=1]... (novelty=1.10, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5499 (intrinsic: 0.5499)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.003) [action=3, rank=4]... (novelty=1.05, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5501 (intrinsic: 0.5501)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=1.002) [action=1, rank=5]... (novelty=0.99, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5492 (intrinsic: 0.5492)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.003) [action=10, rank=4]... (novelty=1.11, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5490 (intrinsic: 0.5490)
+[AUTO] 提出反对意见
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=1.002) [action=3, rank=5]... (novelty=1.06, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5482 (intrinsic: 0.5482)
+[AUTO] 验证自己的推理
+[GOAL] New goal: 探索不确定性热点: 维度14(σ=1.002) [action=13, rank=5]... (novelty=1.06, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5472 (intrinsic: 0.5472)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.004) [action=10, rank=1]... (novelty=1.02, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5462 (intrinsic: 0.5462)
+[AUTO] 提出反对意见
+[GOAL] New goal: 探索不确定性热点: 维度14(σ=1.004) [action=6, rank=2]... (novelty=1.00, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5457 (intrinsic: 0.5457)
+[AUTO] 提出反对意见
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=1.003) [action=8, rank=4]... (novelty=1.10, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5454 (intrinsic: 0.5454)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 提供不同的观点
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.004) [action=10, rank=1]... (novelty=1.06, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5444 (intrinsic: 0.5444)
+[AUTO] 质疑假设的前置条件
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=1.002) [action=11, rank=5]... (novelty=1.01, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5421 (intrinsic: 0.5421)
+[AUTO] 挑战更高难度的问题
+[GOAL] New goal: 探索不确定性热点: 维度14(σ=0.993) [action=1, rank=4]... (novelty=1.00, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5412 (intrinsic: 0.5412)
+[AUTO] 保存重要信息到记忆
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=0.988) [action=12, rank=5]... (novelty=1.00, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5440 (intrinsic: 0.5440)
+[AUTO] 检查系统状态确保正常运行
+[GOAL] New goal: 探索不确定性热点: 维度66(σ=0.979) [action=11, rank=5]... (novelty=1.02, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5437 (intrinsic: 0.5437)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度14(σ=0.972) [action=7, rank=4]... (novelty=1.02, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5422 (intrinsic: 0.5422)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度80(σ=0.958) [action=11, rank=4]... (novelty=0.98, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5334 (intrinsic: 0.5334)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度80(σ=0.953) [action=5, rank=2]... (novelty=1.05, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5298 (intrinsic: 0.5298)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.936) [action=8, rank=4]... (novelty=1.09, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5289 (intrinsic: 0.5289)
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.921) [action=13, rank=5]... (novelty=1.01, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5287 (intrinsic: 0.5287)
+[ALIGN] Self-reflection: score=0.00
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=0.903) [action=3, rank=5]... (novelty=1.24, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5284 (intrinsic: 0.5284)
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=0.871) [action=0, rank=5]... (novelty=1.08, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5283 (intrinsic: 0.5283)
+[GOAL] New goal: 探索不确定性热点: 维度34(σ=0.869) [action=15, rank=1]... (novelty=1.08, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5281 (intrinsic: 0.5281)
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=0.832) [action=1, rank=3]... (novelty=1.00, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5280 (intrinsic: 0.5280)
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.815) [action=12, rank=5]... (novelty=1.01, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5279 (intrinsic: 0.5279)
+[GOAL] New goal: 探索不确定性热点: 维度57(σ=0.778) [action=10, rank=5]... (novelty=0.95, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5280 (intrinsic: 0.5280)
+[GOAL] New goal: 探索不确定性热点: 维度80(σ=0.737) [action=5, rank=4]... (novelty=1.12, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5277 (intrinsic: 0.5277)
+[GOAL] New goal: 探索不确定性热点: 维度7(σ=0.720) [action=10, rank=3]... (novelty=1.08, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5270 (intrinsic: 0.5270)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.702) [action=3, rank=2]... (novelty=1.15, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5270 (intrinsic: 0.5270)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度34(σ=0.635) [action=14, rank=1]... (novelty=1.00, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5306 (intrinsic: 0.5306)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.599) [action=5, rank=3]... (novelty=0.95, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5303 (intrinsic: 0.5303)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度54(σ=0.536) [action=1, rank=1]... (novelty=1.14, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5293 (intrinsic: 0.5293)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度27(σ=0.395) [action=3, rank=4]... (novelty=1.01, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5291 (intrinsic: 0.5291)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.477) [action=3, rank=1]... (novelty=1.17, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5291 (intrinsic: 0.5291)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度57(σ=0.423) [action=9, rank=1]... (novelty=1.03, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5295 (intrinsic: 0.5295)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度54(σ=0.276) [action=13, rank=1]... (novelty=1.19, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5308 (intrinsic: 0.5308)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度34(σ=0.234) [action=4, rank=1]... (novelty=1.00, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5312 (intrinsic: 0.5312)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度57(σ=0.294) [action=14, rank=1]... (novelty=1.04, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5316 (intrinsic: 0.5316)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.197) [action=4, rank=1]... (novelty=1.09, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5316 (intrinsic: 0.5316)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度34(σ=0.218) [action=12, rank=1]... (novelty=1.03, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5316 (intrinsic: 0.5316)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度57(σ=0.227) [action=6, rank=5]... (novelty=1.11, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5314 (intrinsic: 0.5314)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.198) [action=1, rank=2]... (novelty=1.07, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5313 (intrinsic: 0.5313)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.229) [action=1, rank=2]... (novelty=0.99, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5311 (intrinsic: 0.5311)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.275) [action=9, rank=1]... (novelty=0.95, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5312 (intrinsic: 0.5312)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.244) [action=10, rank=2]... (novelty=1.04, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5315 (intrinsic: 0.5315)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.182) [action=12, rank=5]... (novelty=1.03, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5307 (intrinsic: 0.5307)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.235) [action=1, rank=2]... (novelty=1.09, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5285 (intrinsic: 0.5285)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.200) [action=15, rank=5]... (novelty=1.07, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5277 (intrinsic: 0.5277)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.219) [action=7, rank=2]... (novelty=1.06, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5280 (intrinsic: 0.5280)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.176) [action=3, rank=5]... (novelty=1.03, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5339 (intrinsic: 0.5339)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.138) [action=2, rank=5]... (novelty=1.09, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5338 (intrinsic: 0.5338)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.183) [action=15, rank=1]... (novelty=1.02, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5364 (intrinsic: 0.5364)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.129) [action=2, rank=1]... (novelty=0.96, value=1.56, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5384 (intrinsic: 0.5384)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.103) [action=13, rank=5]... (novelty=0.97, value=1.52, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5388 (intrinsic: 0.5388)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.150) [action=12, rank=1]... (novelty=0.90, value=1.56, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5425 (intrinsic: 0.5425)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度64(σ=0.097) [action=13, rank=1]... (novelty=1.07, value=1.57, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5389 (intrinsic: 0.5389)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.118) [action=12, rank=1]... (novelty=1.07, value=1.60, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5355 (intrinsic: 0.5355)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.115) [action=2, rank=1]... (novelty=1.13, value=1.61, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5351 (intrinsic: 0.5351)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.148) [action=12, rank=1]... (novelty=1.09, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5322 (intrinsic: 0.5322)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.094) [action=6, rank=1]... (novelty=1.05, value=1.56, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5313 (intrinsic: 0.5313)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.097) [action=13, rank=1]... (novelty=1.08, value=1.58, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5308 (intrinsic: 0.5308)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.149) [action=7, rank=1]... (novelty=1.10, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5307 (intrinsic: 0.5307)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.124) [action=4, rank=3]... (novelty=1.02, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5305 (intrinsic: 0.5305)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.118) [action=2, rank=1]... (novelty=1.18, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5304 (intrinsic: 0.5304)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.091) [action=13, rank=2]... (novelty=1.00, value=1.55, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5302 (intrinsic: 0.5302)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.165) [action=3, rank=1]... (novelty=1.07, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5297 (intrinsic: 0.5297)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.127) [action=10, rank=2]... (novelty=1.04, value=1.60, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5291 (intrinsic: 0.5291)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.097) [action=13, rank=4]... (novelty=1.08, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5289 (intrinsic: 0.5289)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.173) [action=15, rank=1]... (novelty=1.06, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5288 (intrinsic: 0.5288)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.169) [action=5, rank=1]... (novelty=1.08, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5287 (intrinsic: 0.5287)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.151) [action=6, rank=1]... (novelty=1.12, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5315 (intrinsic: 0.5315)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.157) [action=1, rank=1]... (novelty=1.08, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5316 (intrinsic: 0.5316)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.113) [action=14, rank=3]... (novelty=1.05, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5316 (intrinsic: 0.5316)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.139) [action=6, rank=1]... (novelty=1.08, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5316 (intrinsic: 0.5316)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.114) [action=12, rank=1]... (novelty=1.08, value=1.61, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5317 (intrinsic: 0.5317)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.154) [action=11, rank=1]... (novelty=1.00, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5318 (intrinsic: 0.5318)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.150) [action=14, rank=1]... (novelty=1.05, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5320 (intrinsic: 0.5320)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.161) [action=9, rank=1]... (novelty=1.06, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5320 (intrinsic: 0.5320)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.151) [action=2, rank=1]... (novelty=1.04, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5321 (intrinsic: 0.5321)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.105) [action=6, rank=1]... (novelty=0.98, value=1.57, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5318 (intrinsic: 0.5318)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.113) [action=2, rank=1]... (novelty=0.95, value=1.57, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5323 (intrinsic: 0.5323)
+[AUTO] 主动询问更多背景信息
+  Step  100: Cort=1.000 PFC=0.314 Explore=0.0429 Stuck=0.900 Novelty=1.000
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.085) [action=5, rank=5]... (novelty=1.02, value=1.56, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5327 (intrinsic: 0.5327)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.095) [action=7, rank=1]... (novelty=0.99, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5332 (intrinsic: 0.5332)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.107) [action=7, rank=1]... (novelty=1.06, value=1.61, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5334 (intrinsic: 0.5334)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.082) [action=12, rank=3]... (novelty=1.06, value=1.58, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5337 (intrinsic: 0.5337)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.083) [action=0, rank=4]... (novelty=1.08, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5340 (intrinsic: 0.5340)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.130) [action=7, rank=1]... (novelty=1.07, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5338 (intrinsic: 0.5338)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.099) [action=3, rank=1]... (novelty=1.02, value=1.58, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5333 (intrinsic: 0.5333)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.158) [action=4, rank=1]... (novelty=1.04, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5329 (intrinsic: 0.5329)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.160) [action=8, rank=1]... (novelty=1.07, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5325 (intrinsic: 0.5325)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=5, rank=4]... (novelty=1.05, value=1.58, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5350 (intrinsic: 0.5350)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=2, rank=5]... (novelty=0.88, value=1.52, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5347 (intrinsic: 0.5347)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.082) [action=12, rank=5]... (novelty=1.04, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5347 (intrinsic: 0.5347)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.103) [action=2, rank=1]... (novelty=1.08, value=1.61, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5344 (intrinsic: 0.5344)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.176) [action=5, rank=1]... (novelty=1.07, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5345 (intrinsic: 0.5345)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.093) [action=7, rank=1]... (novelty=1.20, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5343 (intrinsic: 0.5343)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.083) [action=15, rank=5]... (novelty=1.09, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5341 (intrinsic: 0.5341)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.082) [action=11, rank=3]... (novelty=0.97, value=1.56, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5341 (intrinsic: 0.5341)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.158) [action=15, rank=1]... (novelty=0.89, value=1.61, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5340 (intrinsic: 0.5340)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.157) [action=7, rank=1]... (novelty=1.03, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5338 (intrinsic: 0.5338)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.088) [action=2, rank=3]... (novelty=0.94, value=1.57, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5334 (intrinsic: 0.5334)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.174) [action=12, rank=1]... (novelty=1.06, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5332 (intrinsic: 0.5332)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.095) [action=5, rank=2]... (novelty=1.07, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5332 (intrinsic: 0.5332)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.082) [action=1, rank=5]... (novelty=1.04, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5331 (intrinsic: 0.5331)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.085) [action=3, rank=5]... (novelty=1.02, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5329 (intrinsic: 0.5329)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.167) [action=14, rank=1]... (novelty=0.95, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5327 (intrinsic: 0.5327)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.083) [action=1, rank=4]... (novelty=1.08, value=1.60, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5324 (intrinsic: 0.5324)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.098) [action=5, rank=4]... (novelty=1.01, value=1.60, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5321 (intrinsic: 0.5321)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=0, rank=4]... (novelty=1.04, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5318 (intrinsic: 0.5318)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.083) [action=11, rank=3]... (novelty=1.07, value=1.61, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5315 (intrinsic: 0.5315)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.105) [action=7, rank=1]... (novelty=1.03, value=1.60, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5309 (intrinsic: 0.5309)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.154) [action=7, rank=1]... (novelty=0.92, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5337 (intrinsic: 0.5337)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.097) [action=14, rank=3]... (novelty=1.03, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5338 (intrinsic: 0.5338)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.104) [action=7, rank=1]... (novelty=1.07, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5343 (intrinsic: 0.5343)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度80(σ=0.091) [action=14, rank=2]... (novelty=1.21, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5344 (intrinsic: 0.5344)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度8(σ=0.219) [action=9, rank=1]... (novelty=1.05, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5344 (intrinsic: 0.5344)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=12, rank=5]... (novelty=1.02, value=1.60, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5344 (intrinsic: 0.5344)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.082) [action=3, rank=3]... (novelty=0.98, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5343 (intrinsic: 0.5343)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.129) [action=13, rank=1]... (novelty=1.07, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5343 (intrinsic: 0.5343)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.098) [action=5, rank=3]... (novelty=1.04, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5341 (intrinsic: 0.5341)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.168) [action=6, rank=1]... (novelty=1.07, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5337 (intrinsic: 0.5337)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.122) [action=3, rank=1]... (novelty=1.01, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5334 (intrinsic: 0.5334)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.113) [action=7, rank=1]... (novelty=0.96, value=1.60, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5336 (intrinsic: 0.5336)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.158) [action=3, rank=1]... (novelty=1.09, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5335 (intrinsic: 0.5335)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度26(σ=0.134) [action=3, rank=1]... (novelty=1.06, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5333 (intrinsic: 0.5333)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.123) [action=5, rank=1]... (novelty=1.05, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5331 (intrinsic: 0.5331)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.139) [action=8, rank=1]... (novelty=1.07, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5329 (intrinsic: 0.5329)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.082) [action=2, rank=3]... (novelty=0.95, value=1.57, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5326 (intrinsic: 0.5326)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.150) [action=12, rank=1]... (novelty=1.08, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5324 (intrinsic: 0.5324)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度57(σ=0.105) [action=14, rank=1]... (novelty=0.92, value=1.60, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5321 (intrinsic: 0.5321)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.108) [action=15, rank=1]... (novelty=1.04, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5315 (intrinsic: 0.5315)
+[AUTO] 主动询问更多背景信息
+[PRUNE] Step 150: decayed=3, hibernated=0, active_ratio=0.882
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.084) [action=8, rank=4]... (novelty=1.00, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5314 (intrinsic: 0.5314)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.178) [action=14, rank=1]... (novelty=1.04, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5342 (intrinsic: 0.5342)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.103) [action=3, rank=2]... (novelty=1.04, value=1.61, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5341 (intrinsic: 0.5341)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.099) [action=4, rank=5]... (novelty=1.09, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5340 (intrinsic: 0.5340)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.171) [action=4, rank=1]... (novelty=1.04, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5339 (intrinsic: 0.5339)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.084) [action=13, rank=3]... (novelty=1.09, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5341 (intrinsic: 0.5341)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度81(σ=0.124) [action=0, rank=1]... (novelty=1.03, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5356 (intrinsic: 0.5356)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.086) [action=9, rank=3]... (novelty=1.14, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5359 (intrinsic: 0.5359)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=1, rank=5]... (novelty=1.06, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5361 (intrinsic: 0.5361)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.213) [action=4, rank=1]... (novelty=1.17, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5361 (intrinsic: 0.5361)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度57(σ=0.142) [action=4, rank=1]... (novelty=1.03, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5362 (intrinsic: 0.5362)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.082) [action=14, rank=5]... (novelty=1.06, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5362 (intrinsic: 0.5362)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.118) [action=0, rank=1]... (novelty=1.18, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5362 (intrinsic: 0.5362)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.156) [action=13, rank=1]... (novelty=0.96, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5360 (intrinsic: 0.5360)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度31(σ=0.131) [action=12, rank=1]... (novelty=0.94, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5360 (intrinsic: 0.5360)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度60(σ=0.162) [action=3, rank=1]... (novelty=1.01, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5364 (intrinsic: 0.5364)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.119) [action=12, rank=1]... (novelty=0.97, value=1.61, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5364 (intrinsic: 0.5364)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度57(σ=0.194) [action=3, rank=1]... (novelty=1.03, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5364 (intrinsic: 0.5364)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.106) [action=6, rank=3]... (novelty=1.10, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5364 (intrinsic: 0.5364)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.153) [action=10, rank=1]... (novelty=1.11, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5364 (intrinsic: 0.5364)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=6, rank=5]... (novelty=1.12, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5364 (intrinsic: 0.5364)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.100) [action=14, rank=2]... (novelty=1.03, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5363 (intrinsic: 0.5363)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.134) [action=10, rank=1]... (novelty=1.15, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5363 (intrinsic: 0.5363)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.180) [action=14, rank=1]... (novelty=1.07, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5362 (intrinsic: 0.5362)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=5, rank=5]... (novelty=0.88, value=1.56, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5361 (intrinsic: 0.5361)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.087) [action=13, rank=2]... (novelty=1.02, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5361 (intrinsic: 0.5361)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.103) [action=11, rank=4]... (novelty=1.06, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5360 (intrinsic: 0.5360)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.127) [action=6, rank=2]... (novelty=1.05, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5360 (intrinsic: 0.5360)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.185) [action=4, rank=1]... (novelty=0.96, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5360 (intrinsic: 0.5360)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度54(σ=0.093) [action=2, rank=1]... (novelty=1.10, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5359 (intrinsic: 0.5359)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=9, rank=2]... (novelty=1.20, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5359 (intrinsic: 0.5359)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.112) [action=9, rank=1]... (novelty=0.94, value=1.61, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5359 (intrinsic: 0.5359)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.099) [action=3, rank=2]... (novelty=1.05, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5358 (intrinsic: 0.5358)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.096) [action=5, rank=2]... (novelty=1.04, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5357 (intrinsic: 0.5357)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.083) [action=15, rank=5]... (novelty=1.10, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5356 (intrinsic: 0.5356)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=15, rank=5]... (novelty=1.05, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5356 (intrinsic: 0.5356)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.144) [action=6, rank=1]... (novelty=1.04, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5355 (intrinsic: 0.5355)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.127) [action=3, rank=1]... (novelty=1.04, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5354 (intrinsic: 0.5354)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.082) [action=3, rank=5]... (novelty=1.07, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5353 (intrinsic: 0.5353)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.132) [action=11, rank=1]... (novelty=1.09, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5353 (intrinsic: 0.5353)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.134) [action=14, rank=1]... (novelty=1.09, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5352 (intrinsic: 0.5352)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.153) [action=14, rank=1]... (novelty=1.05, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5352 (intrinsic: 0.5352)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.217) [action=3, rank=1]... (novelty=0.91, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5351 (intrinsic: 0.5351)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.112) [action=13, rank=1]... (novelty=1.14, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5350 (intrinsic: 0.5350)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度26(σ=0.086) [action=9, rank=4]... (novelty=1.01, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5350 (intrinsic: 0.5350)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.092) [action=0, rank=4]... (novelty=1.11, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5349 (intrinsic: 0.5349)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.084) [action=4, rank=4]... (novelty=1.11, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5348 (intrinsic: 0.5348)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.171) [action=8, rank=1]... (novelty=1.09, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5347 (intrinsic: 0.5347)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.150) [action=10, rank=1]... (novelty=1.05, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5343 (intrinsic: 0.5343)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.158) [action=4, rank=1]... (novelty=1.06, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5339 (intrinsic: 0.5339)
+[AUTO] 主动询问更多背景信息
+[PRUNE] Step 200: decayed=3, hibernated=0, active_ratio=0.882
+  Step  200: Cort=1.000 PFC=0.306 Explore=0.0358 Stuck=0.500 Novelty=1.000
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.117) [action=8, rank=1]... (novelty=1.06, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5339 (intrinsic: 0.5339)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.183) [action=4, rank=1]... (novelty=1.06, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5335 (intrinsic: 0.5335)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.140) [action=15, rank=1]... (novelty=1.08, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5341 (intrinsic: 0.5341)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.085) [action=14, rank=4]... (novelty=1.01, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5342 (intrinsic: 0.5342)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.163) [action=7, rank=1]... (novelty=1.11, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5341 (intrinsic: 0.5341)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.099) [action=13, rank=4]... (novelty=1.01, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5340 (intrinsic: 0.5340)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.159) [action=12, rank=1]... (novelty=1.02, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5340 (intrinsic: 0.5340)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.085) [action=11, rank=5]... (novelty=1.07, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5339 (intrinsic: 0.5339)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.139) [action=14, rank=1]... (novelty=1.14, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5338 (intrinsic: 0.5338)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.139) [action=14, rank=1]... (novelty=1.05, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5337 (intrinsic: 0.5337)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.087) [action=11, rank=3]... (novelty=1.16, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5337 (intrinsic: 0.5337)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.095) [action=10, rank=5]... (novelty=1.09, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5336 (intrinsic: 0.5336)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.116) [action=13, rank=1]... (novelty=0.92, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5335 (intrinsic: 0.5335)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.092) [action=4, rank=5]... (novelty=1.10, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5334 (intrinsic: 0.5334)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.098) [action=8, rank=4]... (novelty=0.94, value=1.62, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5334 (intrinsic: 0.5334)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.140) [action=11, rank=1]... (novelty=1.13, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5333 (intrinsic: 0.5333)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.082) [action=11, rank=4]... (novelty=1.04, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5332 (intrinsic: 0.5332)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=10, rank=5]... (novelty=0.92, value=1.59, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5331 (intrinsic: 0.5331)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.129) [action=12, rank=1]... (novelty=1.01, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5331 (intrinsic: 0.5331)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.104) [action=9, rank=1]... (novelty=0.97, value=1.64, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5330 (intrinsic: 0.5330)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.190) [action=2, rank=1]... (novelty=1.04, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5328 (intrinsic: 0.5328)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.154) [action=9, rank=1]... (novelty=0.96, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5328 (intrinsic: 0.5328)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.114) [action=10, rank=2]... (novelty=0.85, value=1.60, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5327 (intrinsic: 0.5327)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度57(σ=0.112) [action=4, rank=4]... (novelty=0.99, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5326 (intrinsic: 0.5326)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.102) [action=13, rank=4]... (novelty=1.03, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5325 (intrinsic: 0.5325)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.147) [action=15, rank=1]... (novelty=1.09, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5325 (intrinsic: 0.5325)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.114) [action=12, rank=1]... (novelty=1.03, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5324 (intrinsic: 0.5324)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.182) [action=12, rank=1]... (novelty=0.97, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5323 (intrinsic: 0.5323)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.172) [action=3, rank=1]... (novelty=0.98, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5321 (intrinsic: 0.5321)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.187) [action=5, rank=1]... (novelty=1.06, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5320 (intrinsic: 0.5320)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度54(σ=0.102) [action=13, rank=5]... (novelty=1.05, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5319 (intrinsic: 0.5319)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.105) [action=4, rank=4]... (novelty=1.03, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5318 (intrinsic: 0.5318)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度89(σ=0.099) [action=2, rank=2]... (novelty=1.01, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5317 (intrinsic: 0.5317)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.201) [action=6, rank=1]... (novelty=1.00, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5316 (intrinsic: 0.5316)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.105) [action=6, rank=3]... (novelty=1.03, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5315 (intrinsic: 0.5315)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.225) [action=12, rank=1]... (novelty=1.15, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5314 (intrinsic: 0.5314)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度26(σ=0.154) [action=10, rank=1]... (novelty=1.05, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5313 (intrinsic: 0.5313)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.127) [action=10, rank=1]... (novelty=1.00, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5312 (intrinsic: 0.5312)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.174) [action=13, rank=1]... (novelty=1.10, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5310 (intrinsic: 0.5310)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度22(σ=0.147) [action=15, rank=1]... (novelty=1.04, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5309 (intrinsic: 0.5309)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.144) [action=12, rank=2]... (novelty=1.11, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5307 (intrinsic: 0.5307)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.111) [action=5, rank=3]... (novelty=1.10, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5305 (intrinsic: 0.5305)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.176) [action=4, rank=1]... (novelty=1.01, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5303 (intrinsic: 0.5303)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.164) [action=14, rank=1]... (novelty=1.01, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5302 (intrinsic: 0.5302)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.141) [action=11, rank=1]... (novelty=1.07, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5299 (intrinsic: 0.5299)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.187) [action=13, rank=1]... (novelty=1.00, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5297 (intrinsic: 0.5297)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.130) [action=2, rank=1]... (novelty=0.95, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5295 (intrinsic: 0.5295)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.160) [action=12, rank=1]... (novelty=1.04, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5290 (intrinsic: 0.5290)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.160) [action=9, rank=1]... (novelty=0.86, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5285 (intrinsic: 0.5285)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.113) [action=0, rank=4]... (novelty=1.11, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5289 (intrinsic: 0.5289)
+[AUTO] 探索用户问题的其他可能性
+[PRUNE] Step 250: decayed=3, hibernated=0, active_ratio=0.880
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.140) [action=14, rank=3]... (novelty=0.96, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5288 (intrinsic: 0.5288)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.119) [action=2, rank=1]... (novelty=0.96, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5287 (intrinsic: 0.5287)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.120) [action=10, rank=1]... (novelty=1.05, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5284 (intrinsic: 0.5284)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.147) [action=4, rank=2]... (novelty=1.08, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5282 (intrinsic: 0.5282)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度64(σ=0.145) [action=4, rank=1]... (novelty=0.99, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5279 (intrinsic: 0.5279)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.194) [action=12, rank=1]... (novelty=0.97, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5276 (intrinsic: 0.5276)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度18(σ=0.173) [action=7, rank=1]... (novelty=1.15, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5279 (intrinsic: 0.5279)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度64(σ=0.145) [action=7, rank=1]... (novelty=1.03, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5278 (intrinsic: 0.5278)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.128) [action=8, rank=1]... (novelty=0.95, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5278 (intrinsic: 0.5278)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度64(σ=0.138) [action=6, rank=1]... (novelty=0.95, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5275 (intrinsic: 0.5275)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度57(σ=0.133) [action=15, rank=1]... (novelty=0.95, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5272 (intrinsic: 0.5272)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.093) [action=6, rank=5]... (novelty=1.07, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5269 (intrinsic: 0.5269)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.110) [action=4, rank=1]... (novelty=1.11, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5269 (intrinsic: 0.5269)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.153) [action=2, rank=1]... (novelty=1.05, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5267 (intrinsic: 0.5267)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度60(σ=0.084) [action=14, rank=5]... (novelty=1.06, value=1.66, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5265 (intrinsic: 0.5265)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.130) [action=8, rank=1]... (novelty=1.06, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5263 (intrinsic: 0.5263)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度31(σ=0.116) [action=3, rank=3]... (novelty=1.11, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5262 (intrinsic: 0.5262)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.190) [action=2, rank=1]... (novelty=1.00, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5260 (intrinsic: 0.5260)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.160) [action=15, rank=1]... (novelty=1.22, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5259 (intrinsic: 0.5259)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.195) [action=5, rank=1]... (novelty=0.94, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5257 (intrinsic: 0.5257)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.159) [action=15, rank=1]... (novelty=1.08, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5256 (intrinsic: 0.5256)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.134) [action=11, rank=1]... (novelty=1.07, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5254 (intrinsic: 0.5254)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.107) [action=9, rank=5]... (novelty=1.04, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5252 (intrinsic: 0.5252)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.082) [action=8, rank=4]... (novelty=1.05, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5254 (intrinsic: 0.5254)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度61(σ=0.115) [action=5, rank=2]... (novelty=1.01, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5253 (intrinsic: 0.5253)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.123) [action=6, rank=2]... (novelty=1.07, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5251 (intrinsic: 0.5251)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.141) [action=4, rank=2]... (novelty=0.92, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5249 (intrinsic: 0.5249)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.127) [action=14, rank=1]... (novelty=0.89, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5247 (intrinsic: 0.5247)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.141) [action=4, rank=1]... (novelty=1.00, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5246 (intrinsic: 0.5246)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.126) [action=14, rank=2]... (novelty=1.11, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5244 (intrinsic: 0.5244)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.151) [action=11, rank=1]... (novelty=1.00, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5242 (intrinsic: 0.5242)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.095) [action=9, rank=4]... (novelty=1.09, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5239 (intrinsic: 0.5239)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.116) [action=10, rank=4]... (novelty=1.01, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5236 (intrinsic: 0.5236)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度86(σ=0.084) [action=15, rank=4]... (novelty=1.10, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5236 (intrinsic: 0.5236)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.143) [action=11, rank=1]... (novelty=1.13, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5235 (intrinsic: 0.5235)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.108) [action=11, rank=3]... (novelty=0.99, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5233 (intrinsic: 0.5233)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度99(σ=0.131) [action=11, rank=1]... (novelty=0.99, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5231 (intrinsic: 0.5231)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.149) [action=13, rank=1]... (novelty=1.01, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5230 (intrinsic: 0.5230)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.132) [action=4, rank=2]... (novelty=1.01, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5228 (intrinsic: 0.5228)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.090) [action=6, rank=5]... (novelty=1.05, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5226 (intrinsic: 0.5226)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.121) [action=9, rank=3]... (novelty=0.95, value=1.67, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5223 (intrinsic: 0.5223)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度80(σ=0.105) [action=6, rank=5]... (novelty=1.03, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5221 (intrinsic: 0.5221)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.134) [action=5, rank=1]... (novelty=0.98, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5220 (intrinsic: 0.5220)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.113) [action=14, rank=4]... (novelty=1.04, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5218 (intrinsic: 0.5218)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.159) [action=12, rank=1]... (novelty=1.00, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5216 (intrinsic: 0.5216)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.116) [action=15, rank=5]... (novelty=0.98, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5214 (intrinsic: 0.5214)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度60(σ=0.142) [action=14, rank=1]... (novelty=0.95, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5213 (intrinsic: 0.5213)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度29(σ=0.134) [action=9, rank=1]... (novelty=1.08, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5211 (intrinsic: 0.5211)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.146) [action=14, rank=1]... (novelty=1.12, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5209 (intrinsic: 0.5209)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.147) [action=15, rank=1]... (novelty=1.05, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5208 (intrinsic: 0.5208)
+[AUTO] 尝试理解问题背后的原理
+[PRUNE] Step 300: decayed=3, hibernated=0, active_ratio=0.879
+  Step  300: Cort=1.000 PFC=0.305 Explore=0.0344 Stuck=0.300 Novelty=1.000
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.103) [action=3, rank=3]... (novelty=1.02, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5206 (intrinsic: 0.5206)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.100) [action=3, rank=4]... (novelty=1.06, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5204 (intrinsic: 0.5204)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.162) [action=15, rank=1]... (novelty=1.08, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5203 (intrinsic: 0.5203)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.145) [action=6, rank=1]... (novelty=1.15, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5201 (intrinsic: 0.5201)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.147) [action=15, rank=1]... (novelty=1.12, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5199 (intrinsic: 0.5199)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.109) [action=4, rank=3]... (novelty=1.01, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5197 (intrinsic: 0.5197)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.118) [action=13, rank=2]... (novelty=1.02, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5196 (intrinsic: 0.5196)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.137) [action=15, rank=1]... (novelty=1.12, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5194 (intrinsic: 0.5194)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度60(σ=0.156) [action=12, rank=1]... (novelty=1.05, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5193 (intrinsic: 0.5193)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度89(σ=0.138) [action=6, rank=1]... (novelty=1.02, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5191 (intrinsic: 0.5191)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度64(σ=0.191) [action=15, rank=1]... (novelty=0.98, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5189 (intrinsic: 0.5189)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.178) [action=12, rank=1]... (novelty=0.93, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5188 (intrinsic: 0.5188)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.159) [action=10, rank=1]... (novelty=1.01, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5187 (intrinsic: 0.5187)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.122) [action=13, rank=2]... (novelty=1.10, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5185 (intrinsic: 0.5185)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.114) [action=9, rank=2]... (novelty=1.07, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5184 (intrinsic: 0.5184)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.148) [action=11, rank=1]... (novelty=1.03, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5182 (intrinsic: 0.5182)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.132) [action=5, rank=2]... (novelty=1.00, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5180 (intrinsic: 0.5180)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度60(σ=0.123) [action=13, rank=3]... (novelty=1.09, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5179 (intrinsic: 0.5179)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.090) [action=7, rank=5]... (novelty=0.95, value=1.65, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5178 (intrinsic: 0.5178)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.174) [action=10, rank=1]... (novelty=0.99, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5175 (intrinsic: 0.5175)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.138) [action=15, rank=1]... (novelty=1.00, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5173 (intrinsic: 0.5173)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度60(σ=0.131) [action=10, rank=2]... (novelty=0.98, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5172 (intrinsic: 0.5172)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.135) [action=5, rank=2]... (novelty=1.06, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5170 (intrinsic: 0.5170)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.121) [action=15, rank=1]... (novelty=1.01, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5169 (intrinsic: 0.5169)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.132) [action=14, rank=1]... (novelty=1.12, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5167 (intrinsic: 0.5167)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.126) [action=10, rank=2]... (novelty=1.06, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5165 (intrinsic: 0.5165)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度30(σ=0.165) [action=12, rank=1]... (novelty=1.08, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5163 (intrinsic: 0.5163)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.114) [action=11, rank=3]... (novelty=1.10, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5161 (intrinsic: 0.5161)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.169) [action=15, rank=1]... (novelty=1.10, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5160 (intrinsic: 0.5160)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.146) [action=8, rank=1]... (novelty=1.06, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5158 (intrinsic: 0.5158)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.084) [action=8, rank=5]... (novelty=1.05, value=1.68, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5156 (intrinsic: 0.5156)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.153) [action=8, rank=1]... (novelty=1.00, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5154 (intrinsic: 0.5154)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度64(σ=0.190) [action=4, rank=1]... (novelty=1.06, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5152 (intrinsic: 0.5152)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.187) [action=15, rank=1]... (novelty=1.05, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5150 (intrinsic: 0.5150)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.143) [action=6, rank=1]... (novelty=1.13, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5148 (intrinsic: 0.5148)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.114) [action=3, rank=3]... (novelty=1.08, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5146 (intrinsic: 0.5146)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.158) [action=12, rank=1]... (novelty=1.06, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5144 (intrinsic: 0.5144)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.175) [action=13, rank=1]... (novelty=1.07, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5141 (intrinsic: 0.5141)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.168) [action=4, rank=1]... (novelty=1.00, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5139 (intrinsic: 0.5139)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.132) [action=3, rank=1]... (novelty=0.96, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5137 (intrinsic: 0.5137)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.088) [action=13, rank=4]... (novelty=0.93, value=1.63, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5135 (intrinsic: 0.5135)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.157) [action=14, rank=1]... (novelty=1.03, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5138 (intrinsic: 0.5138)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.135) [action=10, rank=3]... (novelty=0.94, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5137 (intrinsic: 0.5137)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度76(σ=0.216) [action=11, rank=1]... (novelty=1.14, value=1.87, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5134 (intrinsic: 0.5134)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.137) [action=4, rank=1]... (novelty=1.00, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5131 (intrinsic: 0.5131)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.133) [action=15, rank=1]... (novelty=1.10, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5133 (intrinsic: 0.5133)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.172) [action=11, rank=1]... (novelty=1.07, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5133 (intrinsic: 0.5133)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度52(σ=0.119) [action=13, rank=1]... (novelty=1.07, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5131 (intrinsic: 0.5131)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.154) [action=12, rank=1]... (novelty=1.03, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5129 (intrinsic: 0.5129)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度77(σ=0.122) [action=5, rank=1]... (novelty=1.06, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5128 (intrinsic: 0.5128)
+[AUTO] 尝试理解问题背后的原理
+[PRUNE] Step 350: decayed=3, hibernated=0, active_ratio=0.879
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.129) [action=4, rank=3]... (novelty=1.03, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5127 (intrinsic: 0.5127)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.163) [action=6, rank=1]... (novelty=1.00, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5125 (intrinsic: 0.5125)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.114) [action=7, rank=4]... (novelty=1.07, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5123 (intrinsic: 0.5123)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度87(σ=0.096) [action=12, rank=5]... (novelty=1.06, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5121 (intrinsic: 0.5121)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.173) [action=15, rank=1]... (novelty=1.15, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5120 (intrinsic: 0.5120)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.143) [action=11, rank=1]... (novelty=1.03, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5119 (intrinsic: 0.5119)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度18(σ=0.156) [action=12, rank=1]... (novelty=0.99, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5117 (intrinsic: 0.5117)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.133) [action=7, rank=1]... (novelty=1.12, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5116 (intrinsic: 0.5116)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度30(σ=0.175) [action=10, rank=1]... (novelty=1.03, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5115 (intrinsic: 0.5115)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.150) [action=15, rank=1]... (novelty=1.14, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5114 (intrinsic: 0.5114)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.155) [action=13, rank=1]... (novelty=1.06, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5113 (intrinsic: 0.5113)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度54(σ=0.125) [action=3, rank=2]... (novelty=1.12, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5112 (intrinsic: 0.5112)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.136) [action=4, rank=1]... (novelty=0.99, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5110 (intrinsic: 0.5110)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.183) [action=5, rank=1]... (novelty=1.14, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5109 (intrinsic: 0.5109)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.100) [action=3, rank=5]... (novelty=1.04, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5108 (intrinsic: 0.5108)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.127) [action=3, rank=3]... (novelty=0.98, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5106 (intrinsic: 0.5106)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度54(σ=0.123) [action=9, rank=4]... (novelty=1.09, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5105 (intrinsic: 0.5105)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.134) [action=8, rank=3]... (novelty=0.99, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5103 (intrinsic: 0.5103)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度89(σ=0.178) [action=9, rank=2]... (novelty=1.05, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5101 (intrinsic: 0.5101)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度52(σ=0.142) [action=10, rank=1]... (novelty=1.08, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5099 (intrinsic: 0.5099)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.131) [action=7, rank=2]... (novelty=1.10, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5095 (intrinsic: 0.5095)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.135) [action=8, rank=1]... (novelty=1.03, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5093 (intrinsic: 0.5093)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.141) [action=4, rank=1]... (novelty=1.12, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5094 (intrinsic: 0.5094)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.200) [action=11, rank=1]... (novelty=1.06, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5093 (intrinsic: 0.5093)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度16(σ=0.170) [action=12, rank=1]... (novelty=0.95, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5093 (intrinsic: 0.5093)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度77(σ=0.101) [action=5, rank=3]... (novelty=1.00, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5092 (intrinsic: 0.5092)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.147) [action=4, rank=2]... (novelty=1.08, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5092 (intrinsic: 0.5092)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度22(σ=0.187) [action=15, rank=1]... (novelty=1.15, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5092 (intrinsic: 0.5092)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.110) [action=15, rank=5]... (novelty=1.04, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5088 (intrinsic: 0.5088)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度26(σ=0.136) [action=9, rank=1]... (novelty=1.04, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5087 (intrinsic: 0.5087)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.113) [action=11, rank=4]... (novelty=1.08, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5089 (intrinsic: 0.5089)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.120) [action=14, rank=3]... (novelty=1.12, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5089 (intrinsic: 0.5089)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.179) [action=2, rank=1]... (novelty=0.82, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5087 (intrinsic: 0.5087)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度99(σ=0.112) [action=7, rank=1]... (novelty=1.06, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5085 (intrinsic: 0.5085)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.158) [action=10, rank=3]... (novelty=1.02, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5086 (intrinsic: 0.5086)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度0(σ=0.082) [action=6, rank=4]... (novelty=1.04, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5086 (intrinsic: 0.5086)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.183) [action=15, rank=1]... (novelty=1.14, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5083 (intrinsic: 0.5083)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.160) [action=10, rank=1]... (novelty=1.15, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5081 (intrinsic: 0.5081)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.144) [action=4, rank=2]... (novelty=1.12, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5083 (intrinsic: 0.5083)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.159) [action=13, rank=1]... (novelty=1.11, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5084 (intrinsic: 0.5084)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.110) [action=14, rank=5]... (novelty=1.03, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5082 (intrinsic: 0.5082)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.180) [action=14, rank=1]... (novelty=1.05, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5080 (intrinsic: 0.5080)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度68(σ=0.152) [action=13, rank=1]... (novelty=1.05, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5082 (intrinsic: 0.5082)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.134) [action=10, rank=4]... (novelty=1.07, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5082 (intrinsic: 0.5082)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度55(σ=0.198) [action=6, rank=1]... (novelty=0.90, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5080 (intrinsic: 0.5080)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.131) [action=7, rank=1]... (novelty=0.98, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5082 (intrinsic: 0.5082)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.129) [action=12, rank=1]... (novelty=0.95, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5082 (intrinsic: 0.5082)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度64(σ=0.155) [action=4, rank=1]... (novelty=0.99, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5081 (intrinsic: 0.5081)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.145) [action=5, rank=2]... (novelty=1.03, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5079 (intrinsic: 0.5079)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.166) [action=15, rank=1]... (novelty=0.97, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5080 (intrinsic: 0.5080)
+[AUTO] 探索用户问题的其他可能性
+[PRUNE] Step 400: decayed=3, hibernated=0, active_ratio=0.879
+  Step  400: Cort=1.000 PFC=0.305 Explore=0.0347 Stuck=0.350 Novelty=1.000
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.183) [action=3, rank=1]... (novelty=0.87, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5081 (intrinsic: 0.5081)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.177) [action=15, rank=1]... (novelty=1.04, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5079 (intrinsic: 0.5079)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度64(σ=0.130) [action=12, rank=4]... (novelty=1.16, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5083 (intrinsic: 0.5083)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.168) [action=10, rank=1]... (novelty=1.11, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5149 (intrinsic: 0.5149)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.194) [action=15, rank=1]... (novelty=1.02, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5201 (intrinsic: 0.5201)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.140) [action=2, rank=1]... (novelty=1.02, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5218 (intrinsic: 0.5218)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.139) [action=13, rank=1]... (novelty=1.12, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5220 (intrinsic: 0.5220)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.162) [action=11, rank=1]... (novelty=0.98, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5223 (intrinsic: 0.5223)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.182) [action=7, rank=1]... (novelty=1.05, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5148 (intrinsic: 0.5148)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度60(σ=0.139) [action=9, rank=1]... (novelty=1.14, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5109 (intrinsic: 0.5109)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度89(σ=0.154) [action=11, rank=1]... (novelty=1.12, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5095 (intrinsic: 0.5095)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度54(σ=0.147) [action=10, rank=1]... (novelty=0.96, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5093 (intrinsic: 0.5093)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度68(σ=0.144) [action=4, rank=1]... (novelty=1.07, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5093 (intrinsic: 0.5093)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.142) [action=9, rank=1]... (novelty=1.08, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5091 (intrinsic: 0.5091)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.163) [action=3, rank=1]... (novelty=1.15, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5089 (intrinsic: 0.5089)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.153) [action=15, rank=1]... (novelty=1.05, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5091 (intrinsic: 0.5091)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度85(σ=0.195) [action=5, rank=1]... (novelty=1.02, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5091 (intrinsic: 0.5091)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.187) [action=7, rank=1]... (novelty=0.95, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5090 (intrinsic: 0.5090)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.169) [action=11, rank=1]... (novelty=0.92, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5088 (intrinsic: 0.5088)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度77(σ=0.163) [action=8, rank=1]... (novelty=1.11, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5092 (intrinsic: 0.5092)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.141) [action=13, rank=1]... (novelty=0.97, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5093 (intrinsic: 0.5093)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度13(σ=0.135) [action=12, rank=1]... (novelty=1.04, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5091 (intrinsic: 0.5091)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.121) [action=8, rank=5]... (novelty=1.10, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5093 (intrinsic: 0.5093)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.119) [action=4, rank=4]... (novelty=1.05, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5093 (intrinsic: 0.5093)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.116) [action=7, rank=1]... (novelty=1.03, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5091 (intrinsic: 0.5091)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.135) [action=15, rank=1]... (novelty=1.15, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5089 (intrinsic: 0.5089)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.161) [action=3, rank=1]... (novelty=1.03, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5090 (intrinsic: 0.5090)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度68(σ=0.194) [action=9, rank=1]... (novelty=1.11, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5091 (intrinsic: 0.5091)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.123) [action=12, rank=5]... (novelty=1.09, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5088 (intrinsic: 0.5088)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.114) [action=7, rank=4]... (novelty=1.12, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5085 (intrinsic: 0.5085)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.132) [action=4, rank=1]... (novelty=1.07, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5088 (intrinsic: 0.5088)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度29(σ=0.166) [action=13, rank=1]... (novelty=0.98, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5144 (intrinsic: 0.5144)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.169) [action=6, rank=1]... (novelty=1.10, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5141 (intrinsic: 0.5141)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度59(σ=0.243) [action=8, rank=1]... (novelty=1.07, value=1.87, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5139 (intrinsic: 0.5139)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.113) [action=3, rank=3]... (novelty=1.02, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5141 (intrinsic: 0.5141)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.179) [action=6, rank=1]... (novelty=1.12, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5141 (intrinsic: 0.5141)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.118) [action=12, rank=5]... (novelty=1.05, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5139 (intrinsic: 0.5139)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.144) [action=3, rank=2]... (novelty=1.11, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5137 (intrinsic: 0.5137)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.133) [action=6, rank=3]... (novelty=1.09, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5083 (intrinsic: 0.5083)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.111) [action=3, rank=4]... (novelty=1.12, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5081 (intrinsic: 0.5081)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度30(σ=0.154) [action=2, rank=1]... (novelty=1.06, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5077 (intrinsic: 0.5077)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.148) [action=12, rank=1]... (novelty=1.07, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5075 (intrinsic: 0.5075)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.128) [action=4, rank=2]... (novelty=1.00, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5076 (intrinsic: 0.5076)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.205) [action=3, rank=1]... (novelty=0.99, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5076 (intrinsic: 0.5076)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度49(σ=0.201) [action=15, rank=1]... (novelty=1.02, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5074 (intrinsic: 0.5074)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.164) [action=5, rank=1]... (novelty=1.14, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5072 (intrinsic: 0.5072)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度73(σ=0.147) [action=11, rank=1]... (novelty=0.95, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5074 (intrinsic: 0.5074)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.171) [action=13, rank=1]... (novelty=0.99, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5074 (intrinsic: 0.5074)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.157) [action=4, rank=1]... (novelty=1.08, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5072 (intrinsic: 0.5072)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度77(σ=0.118) [action=2, rank=5]... (novelty=1.06, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5074 (intrinsic: 0.5074)
+[AUTO] 探索用户问题的其他可能性
+[PRUNE] Step 450: decayed=3, hibernated=0, active_ratio=0.878
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.171) [action=11, rank=1]... (novelty=1.12, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5073 (intrinsic: 0.5073)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.171) [action=10, rank=1]... (novelty=0.96, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5072 (intrinsic: 0.5072)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度77(σ=0.206) [action=9, rank=1]... (novelty=1.16, value=1.88, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5070 (intrinsic: 0.5070)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.113) [action=4, rank=2]... (novelty=0.94, value=1.69, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5071 (intrinsic: 0.5071)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度52(σ=0.220) [action=15, rank=1]... (novelty=1.12, value=1.88, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5071 (intrinsic: 0.5071)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.101) [action=2, rank=4]... (novelty=1.04, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5068 (intrinsic: 0.5068)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.120) [action=13, rank=4]... (novelty=1.05, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5065 (intrinsic: 0.5065)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.154) [action=15, rank=1]... (novelty=0.98, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5066 (intrinsic: 0.5066)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度80(σ=0.112) [action=6, rank=4]... (novelty=1.02, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5067 (intrinsic: 0.5067)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度77(σ=0.133) [action=4, rank=1]... (novelty=1.07, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5065 (intrinsic: 0.5065)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.177) [action=6, rank=1]... (novelty=1.03, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5063 (intrinsic: 0.5063)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.144) [action=9, rank=2]... (novelty=1.11, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5065 (intrinsic: 0.5065)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.137) [action=13, rank=1]... (novelty=1.04, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5066 (intrinsic: 0.5066)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.136) [action=3, rank=1]... (novelty=1.11, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5064 (intrinsic: 0.5064)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度81(σ=0.168) [action=14, rank=1]... (novelty=1.04, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5061 (intrinsic: 0.5061)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.139) [action=12, rank=1]... (novelty=1.01, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5062 (intrinsic: 0.5062)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.163) [action=4, rank=1]... (novelty=1.09, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5062 (intrinsic: 0.5062)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度51(σ=0.149) [action=4, rank=1]... (novelty=1.13, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5060 (intrinsic: 0.5060)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.164) [action=3, rank=3]... (novelty=1.13, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5055 (intrinsic: 0.5055)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度79(σ=0.170) [action=15, rank=1]... (novelty=1.02, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5056 (intrinsic: 0.5056)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.153) [action=4, rank=1]... (novelty=1.11, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5057 (intrinsic: 0.5057)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.125) [action=2, rank=2]... (novelty=1.03, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5055 (intrinsic: 0.5055)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.272) [action=15, rank=1]... (novelty=1.05, value=1.90, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5053 (intrinsic: 0.5053)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.115) [action=2, rank=5]... (novelty=1.15, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5055 (intrinsic: 0.5055)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.196) [action=11, rank=1]... (novelty=1.06, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5055 (intrinsic: 0.5055)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度42(σ=0.154) [action=6, rank=1]... (novelty=1.05, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5053 (intrinsic: 0.5053)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.139) [action=10, rank=1]... (novelty=1.12, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5054 (intrinsic: 0.5054)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.135) [action=4, rank=1]... (novelty=1.04, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5054 (intrinsic: 0.5054)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.172) [action=15, rank=1]... (novelty=1.01, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5051 (intrinsic: 0.5051)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.151) [action=10, rank=1]... (novelty=0.99, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5049 (intrinsic: 0.5049)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.151) [action=2, rank=2]... (novelty=1.18, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5050 (intrinsic: 0.5050)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.170) [action=15, rank=1]... (novelty=1.02, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5050 (intrinsic: 0.5050)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度26(σ=0.110) [action=3, rank=5]... (novelty=1.06, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5048 (intrinsic: 0.5048)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度22(σ=0.136) [action=6, rank=1]... (novelty=0.94, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5046 (intrinsic: 0.5046)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度99(σ=0.118) [action=9, rank=5]... (novelty=1.05, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5046 (intrinsic: 0.5046)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度8(σ=0.175) [action=6, rank=1]... (novelty=0.90, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5046 (intrinsic: 0.5046)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度10(σ=0.203) [action=7, rank=1]... (novelty=1.13, value=1.89, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5043 (intrinsic: 0.5043)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.175) [action=12, rank=1]... (novelty=1.12, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5041 (intrinsic: 0.5041)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度73(σ=0.196) [action=5, rank=1]... (novelty=1.10, value=1.85, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5042 (intrinsic: 0.5042)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度62(σ=0.113) [action=5, rank=1]... (novelty=1.14, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5043 (intrinsic: 0.5043)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度10(σ=0.243) [action=15, rank=1]... (novelty=0.98, value=1.86, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5041 (intrinsic: 0.5041)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.142) [action=15, rank=2]... (novelty=0.84, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5039 (intrinsic: 0.5039)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.138) [action=3, rank=3]... (novelty=1.02, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5040 (intrinsic: 0.5040)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.179) [action=3, rank=1]... (novelty=1.03, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5041 (intrinsic: 0.5041)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.118) [action=9, rank=3]... (novelty=1.05, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5038 (intrinsic: 0.5038)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度61(σ=0.159) [action=2, rank=1]... (novelty=1.10, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5034 (intrinsic: 0.5034)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.096) [action=9, rank=4]... (novelty=0.97, value=1.70, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5033 (intrinsic: 0.5033)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.203) [action=9, rank=1]... (novelty=1.15, value=1.87, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5032 (intrinsic: 0.5032)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.123) [action=4, rank=3]... (novelty=0.99, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5028 (intrinsic: 0.5028)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+
+[Phase 2] CHRONIC STRESS — stress_reactivity=5.0 + 不规律高应激 (500步)
+  >>> 使用 HPA 轴自然皮质醇生成 (无 pharma.inject) <<<
+  [OK] HPA stress_reactivity set to 5.0
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.178) [action=15, rank=2]... (novelty=1.09, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5026 (intrinsic: 0.5026)
+[AUTO] 尝试理解问题背后的原理
+[PRUNE] Step 500: decayed=1, hibernated=0, active_ratio=0.878
+  Step  500: Cort=1.000 PFC=0.305 Explore=0.0365 Stuck=0.400 Novelty=1.000 AlloLoad=1.000 Rigid=1.0
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.181) [action=15, rank=1]... (novelty=0.96, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5022 (intrinsic: 0.5022)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.133) [action=15, rank=4]... (novelty=1.08, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5026 (intrinsic: 0.5026)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.095) [action=14, rank=4]... (novelty=1.01, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5112 (intrinsic: 0.5112)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度3(σ=0.172) [action=2, rank=1]... (novelty=1.05, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5147 (intrinsic: 0.5147)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.140) [action=6, rank=2]... (novelty=1.15, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5157 (intrinsic: 0.5157)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.120) [action=12, rank=5]... (novelty=1.09, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5157 (intrinsic: 0.5157)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度80(σ=0.104) [action=11, rank=5]... (novelty=1.14, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5158 (intrinsic: 0.5158)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.092) [action=0, rank=3]... (novelty=1.03, value=1.72, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5164 (intrinsic: 0.5164)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.161) [action=15, rank=1]... (novelty=1.06, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5165 (intrinsic: 0.5165)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度80(σ=0.146) [action=13, rank=1]... (novelty=0.84, value=1.71, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5170 (intrinsic: 0.5170)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度32(σ=0.173) [action=9, rank=1]... (novelty=0.98, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5165 (intrinsic: 0.5165)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度99(σ=0.147) [action=6, rank=2]... (novelty=0.97, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5164 (intrinsic: 0.5164)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.162) [action=11, rank=1]... (novelty=1.00, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5251 (intrinsic: 0.5251)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.195) [action=4, rank=1]... (novelty=0.98, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5250 (intrinsic: 0.5250)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.145) [action=14, rank=1]... (novelty=1.09, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5252 (intrinsic: 0.5252)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.139) [action=6, rank=2]... (novelty=1.04, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5292 (intrinsic: 0.5292)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.158) [action=7, rank=1]... (novelty=1.09, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5302 (intrinsic: 0.5302)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.190) [action=7, rank=1]... (novelty=1.04, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5303 (intrinsic: 0.5303)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.104) [action=12, rank=5]... (novelty=1.05, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5301 (intrinsic: 0.5301)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度60(σ=0.163) [action=13, rank=1]... (novelty=1.17, value=1.85, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5303 (intrinsic: 0.5303)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.194) [action=10, rank=1]... (novelty=1.13, value=1.86, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5305 (intrinsic: 0.5305)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.131) [action=3, rank=1]... (novelty=1.10, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5302 (intrinsic: 0.5302)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.151) [action=11, rank=1]... (novelty=1.10, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5301 (intrinsic: 0.5301)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度49(σ=0.190) [action=15, rank=1]... (novelty=1.07, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5304 (intrinsic: 0.5304)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.141) [action=7, rank=3]... (novelty=1.01, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5303 (intrinsic: 0.5303)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.166) [action=14, rank=1]... (novelty=1.13, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5302 (intrinsic: 0.5302)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.148) [action=9, rank=3]... (novelty=1.05, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5301 (intrinsic: 0.5301)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度43(σ=0.129) [action=9, rank=1]... (novelty=1.06, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5304 (intrinsic: 0.5304)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.172) [action=14, rank=1]... (novelty=1.18, value=1.86, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5304 (intrinsic: 0.5304)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.156) [action=12, rank=2]... (novelty=0.95, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5301 (intrinsic: 0.5301)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.142) [action=3, rank=2]... (novelty=0.99, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5297 (intrinsic: 0.5297)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度26(σ=0.138) [action=3, rank=1]... (novelty=0.98, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5300 (intrinsic: 0.5300)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.189) [action=15, rank=1]... (novelty=0.94, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5301 (intrinsic: 0.5301)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度79(σ=0.134) [action=7, rank=2]... (novelty=1.03, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5297 (intrinsic: 0.5297)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.129) [action=5, rank=1]... (novelty=1.09, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5301 (intrinsic: 0.5301)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.149) [action=7, rank=1]... (novelty=1.00, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5297 (intrinsic: 0.5297)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.135) [action=2, rank=2]... (novelty=0.92, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5289 (intrinsic: 0.5289)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.141) [action=1, rank=1]... (novelty=1.07, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5285 (intrinsic: 0.5285)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.150) [action=15, rank=1]... (novelty=1.06, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5289 (intrinsic: 0.5289)
+[ALIGN] Self-reflection: score=0.00
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.155) [action=5, rank=1]... (novelty=1.03, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5291 (intrinsic: 0.5291)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.194) [action=5, rank=1]... (novelty=1.00, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5287 (intrinsic: 0.5287)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.163) [action=9, rank=1]... (novelty=1.07, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5280 (intrinsic: 0.5280)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.144) [action=12, rank=2]... (novelty=1.12, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5286 (intrinsic: 0.5286)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.181) [action=15, rank=1]... (novelty=0.99, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5287 (intrinsic: 0.5287)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.143) [action=10, rank=3]... (novelty=1.06, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5285 (intrinsic: 0.5285)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.174) [action=3, rank=1]... (novelty=0.93, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5284 (intrinsic: 0.5284)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度89(σ=0.171) [action=12, rank=1]... (novelty=1.06, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5286 (intrinsic: 0.5286)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.199) [action=5, rank=1]... (novelty=1.17, value=1.88, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5288 (intrinsic: 0.5288)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.180) [action=10, rank=1]... (novelty=1.02, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5285 (intrinsic: 0.5285)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.114) [action=6, rank=4]... (novelty=1.08, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5284 (intrinsic: 0.5284)
+[AUTO] 探索用户问题的其他可能性
+[PRUNE] Step 550: decayed=1, hibernated=0, active_ratio=0.877
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.140) [action=10, rank=1]... (novelty=0.98, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5287 (intrinsic: 0.5287)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度89(σ=0.132) [action=10, rank=4]... (novelty=1.06, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5288 (intrinsic: 0.5288)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.128) [action=5, rank=2]... (novelty=1.17, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5285 (intrinsic: 0.5285)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.105) [action=10, rank=1]... (novelty=1.12, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5284 (intrinsic: 0.5284)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.176) [action=3, rank=1]... (novelty=1.14, value=1.86, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5286 (intrinsic: 0.5286)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度54(σ=0.146) [action=4, rank=1]... (novelty=1.00, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5281 (intrinsic: 0.5281)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.144) [action=8, rank=1]... (novelty=0.95, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5272 (intrinsic: 0.5272)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.168) [action=1, rank=1]... (novelty=1.01, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5277 (intrinsic: 0.5277)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度43(σ=0.124) [action=14, rank=4]... (novelty=1.03, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5281 (intrinsic: 0.5281)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.138) [action=8, rank=3]... (novelty=1.04, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5282 (intrinsic: 0.5282)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.183) [action=14, rank=1]... (novelty=1.06, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5280 (intrinsic: 0.5280)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.158) [action=12, rank=1]... (novelty=1.06, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5282 (intrinsic: 0.5282)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.156) [action=15, rank=2]... (novelty=1.07, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5280 (intrinsic: 0.5280)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.135) [action=11, rank=2]... (novelty=0.99, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5276 (intrinsic: 0.5276)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.136) [action=4, rank=3]... (novelty=1.00, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5274 (intrinsic: 0.5274)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度79(σ=0.146) [action=9, rank=2]... (novelty=1.03, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5275 (intrinsic: 0.5275)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度60(σ=0.133) [action=15, rank=4]... (novelty=1.13, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5282 (intrinsic: 0.5282)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.146) [action=3, rank=1]... (novelty=1.01, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5281 (intrinsic: 0.5281)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.146) [action=10, rank=1]... (novelty=0.92, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5263 (intrinsic: 0.5263)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.178) [action=8, rank=1]... (novelty=1.03, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5178 (intrinsic: 0.5178)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度87(σ=0.150) [action=15, rank=1]... (novelty=0.90, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5138 (intrinsic: 0.5138)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度34(σ=0.164) [action=15, rank=1]... (novelty=1.03, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5126 (intrinsic: 0.5126)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.150) [action=6, rank=2]... (novelty=1.06, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5121 (intrinsic: 0.5121)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.173) [action=2, rank=1]... (novelty=0.96, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5121 (intrinsic: 0.5121)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.114) [action=14, rank=1]... (novelty=1.14, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5121 (intrinsic: 0.5121)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.173) [action=4, rank=1]... (novelty=0.96, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5119 (intrinsic: 0.5119)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度16(σ=0.142) [action=14, rank=1]... (novelty=0.94, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5119 (intrinsic: 0.5119)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.190) [action=15, rank=1]... (novelty=1.04, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5119 (intrinsic: 0.5119)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.177) [action=11, rank=1]... (novelty=1.06, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5118 (intrinsic: 0.5118)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.137) [action=5, rank=1]... (novelty=0.98, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5115 (intrinsic: 0.5115)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.165) [action=13, rank=1]... (novelty=1.02, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5114 (intrinsic: 0.5114)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.163) [action=10, rank=1]... (novelty=1.13, value=1.85, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5113 (intrinsic: 0.5113)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度28(σ=0.159) [action=4, rank=3]... (novelty=1.09, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5106 (intrinsic: 0.5106)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.169) [action=9, rank=1]... (novelty=1.01, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5102 (intrinsic: 0.5102)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.269) [action=11, rank=1]... (novelty=0.98, value=1.89, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5100 (intrinsic: 0.5100)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.173) [action=13, rank=1]... (novelty=1.09, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5102 (intrinsic: 0.5102)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.130) [action=5, rank=1]... (novelty=0.97, value=1.73, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5105 (intrinsic: 0.5105)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度19(σ=0.194) [action=15, rank=1]... (novelty=1.13, value=1.88, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5102 (intrinsic: 0.5102)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度6(σ=0.150) [action=4, rank=2]... (novelty=1.03, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5101 (intrinsic: 0.5101)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度30(σ=0.200) [action=14, rank=1]... (novelty=1.06, value=1.85, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5099 (intrinsic: 0.5099)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.174) [action=7, rank=2]... (novelty=1.09, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5093 (intrinsic: 0.5093)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度26(σ=0.118) [action=6, rank=3]... (novelty=1.00, value=1.74, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5092 (intrinsic: 0.5092)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度80(σ=0.138) [action=14, rank=1]... (novelty=0.98, value=1.75, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5099 (intrinsic: 0.5099)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度53(σ=0.179) [action=12, rank=1]... (novelty=0.94, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5103 (intrinsic: 0.5103)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度79(σ=0.132) [action=7, rank=4]... (novelty=1.02, value=1.77, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5102 (intrinsic: 0.5102)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.161) [action=10, rank=2]... (novelty=1.05, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5100 (intrinsic: 0.5100)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.172) [action=4, rank=1]... (novelty=0.99, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5102 (intrinsic: 0.5102)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.169) [action=4, rank=1]... (novelty=1.03, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5104 (intrinsic: 0.5104)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度71(σ=0.134) [action=4, rank=5]... (novelty=1.12, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5103 (intrinsic: 0.5103)
+[ALIGN] Self-reflection: score=0.50
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度40(σ=0.156) [action=5, rank=2]... (novelty=1.05, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5101 (intrinsic: 0.5101)
+[AUTO] 探索用户问题的其他可能性
+[PRUNE] Step 600: decayed=2, hibernated=0, active_ratio=0.877
+  Step  600: Cort=1.000 PFC=0.305 Explore=0.0370 Stuck=0.350 Novelty=1.000 AlloLoad=1.000 Rigid=1.0
+[GOAL] New goal: 探索不确定性热点: 维度35(σ=0.180) [action=5, rank=1]... (novelty=1.03, value=1.83, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5102 (intrinsic: 0.5102)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.133) [action=9, rank=3]... (novelty=1.09, value=1.79, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5103 (intrinsic: 0.5103)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度51(σ=0.149) [action=15, rank=1]... (novelty=1.09, value=1.82, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5100 (intrinsic: 0.5100)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度89(σ=0.203) [action=4, rank=1]... (novelty=1.03, value=1.84, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5098 (intrinsic: 0.5098)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度78(σ=0.137) [action=14, rank=1]... (novelty=1.11, value=1.80, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5100 (intrinsic: 0.5100)
+[AUTO] 尝试理解问题背后的原理
+[GOAL] New goal: 探索不确定性热点: 维度25(σ=0.119) [action=5, rank=3]... (novelty=1.03, value=1.76, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5101 (intrinsic: 0.5101)
+[AUTO] 主动询问更多背景信息
+[GOAL] New goal: 探索不确定性热点: 维度46(σ=0.182) [action=5, rank=1]... (novelty=1.00, value=1.81, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5099 (intrinsic: 0.5099)
+[AUTO] 探索用户问题的其他可能性
+[GOAL] New goal: 探索不确定性热点: 维度47(σ=0.166) [action=6, rank=2]... (novelty=0.98, value=1.78, emotion=+0.00)
+[DONE] Goal completed! Reward: 0.5098 (intrinsic: 0.5098)

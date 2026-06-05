@@ -1,0 +1,8 @@
+Experiment: d2
+Return code: 2
+Elapsed: 0.2s
+============================================================
+
+
+--- STDERR ---
+C:\Program Files\Python313\python.exe: can't open file 'D:\\civis_lucri_faber\\experiments\\experiment_10_d2_occupancy_v2.py': [Errno 2] No such file or directory

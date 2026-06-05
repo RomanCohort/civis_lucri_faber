@@ -1,0 +1,85 @@
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\demo_therapeutic_experiment.py", line 138, in run_demo
+    exp.prepare()
+    ~~~~~~~~~~~^^
+  File "D:\civis_lucri_faber\core\therapeutic_experiment.py", line 294, in prepare
+    print(f"  \u26a0 {w}")
+    ~~~~~^^^^^^^^^^^^
+UnicodeEncodeError: 'gbk' codec can't encode character '\u26a0' in position 2: illegal multibyte sequence
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\demo_therapeutic_experiment.py", line 138, in run_demo
+    exp.prepare()
+    ~~~~~~~~~~~^^
+  File "D:\civis_lucri_faber\core\therapeutic_experiment.py", line 294, in prepare
+    print(f"  \u26a0 {w}")
+    ~~~~~^^^^^^^^^^^^
+UnicodeEncodeError: 'gbk' codec can't encode character '\u26a0' in position 2: illegal multibyte sequence
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\demo_therapeutic_experiment.py", line 138, in run_demo
+    exp.prepare()
+    ~~~~~~~~~~~^^
+  File "D:\civis_lucri_faber\core\therapeutic_experiment.py", line 294, in prepare
+    print(f"  \u26a0 {w}")
+    ~~~~~^^^^^^^^^^^^
+UnicodeEncodeError: 'gbk' codec can't encode character '\u26a0' in position 2: illegal multibyte sequence
+
+============================================================
+  Running arm: Sertraline
+============================================================
+  Remission rate: 101.3%
+  Relapse rate:   0.0%
+  Peak drug effect: 0.799
+  Therapy sessions: 0
+
+============================================================
+  Running arm: CBT
+============================================================
+  Remission rate: 0.0%
+  Relapse rate:   0.0%
+  Peak drug effect: 0.000
+  Therapy sessions: 8
+
+============================================================
+  Running arm: Sertraline+CBT
+============================================================
+  Remission rate: 101.3%
+  Relapse rate:   0.0%
+  Peak drug effect: 0.802
+  Therapy sessions: 8
+
+============================================================
+  Running arm: Placebo
+============================================================
+  Remission rate: 0.0%
+  Relapse rate:   0.0%
+  Peak drug effect: 0.000
+  Therapy sessions: 0
+
+============================================================
+  Running arm: Sertraline+Fluoxetine
+============================================================
+
+[DDI Assessment]
+  ERROR: 'gbk' codec can't encode character '\u26a0' in position 2: illegal multibyte sequence
+
+============================================================
+  Running arm: Haloperidol+Amphetamine
+============================================================
+
+[DDI Assessment]
+  ERROR: 'gbk' codec can't encode character '\u26a0' in position 2: illegal multibyte sequence
+
+============================================================
+  Running arm: Diazepam+Morphine
+============================================================
+
+[DDI Assessment]
+  ERROR: 'gbk' codec can't encode character '\u26a0' in position 2: illegal multibyte sequence
+
+Report generated: docs/therapeutic_experiment_report.md
+
+
+=== META ===
+Name: 14_therapeutic
+ReturnCode: 0
+Elapsed: 105.6s

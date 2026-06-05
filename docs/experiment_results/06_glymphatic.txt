@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_6_glymphatic_timing.py", line 34, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 06_glymphatic
+ReturnCode: 1
+Elapsed: 6.0s

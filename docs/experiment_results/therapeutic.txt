@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\demo_therapeutic_experiment.py", line 139, in run_demo
+    result = exp.run()
+  File "D:\civis_lucri_faber\core\therapeutic_experiment.py", line 370, in run
+    cmax_refs[drug_name] = drug_cfg.dose_mg / max(params.vd_l_per_kg * 70, 1.0)
+                                                  ^^^^^^^^^^^^^^^^^^
+AttributeError: 'PKPDParams' object has no attribute 'vd_l_per_kg'
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\demo_therapeutic_experiment.py", line 139, in run_demo
+    result = exp.run()
+  File "D:\civis_lucri_faber\core\therapeutic_experiment.py", line 370, in run
+    cmax_refs[drug_name] = drug_cfg.dose_mg / max(params.vd_l_per_kg * 70, 1.0)
+                                                  ^^^^^^^^^^^^^^^^^^
+AttributeError: 'PKPDParams' object has no attribute 'vd_l_per_kg'
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\demo_therapeutic_experiment.py", line 139, in run_demo
+    result = exp.run()
+  File "D:\civis_lucri_faber\core\therapeutic_experiment.py", line 370, in run
+    cmax_refs[drug_name] = drug_cfg.dose_mg / max(params.vd_l_per_kg * 70, 1.0)
+                                                  ^^^^^^^^^^^^^^^^^^
+AttributeError: 'PKPDParams' object has no attribute 'vd_l_per_kg'
+EXIT_CODE=0

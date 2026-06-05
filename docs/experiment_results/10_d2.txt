@@ -1,0 +1,10 @@
+  File "D:\civis_lucri_faber\experiment_10_d2_occupancy_v2.py", line 365
+    f"{results['High']['phase3_anhedonia':>12.3f}")
+                      ^
+SyntaxError: f-string: expecting '=', or '!', or ':', or '}'
+
+
+=== META ===
+Name: 10_d2
+ReturnCode: 1
+Elapsed: 0.2s

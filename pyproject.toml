@@ -1,0 +1,36 @@
+[project]
+name = "civis-lucri-faber"
+version = "0.1.0"
+description = "Bio-inspired AI with full brain-region architecture"
+requires-python = ">=3.10"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+src = ["core", "utils", "personality", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (let black handle it)
+    "B905",   # zip-without-explicit-strict (Python 3.10+)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["core", "utils", "personality"]
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

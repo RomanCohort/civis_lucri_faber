@@ -1,0 +1,62 @@
+{
+  "name": "simulacrum-neuro-monitor",
+  "version": "1.0.0",
+  "description": "Simulacrum Bio-Inspired Neuro Monitor",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "set ELECTRON_DEV=1 && electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win --portable",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "author": "YAN",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.simulacrum.neuro-monitor",
+    "productName": "Simulacrum Neuro Monitor",
+    "directories": {
+      "output": "../dist_electron"
+    },
+    "files": [
+      "main.js",
+      "server.py",
+      "renderer/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../core",
+        "to": "../core"
+      },
+      {
+        "from": "../utils",
+        "to": "../utils"
+      },
+      {
+        "from": "../__init__.py",
+        "to": "../__init__.py"
+      },
+      {
+        "from": "../../requirements.txt",
+        "to": "../../requirements.txt"
+      }
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  }
+}

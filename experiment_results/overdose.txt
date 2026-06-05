@@ -1,0 +1,12 @@
+Experiment: overdose
+Return code: 1
+Elapsed: 0.2s
+============================================================
+
+
+--- STDERR ---
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from core.sertraline_overdose_experiment import run_experiment; run_experiment()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'core'

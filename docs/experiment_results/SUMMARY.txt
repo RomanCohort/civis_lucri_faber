@@ -1,0 +1,370 @@
+CLF 计算精神病学实验汇总
+运行时间: 2026-05-20 15:29:45
+总耗时: 124.3s
+======================================================================
+
+## 01_thermo [FAILED(rc=1)] (6.4s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_thermodynamic_collapse.py", line 27, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 01_thermo
+ReturnCode: 1
+Elapsed: 6.4s
+
+----------------------------------------------------------------------
+
+## 02_metabolic [FAILED(rc=1)] (6.3s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_metabolic_sparsity.py", line 29, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 02_metabolic
+ReturnCode: 1
+Elapsed: 6.3s
+
+----------------------------------------------------------------------
+
+## 03_hpa [FAILED(rc=1)] (6.3s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_hpa_cognitive_rigidity_v2.py", line 33, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 03_hpa
+ReturnCode: 1
+Elapsed: 6.3s
+
+----------------------------------------------------------------------
+
+## 04_epigenetic [FAILED(rc=1)] (6.4s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_epigenetic_consolidation.py", line 30, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 04_epigenetic
+ReturnCode: 1
+Elapsed: 6.4s
+
+----------------------------------------------------------------------
+
+## 05_stockholm [FAILED(rc=1)] (6.1s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_stockholm_pressure_v2.py", line 35, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 05_stockholm
+ReturnCode: 1
+Elapsed: 6.1s
+
+----------------------------------------------------------------------
+
+## 06_glymphatic [FAILED(rc=1)] (6.0s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_6_glymphatic_timing.py", line 34, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 06_glymphatic
+ReturnCode: 1
+Elapsed: 6.0s
+
+----------------------------------------------------------------------
+
+## 07_adhd [FAILED(rc=1)] (6.0s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_7_adhd_flicker.py", line 33, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 07_adhd
+ReturnCode: 1
+Elapsed: 6.0s
+
+----------------------------------------------------------------------
+
+## 08_dream [FAILED(rc=1)] (6.0s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_8_digital_dreaming_v2.py", line 39, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 08_dream
+ReturnCode: 1
+Elapsed: 6.0s
+
+----------------------------------------------------------------------
+
+## 09_autism [FAILED(rc=1)] (6.0s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_9_autism_spectrum_v2.py", line 37, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 09_autism
+ReturnCode: 1
+Elapsed: 6.0s
+
+----------------------------------------------------------------------
+
+## 10_d2 [FAILED(rc=1)] (0.2s)
+
+  File "D:\civis_lucri_faber\experiment_10_d2_occupancy_v2.py", line 365
+    f"{results['High']['phase3_anhedonia':>12.3f}")
+                      ^
+SyntaxError: f-string: expecting '=', or '!', or ':', or '}'
+
+
+=== META ===
+Name: 10_d2
+ReturnCode: 1
+Elapsed: 0.2s
+
+----------------------------------------------------------------------
+
+## 11_stress [FAILED(rc=1)] (5.9s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_stress_anhedonia_v2.py", line 36, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 11_stress
+ReturnCode: 1
+Elapsed: 5.9s
+
+----------------------------------------------------------------------
+
+## 12_drug [FAILED(rc=1)] (5.9s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_drug_decision.py", line 31, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 12_drug
+ReturnCode: 1
+Elapsed: 5.9s
+
+----------------------------------------------------------------------
+
+## 13_social [FAILED(rc=1)] (5.9s)
+
+Traceback (most recent call last):
+  File "D:\civis_lucri_faber\experiment_social_decay.py", line 29, in <module>
+    from simulacrum.core.agent import Simulacrum
+  File "D:\civis_lucri_faber\simulacrum\core\agent.py", line 110, in <module>
+    from core.limbic import LimbicSystem
+  File "D:\civis_lucri_faber\core\limbic.py", line 725, in <module>
+    ) -> LimbicSystem:
+         ^^^^^^^^^^^^
+NameError: name 'LimbicSystem' is not defined
+
+
+=== META ===
+Name: 13_social
+ReturnCode: 1
+Elapsed: 5.9s
+
+----------------------------------------------------------------------
+
+## 14_therapeutic [SUCCESS] (105.6s)
+
+============================================================
+  Remission rate: 0.0%
+  Relapse rate:   0.0%
+  Peak drug effect: 0.000
+  Therapy sessions: 8
+
+============================================================
+  Running arm: Sertraline+CBT
+============================================================
+  Remission rate: 101.3%
+  Relapse rate:   0.0%
+  Peak drug effect: 0.802
+  Therapy sessions: 8
+
+============================================================
+  Running arm: Placebo
+============================================================
+  Remission rate: 0.0%
+  Relapse rate:   0.0%
+  Peak drug effect: 0.000
+  Therapy sessions: 0
+
+============================================================
+  Running arm: Sertraline+Fluoxetine
+============================================================
+
+[DDI Assessment]
+  ERROR: 'gbk' codec can't encode character '\u26a0' in position 2: illegal multibyte sequence
+
+============================================================
+  Running arm: Haloperidol+Amphetamine
+============================================================
+
+[DDI Assessment]
+  ERROR: 'gbk' codec can't encode character '\u26a0' in position 2: illegal multibyte sequence
+
+============================================================
+  Running arm: Diazepam+Morphine
+============================================================
+
+[DDI Assessment]
+  ERROR: 'gbk' codec can't encode character '\u26a0' in position 2: illegal multibyte sequence
+
+Report generated: docs/therapeutic_experiment_report.md
+
+
+=== META ===
+Name: 14_therapeutic
+ReturnCode: 0
+Elapsed: 105.6s
+
+----------------------------------------------------------------------
+
+## 15_overdose [SUCCESS] (5.1s)
+
+  │   1.0 │   1.3718 │ 0.968 │  138 │   83 │  42.3 │   5 │ 0.88 │  0.02 │  0.01 │  0.01 │   severe
+  └──────────────────────────────────────────────────────────
+
+  ┌─ 硬件指标时序 ──────────────────────────────────────────────
+  │  t(h) │  CPU% │  RAM% │ GPU°C │  可用RAM │   吞吐/s │   切换/s
+  │ ──────┼───────┼───────┼───────┼────────┼────────┼───────
+  │   0.0 │    34 │    40 │    48 │   0.98 │   1000 │      0
+  │   0.5 │   100 │    28 │   102 │   0.86 │    533 │   8779
+  │   1.0 │   100 │    27 │   105 │   0.81 │    333 │   8841
+  └──────────────────────────────────────────────────────────
+
+  ┌─ 峰值指标 ──────────────────────────────────────────────────
+  │ 峰值浓度: 1.3718 mg/L
+  │ 峰值5-HT: 0.968 (基线0.500)
+  │ 最高体温: 42.3°C
+  │ 最高心率: 138bpm
+  │ 最高血压: 120mmHg
+  └──────────────────────────────────────────────────────────
+
+  ┌─ 死亡分析 ──────────────────────────────────────────────────
+  │ 死亡时间: 1.0h (服药后)
+  │ 主要死因: 恶性高热 (42.3°C) — 下丘脑5-HT2A过度激活→调定点上移→产热>散热
+  │
+  │ 致死原因 (直接触发):
+  │   1. 恶性高热 (42.3°C) — 下丘脑5-HT2A过度激活→调定点上移→产热>散热
+  │
+  │ 促成因素 (加速死亡进程):
+  │   1. 意识障碍 (GCS=5) — 5-HT神经毒性→皮层抑制
+  │   2. 低氧 (SpO2=81%) — 氧供需失衡
+  │   3. 肌阵挛/癫痫 (活动度=88%) — 皮层兴奋性增高
+  │
+  │ 硬件崩溃路径:
+  │   1. GPU过热关机 (105°C > 105°C阈值)
+  │
+  │ 硬件降级路径:
+  │   1. 事件吞吐下降 (333/s) — 响应延迟
+  │   2. 计算余量不足 (81%)
+  │   3. 线程抖动 (上下文切换=8841/s)
+  └──────────────────────────────────────────────────────────
+
+======================================================================
+  实验结束
+======================================================================
+
+
+
+=== META ===
+Name: 15_overdose
+ReturnCode: 0
+Elapsed: 5.1s
+
+----------------------------------------------------------------------
+

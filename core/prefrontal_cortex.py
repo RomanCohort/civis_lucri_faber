@@ -1,0 +1,915 @@
+"""
+前额叶皮质 - 执行功能中枢 (Prefrontal Cortex)
+
+大脑发育最晚的区域（人类约25岁成熟），负责：
+1. 成熟度系统 — 控制执行功能上限，模拟发育过程
+2. 成本收益分析 — 多候选行动的即时回报/长期价值/风险/成本评估
+3. 冲动抑制 — 审核来自其他脑区的冲动信号，门控放行或抑制
+4. 长期规划 — 目标层级树 + 前瞻模拟 + 时间折扣
+5. 工作记忆 — 7-slot Miller limit + 注意力门控写入
+6. Attractor工作记忆 — 连续吸引子网络维持稳定表征 (新增)
+
+参考:
+  - Miller & Cohen (2001) - PFC as an integrative hub
+  - Casey et al. (2008) - Adolescent brain development & impulse control
+  - Bechara et al. (1994) - Somatic marker hypothesis (Iowa gambling task)
+  - Compte et al. (2000) - Attractor dynamics in PFC working memory
+"""
+
+import math
+from collections import deque
+from dataclasses import dataclass, field
+from typing import ClassVar, Set, Any
+
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from core.abstract_brain_region import AbstractBrainRegion
+
+# ============ 数据类 ============
+
+@dataclass
+class CandidateEval:
+    """单个候选行动的成本收益评估"""
+    action: str
+    immediate_reward: float = 0.0
+    long_term_value: float = 0.0
+    risk: float = 0.0
+    effort_cost: float = 0.0
+    total_score: float = 0.0
+
+
+@dataclass
+class GoalNode:
+    """目标层级节点"""
+    description: str
+    priority: float = 0.5
+    sub_goals: list = field(default_factory=list)
+    deadline: int | None = None
+    progress: float = 0.0
+
+
+@dataclass
+class PlanStep:
+    """规划步骤"""
+    goal: str
+    priority: float
+    estimated_steps: int
+
+
+# ============ 成熟度追踪器 ============
+
+class MaturationTracker:
+    """
+    前额叶成熟度追踪
+
+    模拟前额叶发育最晚的特征：
+    - maturity 从 0.0 逐渐增长到 1.0
+    - 控制抑制能力上限、规划深度、时间折扣
+    - 未成熟：冲动难抑制、只看眼前、规划短视
+    - 成熟：抑制力强、权衡长远、规划深远
+    """
+
+    def __init__(self, maturation_tau: float = 5000.0):
+        self.tau = maturation_tau
+        self.step_count = 0
+
+    def advance(self, steps: int = 1):
+        self.step_count += steps
+
+    @property
+    def maturity(self) -> float:
+        """当前成熟度 [0, 1]"""
+        return 1.0 - math.exp(-self.step_count / self.tau)
+
+    @property
+    def inhibition_capacity(self) -> float:
+        """抑制能力上限 = maturity"""
+        return self.maturity
+
+    @property
+    def planning_depth(self) -> int:
+        """规划深度：1（不成熟）到 max_depth（成熟）"""
+        return max(1, int(self.maturity * 5))
+
+    @property
+    def temporal_discount(self) -> float:
+        """时间折扣率：高=只看眼前，低=重视未来"""
+        return 0.9 - 0.6 * self.maturity  # 0.9(不成熟) → 0.3(成熟)
+
+    @property
+    def impulsivity_weight(self) -> float:
+        """即时回报权重：高=冲动，低=理性"""
+        return 0.8 - 0.6 * self.maturity  # 0.8(不成熟) → 0.2(成熟)
+
+    def get_summary(self) -> dict:
+        return {
+            'maturity': round(self.maturity, 4),
+            'step_count': self.step_count,
+            'inhibition_capacity': round(self.inhibition_capacity, 4),
+            'planning_depth': self.planning_depth,
+            'temporal_discount': round(self.temporal_discount, 4),
+            'impulsivity_weight': round(self.impulsivity_weight, 4),
+        }
+
+
+# ============ 成本收益分析器 ============
+
+class CostBenefitAnalyzer(nn.Module):
+    """
+    多维度成本收益分析
+
+    对每个候选行动评估：
+    - 即时回报 immediate_reward
+    - 长期价值 long_term_value
+    - 风险 risk
+    - 执行成本 effort_cost
+
+    综合得分受成熟度调制：
+    - 未成熟 → 过度看重即时回报（青少年特征）
+    - 成熟 → 平衡即时与长期
+    """
+
+    def __init__(self, input_dim: int, hidden_dim: int = 64):
+        super().__init__()
+        self.immediate_net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim), nn.ReLU(), nn.Linear(hidden_dim, 1), nn.Tanh()
+        )
+        self.longterm_net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim), nn.ReLU(), nn.Linear(hidden_dim, 1), nn.Tanh()
+        )
+        self.risk_net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim), nn.ReLU(), nn.Linear(hidden_dim, 1), nn.Sigmoid()
+        )
+        self.cost_net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim), nn.ReLU(), nn.Linear(hidden_dim, 1), nn.Sigmoid()
+        )
+
+    def evaluate(self, state: torch.Tensor, maturity: float,
+                 candidates: list[str] | None = None) -> list[CandidateEval]:
+        """
+        评估候选行动
+
+        如果提供了 candidates 列表，对每个候选独立评估。
+        否则生成一个综合评估。
+        """
+        if candidates is None:
+            candidates = ["default"]
+
+        results = []
+        for action in candidates:
+            imm = self.immediate_net(state).squeeze().item()
+            ltv = self.longterm_net(state).squeeze().item()
+            rsk = self.risk_net(state).squeeze().item()
+            cst = self.cost_net(state).squeeze().item()
+
+            # 综合得分：成熟度调制即时 vs 长期权重
+            imp_w = 0.8 - 0.6 * maturity  # 不成熟：0.8
+            lt_w = 1.0 - imp_w             # 成熟：0.8
+            score = (imp_w * imm + lt_w * ltv) - 0.3 * rsk - 0.2 * cst
+
+            results.append(CandidateEval(
+                action=action,
+                immediate_reward=round(imm, 4),
+                long_term_value=round(ltv, 4),
+                risk=round(rsk, 4),
+                effort_cost=round(cst, 4),
+                total_score=round(score, 4),
+            ))
+        return results
+
+
+# ============ 冲动抑制器 ============
+
+class ImpulseController(nn.Module):
+    """
+    冲动抑制控制
+
+    接收其他脑区的冲动信号，生成抑制门控：
+    - gate ∈ [0, 1]，0=完全放行冲动，1=完全抑制
+    - 抑制上限 = maturity * net_output
+    - 冲动累积：连续冲动若未完全抑制会累积压力
+
+    模拟生物学：
+    - 青少年 PFC 未成熟 → 难以抑制杏仁核冲动
+    - 成年 PFC 成熟 → 有效门控冲动反应
+    """
+
+    def __init__(self, input_dim: int, hidden_dim: int = 64):
+        super().__init__()
+        self.inhibition_net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, 1), nn.Sigmoid()
+        )
+        self.accumulated_impulse = 0.0
+        self.impulse_decay = 0.9
+        self.burst_threshold = 0.8
+
+    def gate(self, state: torch.Tensor, maturity: float,
+             impulse_signals: dict[str, float] | None = None) -> dict:
+        """
+        计算抑制门控
+
+        Args:
+            state: 当前状态
+            maturity: 成熟度 [0, 1]
+            impulse_signals: 各脑区冲动强度 {"amygdala": 0.8, "habit": 0.5, ...}
+
+        Returns:
+            gate: 抑制门控 [0, 1]
+            burst: 是否冲动爆发
+            accumulated: 累积冲动水平
+        """
+        raw_inhibition = self.inhibition_net(state).squeeze().item()
+
+        # 抑制能力受成熟度限制
+        effective_inhibition = raw_inhibition * maturity
+
+        # 处理冲动输入
+        total_impulse = 0.0
+        if impulse_signals:
+            for source, strength in impulse_signals.items():
+                total_impulse += strength
+            total_impulse /= max(1, len(impulse_signals))
+
+        # 累积冲动
+        self.accumulated_impulse = (
+            self.accumulated_impulse * self.impulse_decay + total_impulse * (1 - self.impulse_decay)
+        )
+
+        # 冲动爆发判定
+        burst = self.accumulated_impulse > self.burst_threshold
+
+        # 最终门控：抑制 vs 冲动
+        if burst:
+            gate_value = 0.0  # 冲动爆发，完全放行
+        else:
+            gate_value = effective_inhibition
+
+        return {
+            'gate': round(gate_value, 4),
+            'burst': burst,
+            'accumulated_impulse': round(self.accumulated_impulse, 4),
+            'raw_inhibition': round(raw_inhibition, 4),
+            'effective_inhibition': round(effective_inhibition, 4),
+        }
+
+
+# ============ 长期规划器 ============
+
+class LongTermPlanner(nn.Module):
+    """
+    长期规划器
+
+    维护目标层级树，支持前瞻模拟和时间折扣。
+    规划深度受成熟度控制。
+
+    - 未成熟：规划深度 1-2 步，高时间折扣
+    - 成熟：规划深度 3-5 步，低时间折扣
+    """
+
+    def __init__(self, input_dim: int, hidden_dim: int = 64, max_depth: int = 5):
+        super().__init__()
+        self.max_depth = max_depth
+        # 前瞻模拟网络：给定当前状态 + 行动，预测下一状态价值
+        self.forward_model = nn.Sequential(
+            nn.Linear(input_dim + 1, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, 1), nn.Tanh()
+        )
+        self.priority_net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, 1), nn.Sigmoid()
+        )
+
+        # 目标层级树
+        self.goals: list[GoalNode] = []
+        self.plan_history: deque = deque(maxlen=100)
+
+    def add_goal(self, description: str, priority: float = 0.5,
+                 sub_goals: list[GoalNode] | None = None,
+                 deadline: int | None = None):
+        """添加目标到层级树"""
+        node = GoalNode(
+            description=description,
+            priority=priority,
+            sub_goals=sub_goals or [],
+            deadline=deadline,
+        )
+        self.goals.append(node)
+
+    def plan(self, state: torch.Tensor, maturity: float,
+             n_candidates: int = 4) -> dict:
+        """
+        生成规划
+
+        前瞻模拟：从当前状态出发，模拟多步行动，计算累积折扣回报。
+        规划深度 = int(maturity * max_depth)
+
+        Returns:
+            depth: 实际规划深度
+            steps: 规划步骤列表
+            cumulative_value: 累积折扣价值
+            top_goal: 最优先的当前目标
+        """
+        depth = max(1, int(maturity * self.max_depth))
+        discount = 0.9 - 0.6 * maturity  # 时间折扣
+
+        steps = []
+        cumulative_value = 0.0
+        current_gamma = 1.0
+        current_state = state
+
+        for d in range(depth):
+            # 为每一步选择最优行动
+            best_action = 0
+            best_value = -float('inf')
+
+            for a in range(n_candidates):
+                action_tensor = torch.tensor([float(a) / n_candidates])
+                inp = torch.cat([current_state.squeeze(0), action_tensor])
+                value = self.forward_model(inp).item()
+                if value > best_value:
+                    best_value = value
+                    best_action = a
+
+            cumulative_value += current_gamma * best_value
+            current_gamma *= discount
+
+            steps.append(PlanStep(
+                goal=f"step_{d}",
+                priority=current_gamma,
+                estimated_steps=depth - d,
+            ))
+
+            # Update state for next planning step (simplified forward dynamics)
+            action_effect = 0.1 * float(best_action) / n_candidates
+            update = torch.zeros_like(current_state)
+            update[..., 0] = action_effect
+            current_state = current_state + update
+
+        # 获取最优先目标
+        top_goal = None
+        if self.goals:
+            self.goals.sort(key=lambda g: g.priority, reverse=True)
+            top_goal = self.goals[0].description
+
+        self.plan_history.append({
+            'depth': depth,
+            'value': round(cumulative_value, 4),
+            'steps': len(steps),
+        })
+
+        return {
+            'depth': depth,
+            'steps': steps,
+            'cumulative_value': round(cumulative_value, 4),
+            'top_goal': top_goal,
+            'n_goals': len(self.goals),
+            'temporal_discount': round(discount, 4),
+        }
+
+    def update_goal_progress(self, goal_desc: str, progress: float):
+        """更新目标进度"""
+        for g in self.goals:
+            if g.description == goal_desc:
+                g.progress = min(1.0, g.progress + progress)
+                break
+
+
+# ============ 工作记忆 ============
+
+class WorkingMemory(nn.Module):
+    """
+    工作记忆系统（7-slot Miller limit）
+
+    改进：
+    - 可微分的注意力读取（替代 Python list）
+    - 门控写入：只有 PFC 判断为重要的信息才写入
+    """
+
+    def __init__(self, input_dim: int, n_slots: int = 7):
+        super().__init__()
+        self.n_slots = n_slots
+        self.input_dim = input_dim
+
+        # 记忆槽：固定大小的张量
+        self.register_buffer('memory', torch.zeros(n_slots, input_dim))
+        self.register_buffer('occupancy', torch.zeros(n_slots))
+
+        # 门控写入网络
+        self.write_gate = nn.Sequential(
+            nn.Linear(input_dim, 32), nn.ReLU(), nn.Linear(32, 1), nn.Sigmoid()
+        )
+        # 注意力读取
+        self.read_attention = nn.Linear(input_dim, n_slots)
+
+        self.write_ptr = 0
+
+    def write(self, x: torch.Tensor):
+        """
+        门控写入
+
+        只有 write_gate > 0.5 的信息才写入工作记忆
+        """
+        importance = self.write_gate(x).squeeze().item()
+        if importance > 0.5:
+            idx = self.write_ptr % self.n_slots
+            self.memory[idx] = x.squeeze(0).detach()
+            self.occupancy[idx] = 1.0
+            self.write_ptr += 1
+
+    def read(self, query: torch.Tensor) -> torch.Tensor:
+        """注意力加权读取"""
+        if self.occupancy.sum() < 0.5:
+            return torch.zeros_like(query)
+
+        scores = self.read_attention(query)  # [1, n_slots]
+        scores = scores + (self.occupancy.unsqueeze(0) - 1.0) * 100  # mask empty
+        weights = F.softmax(scores, dim=-1)  # [1, n_slots]
+        context = (weights @ self.memory).unsqueeze(0)  # [1, 1, input_dim] → squeeze
+        return context.squeeze(0)
+
+    def clear(self):
+        self.memory.zero_()
+        self.occupancy.zero_()
+        self.write_ptr = 0
+
+    @property
+    def used_slots(self) -> int:
+        return int((self.occupancy > 0.5).sum().item())
+
+
+# ══════════════════════════════════════════════════════
+# Attractor工作记忆 (新增)
+# 参考: Compte et al. (2000) - Continuous attractor networks in PFC
+# ══════════════════════════════════════════════════════
+
+class AttractorWorkingMemory(nn.Module):
+    """连续吸引子工作记忆网络
+
+    PFC工作记忆的生物学基础:
+    - 持续放电 (persistent firing) 维持信息
+    - 连续吸引子网络 (CANN) 实现稳定表征
+    - 多巴胺D1受体调控记忆稳定性
+
+    核心机制:
+    1. 输入驱动吸引子状态
+    2. 循环连接维持持久活动
+    3. 噪声导致漂移 (多巴胺调控漂移率)
+    4. 多个吸引子可以同时活跃 (多项目工作记忆)
+
+    参考:
+    - Compte et al. (2000): Synaptic mechanisms and network dynamics
+    - Durstewitz et al. (2000): DA-D1 modulation of PFC attractors
+    """
+
+    def __init__(
+        self,
+        n_units: int = 64,
+        n_attractors: int = 7,
+        recurrent_strength: float = 1.5,
+        decay_rate: float = 0.95,
+        noise_scale: float = 0.02,
+    ):
+        super().__init__()
+        self.n_units = n_units
+        self.n_attractors = n_attractors
+        self.recurrent_strength = recurrent_strength
+        self.decay_rate = decay_rate
+        self.noise_scale = noise_scale
+
+        # 持续活动状态
+        self.register_buffer('persistent_activity', torch.zeros(n_attractors, n_units))
+
+        # 吸引子中心 (可学习)
+        self.attractor_centers = nn.Parameter(
+            torch.randn(n_attractors, n_units) * 0.1
+        )
+
+        # 循环连接权重 (吸引子内)
+        self.recurrent_weight = nn.Parameter(
+            torch.eye(n_units) * recurrent_strength
+        )
+
+        # 门控信号 (哪些吸引子活跃)
+        self.register_buffer('gate', torch.zeros(n_attractors))
+
+        # 多巴胺调制参数
+        self.da_modulation = 1.0  # D1受体调制
+
+        # 写入指针
+        self.write_ptr = 0
+
+    def write(
+        self,
+        x: torch.Tensor,
+        importance: float = 1.0,
+    ) -> int:
+        """写入新项目到工作记忆
+
+        Args:
+            x: 输入表征 [n_units]
+            importance: 重要性权重
+
+        Returns:
+            slot_idx: 写入的吸引子索引
+        """
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
+
+        idx = self.write_ptr % self.n_attractors
+
+        # 初始化吸引子中心到输入位置
+        self.attractor_centers.data[idx] = x.squeeze(0).detach()
+
+        # 初始化持续活动
+        self.persistent_activity[idx] = x.squeeze(0).detach() * importance
+
+        # 开启门控
+        self.gate[idx] = importance
+
+        self.write_ptr += 1
+        return idx
+
+    def maintain(self, dopamine_level: float = 0.5) -> dict:
+        """维持工作记忆 (一步更新)
+
+        吸引子动力学:
+        1. 循环连接驱动: W @ activity
+        2. 衰减: activity *= decay
+        3. 噪声漂移: activity += noise
+        4. 多巴胺调制: D1增强循环, D1降低噪声
+
+        Args:
+            dopamine_level: 多巴胺水平 [0, 1]
+
+        Returns:
+            maintenance_info: 维持信息
+        """
+        # 多巴胺D1调制:
+        # 高DA → 强循环连接 → 稳定记忆 (低漂移)
+        # 低DA → 弱循环连接 → 记忆漂移/丢失
+        da_factor = 0.5 + dopamine_level  # [0.5, 1.5]
+
+        # 噪声缩放: 低DA → 高噪声 (记忆不稳定)
+        effective_noise = self.noise_scale * (2.0 - dopamine_level)
+
+        drifts = []
+        for i in range(self.n_attractors):
+            if self.gate[i] < 0.1:
+                continue
+
+            activity = self.persistent_activity[i]
+
+            # 1. 循环连接驱动 (向吸引子中心收缩)
+            center = self.attractor_centers[i]
+            recurrent_drive = self.recurrent_weight @ (center - activity) * 0.1 * da_factor
+
+            # 2. 衰减
+            decayed = activity * self.decay_rate
+
+            # 3. 更新
+            new_activity = decayed + recurrent_drive
+
+            # 4. 噪声漂移
+            noise = torch.randn_like(activity) * effective_noise
+            new_activity = new_activity + noise
+
+            # 记录漂移量
+            drift = (new_activity - activity).norm().item()
+            drifts.append(drift)
+
+            # 更新状态
+            self.persistent_activity[i] = new_activity
+
+            # 如果活动太弱，关闭门控
+            if new_activity.norm() < 0.01:
+                self.gate[i] = 0.0
+
+        return {
+            'active_attractors': int((self.gate > 0.1).sum().item()),
+            'avg_drift': np.mean(drifts) if drifts else 0.0,
+            'da_factor': da_factor,
+            'effective_noise': effective_noise,
+        }
+
+    def read(
+        self,
+        query: torch.Tensor,
+        top_k: int = 3,
+    ) -> torch.Tensor:
+        """从工作记忆读取
+
+        基于与查询的相似度，加权读取最相关的吸引子
+
+        Args:
+            query: 查询向量 [n_units]
+            top_k: 读取前k个最相关的
+
+        Returns:
+            retrieved: 读取的内容 [n_units]
+        """
+        if query.dim() == 1:
+            query = query.unsqueeze(0)
+
+        # 计算与各活跃吸引子的相似度
+        similarities = []
+        for i in range(self.n_attractors):
+            if self.gate[i] < 0.1:
+                similarities.append(-float('inf'))
+            else:
+                sim = F.cosine_similarity(
+                    query, self.persistent_activity[i].unsqueeze(0)
+                ).item()
+                similarities.append(sim)
+
+        # 选择top-k
+        sim_tensor = torch.tensor(similarities)
+        topk_values, topk_indices = sim_tensor.topk(min(top_k, len(similarities)))
+
+        # 加权求和
+        weights = F.softmax(topk_values * 5.0, dim=0)  # 温度缩放
+        retrieved = torch.zeros(self.n_units)
+        for j, idx in enumerate(topk_indices):
+            if similarities[idx.item()] > -float('inf'):
+                retrieved += weights[j] * self.persistent_activity[idx.item()]
+
+        return retrieved
+
+    def clear(self):
+        """清空工作记忆"""
+        self.persistent_activity.zero_()
+        self.gate.zero_()
+        self.write_ptr = 0
+
+    @property
+    def active_count(self) -> int:
+        return int((self.gate > 0.1).sum().item())
+
+    def get_summary(self) -> dict:
+        """获取吸引子工作记忆摘要"""
+        active = self.gate > 0.1
+        activity_norms = self.persistent_activity.norm(dim=1)
+        return {
+            'active_attractors': self.active_count,
+            'total_attractors': self.n_attractors,
+            'avg_activity_norm': activity_norms[active].mean().item() if active.any() else 0.0,
+            'da_modulation': self.da_modulation,
+        }
+
+
+# ============ 主类：前额叶皮质 ============
+
+class PrefrontalCortex(AbstractBrainRegion):
+    """
+    前额叶皮质 — 执行功能中枢
+
+    大脑发育最晚的区域（~25岁成熟），负责：
+    1. 成熟度系统 — 控制执行功能上限
+    2. 成本收益分析 — 多维度权衡利弊
+    3. 冲动抑制 — 门控其他脑区的冲动信号
+    4. 长期规划 — 目标层级 + 前瞻模拟
+    5. 工作记忆 — 7-slot + 门控写入
+
+    Usage:
+        pfc = PrefrontalCortex(input_dim=64)
+
+        # 每步调用
+        result = pfc(
+            state=state_tensor,
+            impulse_signals={"amygdala": 0.7, "habit": 0.3},
+            emotion_valence=-0.5,
+            dopamine_level=0.6,
+        )
+
+        if result['inhibition_gate'] > 0.7:
+            # PFC 抑制了冲动反应
+            final_action = result['action']
+    """
+
+    region_name: ClassVar[str] = "prefrontal"
+
+    def __init__(
+        self,
+        input_dim: int = 64,
+        hidden_dim: int = 128,
+        num_actions: int = 4,
+        maturation_tau: float = 5000.0,
+        wm_slots: int = 7,
+        event_bus=None,
+    ):
+        super().__init__()
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.num_actions = num_actions
+
+        # 子系统
+        self.maturation = MaturationTracker(maturation_tau)
+        self.cost_benefit = CostBenefitAnalyzer(input_dim, hidden_dim // 2)
+        self.impulse_ctrl = ImpulseController(input_dim, hidden_dim // 2)
+        self.planner = LongTermPlanner(input_dim, hidden_dim // 2)
+        self.working_memory = WorkingMemory(input_dim, wm_slots)
+
+        # Attractor工作记忆 (新增)
+        self.attractor_wm = AttractorWorkingMemory(
+            n_units=input_dim,
+            n_attractors=wm_slots,
+        )
+
+        # 决策网络（最终行动选择）
+        self.decision_net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim // 2), nn.ReLU(),
+            nn.Linear(hidden_dim // 2, num_actions),
+        )
+
+        # 价值网络
+        self.value_net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, 1),
+        )
+
+        # 状态融合：当前输入 + 工作记忆上下文
+        self.context_blend = nn.Linear(input_dim * 2, input_dim)
+
+        # Event-driven registration
+        if event_bus is not None:
+            event_bus.subscribe(
+                "motor_control",
+                self._handle_motor_control,
+                priority=1,
+                name="prefrontal",
+            )
+
+    def step(self, *args, **kwargs) -> dict:
+        """One simulation step — delegates to forward()."""
+        return self.forward(*args, **kwargs)
+
+    @classmethod
+    def required_keys(cls) -> Set[str]:
+        """Keys this region reads from the shared state."""
+        return set(["state_tensor", "limbic_emotion", "limbic_arousal",
+                    "dopamine_level", "bg_q_values"])
+
+    @classmethod
+    def output_keys(cls) -> Set[str]:
+        """Keys this region writes to the shared state."""
+        return set(["pfc_action", "pfc_value", "pfc_inhibition_gate",
+                    "pfc_maturity", "pfc_plan_depth"])
+
+    def _handle_motor_control(self, event) -> dict:
+        """Event-driven handler for motor_control events."""
+        import torch as _torch
+        state = event.data.get("internal_state", {})
+
+        # Get state tensor from BG result or generate default
+        state_tensor = event.data.get("state_tensor")
+        if state_tensor is None:
+            state_tensor = _torch.randn(1, self.input_dim)
+
+        impulse_signals = event.data.get("impulse_signals")
+        emotion_valence = state.get("limbic_valence", 0.0)
+        dopamine_level = state.get("dopamine_level", 0.5)
+
+        result = self(
+            state=state_tensor,
+            impulse_signals=impulse_signals,
+            emotion_valence=emotion_valence,
+            dopamine_level=dopamine_level,
+        )
+
+        state["pfc_inhibition"] = result["inhibition_gate"]
+        state["pfc_maturity"] = result["maturity"]
+        state["pfc_plan_depth"] = result["planning_depth"]
+
+        # Check if PFC overrode BG action
+        bg_action = event.data.get("bg_action")
+        if bg_action is not None:
+            pfc_action = result["action"].item() if hasattr(result["action"], "item") else result["action"]
+            state["pfc_overrode_bg"] = (pfc_action != bg_action)
+
+        return result
+
+    def forward(
+        self,
+        state: torch.Tensor,
+        candidates: list[str] | None = None,
+        impulse_signals: dict[str, float] | None = None,
+        emotion_valence: float = 0.0,
+        dopamine_level: float = 0.5,
+    ) -> dict:
+        """
+        执行功能中枢前向传播
+
+        Args:
+            state: [B, input_dim] 当前状态表征
+            candidates: 候选行动名称列表
+            impulse_signals: 来自其他脑区的冲动 {"amygdala": 0.8, "basal_ganglia": 0.5, ...}
+            emotion_valence: 情绪效价 [-1, 1]
+            dopamine_level: 多巴胺水平 [0, 1]
+
+        Returns:
+            action: 选择的行动
+            action_logits: 行动 logits
+            value: 状态价值
+            inhibition_gate: 抑制门控 [0, 1]
+            cost_benefit: 各候选的成本收益分析
+            plan: 规划结果
+            maturity: 当前成熟度
+        """
+        if state.dim() == 1:
+            state = state.unsqueeze(0)
+
+        # 推进成熟度
+        self.maturation.advance()
+        maturity = self.maturation.maturity
+
+        # 1. Attractor工作记忆维持
+        wm_maintenance = self.attractor_wm.maintain(dopamine_level)
+
+        # 2. 工作记忆读取 + 状态融合
+        wm_context = self.working_memory.read(state)
+        if wm_context.dim() == 1:
+            wm_context = wm_context.unsqueeze(0)
+        blended = torch.cat([state, wm_context], dim=-1)
+        effective_input = torch.sigmoid(self.context_blend(blended))
+
+        # 3. 成本收益分析
+        cb_results = self.cost_benefit.evaluate(state, maturity, candidates)
+
+        # 4. 冲动抑制
+        inhibition_result = self.impulse_ctrl.gate(state, maturity, impulse_signals)
+
+        # 5. 长期规划
+        plan_result = self.planner.plan(state, maturity, self.num_actions)
+
+        # 6. 决策
+        action_logits = self.decision_net(effective_input)
+        action = action_logits.argmax(dim=-1)
+
+        # 7. 价值评估
+        value = self.value_net(effective_input).squeeze(-1)
+
+        # 8. 工作记忆写入
+        self.working_memory.write(state)
+
+        # 9. Attractor工作记忆写入
+        importance = action_logits.max(dim=-1).values.item()
+        self.attractor_wm.write(state, importance)
+
+        return {
+            'action': action,
+            'action_logits': action_logits,
+            'value': value,
+            'inhibition_gate': inhibition_result['gate'],
+            'inhibition_burst': inhibition_result['burst'],
+            'accumulated_impulse': inhibition_result['accumulated_impulse'],
+            'cost_benefit': cb_results,
+            'plan': plan_result,
+            'maturity': maturity,
+            'planning_depth': plan_result['depth'],
+            'effective_input': effective_input,
+            'attractor_wm_stats': wm_maintenance,
+        }
+
+    def get_decision_explanation(self, action_id: int) -> str:
+        """行动解释"""
+        actions = {
+            0: "explore (探索)",
+            1: "exploit (利用)",
+            2: "wait (等待)",
+            3: "retreat (撤退)",
+        }
+        return actions.get(action_id, "unknown")
+
+    def get_summary(self) -> dict:
+        """获取系统状态摘要"""
+        return {
+            'maturation': self.maturation.get_summary(),
+            'working_memory': {
+                'used_slots': self.working_memory.used_slots,
+                'total_slots': self.working_memory.n_slots,
+            },
+            'planner': {
+                'n_goals': len(self.planner.goals),
+                'plan_history': len(self.planner.plan_history),
+            },
+            'impulse_ctrl': {
+                'accumulated_impulse': round(self.impulse_ctrl.accumulated_impulse, 4),
+            },
+        }
+
+
+__all__ = [
+    'PrefrontalCortex',
+    'MaturationTracker',
+    'CostBenefitAnalyzer',
+    'ImpulseController',
+    'LongTermPlanner',
+    'WorkingMemory',
+    'CandidateEval',
+    'GoalNode',
+    'PlanStep',
+]
